@@ -1,0 +1,94 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ProductCategory {
+  FRUIT
+  VEGETABLE
+  LEGUME
+}
+
+enum ArticleCategory {
+  TIPS
+  STORAGE
+  SEASONALITY
+  RECIPES
+  WASTE_REDUCTION
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+model User {
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  passwordHash   String
+  avatarUrl      String?
+  gender         Gender?
+  role           UserRole        @default(USER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  articles       Article[]
+  preferences    UserPreference?
+}
+
+model Product {
+  id               String           @id @default(uuid())
+  name             String
+  slug             String           @unique
+  category         ProductCategory
+  shortDescription String
+  description      String?
+  imageUrl         String?
+  benefits         String[]
+  howToChoose      String[]
+  howToStore       String[]
+  usageTips        String[]
+  nutrients        Json?
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Article {
+  id          String          @id @default(uuid())
+  title       String
+  slug        String          @unique
+  summary     String
+  content     String
+  category    ArticleCategory
+  imageUrl    String?
+  tags        String[]
+  authorId    String
+  author      User            @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  publishedAt DateTime?
+  isPublished Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model UserPreference {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  notificationsEnabled  Boolean  @default(true)
+  seasonalTipsEnabled   Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
