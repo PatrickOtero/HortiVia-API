@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { StorageService } from '../storage/storage.service';
@@ -22,6 +23,8 @@ const ALLOWED_PROFILE_AVATAR_MIME_TYPES = new Set([
 
 @Injectable()
 export class ProfileService {
+  private readonly logger = new Logger(ProfileService.name);
+
   constructor(
     private readonly profileRepository: ProfileRepository,
     private readonly storageService: StorageService,
@@ -95,6 +98,8 @@ export class ProfileService {
     userId: string,
     file?: UploadFile,
   ): Promise<ProfileResponse> {
+    this.logger.log(`Avatar upload requested for user ${userId}`);
+
     const existingUser = await this.profileRepository.findUserById(userId);
 
     if (!existingUser) {
@@ -113,11 +118,18 @@ export class ProfileService {
         uploadResult.url,
       );
 
+      this.logger.log(`Avatar upload completed for user ${userId}`);
+
       return toProfileResponse(updatedUser);
     } catch (error) {
       if (this.isDuplicateEmailError(error)) {
         throw this.buildDuplicateEmailException();
       }
+
+      this.logger.error(
+        `Avatar upload failed for user ${userId}`,
+        error instanceof Error ? error.stack : undefined,
+      );
 
       throw new InternalServerErrorException({
         message: 'Nao foi possivel enviar a imagem agora.',
