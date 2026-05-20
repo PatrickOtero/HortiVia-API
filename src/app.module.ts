@@ -5,9 +5,9 @@ import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { PreferencesModule } from './modules/preferences/preferences.module';
 import { ProductsModule } from './modules/products/products.module';
 import { ProfileModule } from './modules/profile/profile.module';
-import { SettingsModule } from './modules/settings/settings.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -24,7 +24,7 @@ import { UsersModule } from './modules/users/users.module';
     ProductsModule,
     ArticlesModule,
     ProfileModule,
-    SettingsModule,
+    PreferencesModule,
   ],
 })
 export class AppModule {}
