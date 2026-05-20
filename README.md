@@ -1,6 +1,6 @@
 # HortiVia API
 
-Backend da HortiVia construído com NestJS, Prisma e PostgreSQL.
+Backend da HortiVia construido com NestJS, Prisma e PostgreSQL.
 
 ## Stack
 
@@ -9,18 +9,21 @@ Backend da HortiVia construído com NestJS, Prisma e PostgreSQL.
 - PostgreSQL / Supabase
 - JWT auth
 - Docker
+- Cloudflare R2
 
-## Módulos atuais
+## Modulos atuais
 
 - Auth
 - Users
 - Products
 - Articles
+- Profile
+- Preferences
 - Health
 
 ## Rodando localmente
 
-1. Instale as dependências:
+1. Instale as dependencias:
 
 ```bash
 npm install
@@ -52,6 +55,23 @@ Health check:
 GET /health
 ```
 
+## Avatar upload
+
+- Endpoint: `POST /profile/avatar`
+- Auth: JWT obrigatorio
+- Content-Type: `multipart/form-data`
+- Campo do arquivo: `avatar`
+- Formatos aceitos: `image/jpeg`, `image/png`, `image/webp`
+- Tamanho maximo: `2 MB`
+- Variaveis obrigatorias:
+  - `CLOUDFLARE_ACCOUNT_ID`
+  - `CLOUDFLARE_ACCESS_KEY`
+  - `CLOUDFLARE_ACCESS_SECRET_KEY`
+  - `CLOUDFLARE_BUCKET_NAME`
+  - `CLOUDFLARE_PUBLIC_BASE_URL`
+
+No Northflank, configure essas variaveis como runtime env vars do servico.
+
 ## Docker
 
 Build:
@@ -78,7 +98,7 @@ Para parar:
 docker compose down
 ```
 
-## Comandos úteis
+## Comandos uteis
 
 ```bash
 npm run lint

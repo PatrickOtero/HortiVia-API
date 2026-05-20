@@ -1,16 +1,31 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { StorageService } from '../storage/storage.service';
+import type { UploadFile } from '../storage/types/upload-file';
 import { toProfileResponse } from './mappers/profile-response.mapper';
 import { ProfileRepository } from './profile.repository';
 import type { UpdateProfileDto } from './dto/update-profile.dto';
 import type { ProfileResponse } from './types/profile-response';
 
+export const PROFILE_AVATAR_MAX_FILE_SIZE = 2 * 1024 * 1024;
+
+const ALLOWED_PROFILE_AVATAR_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+]);
+
 @Injectable()
 export class ProfileService {
-  constructor(private readonly profileRepository: ProfileRepository) {}
+  constructor(
+    private readonly profileRepository: ProfileRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getProfile(userId: string): Promise<ProfileResponse> {
     const user = await this.profileRepository.findUserById(userId);
@@ -76,6 +91,41 @@ export class ProfileService {
     }
   }
 
+  async uploadAvatar(
+    userId: string,
+    file?: UploadFile,
+  ): Promise<ProfileResponse> {
+    const existingUser = await this.profileRepository.findUserById(userId);
+
+    if (!existingUser) {
+      throw this.buildAuthenticatedUserNotFoundException();
+    }
+
+    const avatarFile = this.validateAvatarFile(file);
+
+    try {
+      const uploadResult = await this.storageService.uploadAvatar(
+        userId,
+        avatarFile,
+      );
+      const updatedUser = await this.profileRepository.updateAvatar(
+        userId,
+        uploadResult.url,
+      );
+
+      return toProfileResponse(updatedUser);
+    } catch (error) {
+      if (this.isDuplicateEmailError(error)) {
+        throw this.buildDuplicateEmailException();
+      }
+
+      throw new InternalServerErrorException({
+        message: 'Nao foi possivel enviar a imagem agora.',
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
   private normalizeEmail(email: string) {
     return email.trim().toLowerCase();
   }
@@ -98,6 +148,31 @@ export class ProfileService {
       message: 'Usuario autenticado nao encontrado.',
       error: 'Unauthorized',
     });
+  }
+
+  private validateAvatarFile(file?: UploadFile): UploadFile {
+    if (!file) {
+      throw new BadRequestException({
+        message: 'Envie uma imagem valida.',
+        error: 'Bad Request',
+      });
+    }
+
+    if (file.size > PROFILE_AVATAR_MAX_FILE_SIZE) {
+      throw new BadRequestException({
+        message: 'A imagem deve ter no maximo 2 MB.',
+        error: 'Bad Request',
+      });
+    }
+
+    if (!ALLOWED_PROFILE_AVATAR_MIME_TYPES.has(file.mimeType)) {
+      throw new BadRequestException({
+        message: 'Formato de imagem nao permitido.',
+        error: 'Bad Request',
+      });
+    }
+
+    return file;
   }
 
   private isDuplicateEmailError(error: unknown) {
