@@ -8,20 +8,25 @@ class EnvironmentVariables {
   @IsString()
   JWT_SECRET!: string;
 
+  @IsOptional()
   @IsString()
-  CLOUDFLARE_ACCOUNT_ID!: string;
+  CLOUDFLARE_ACCOUNT_ID?: string;
 
+  @IsOptional()
   @IsString()
-  CLOUDFLARE_ACCESS_KEY!: string;
+  CLOUDFLARE_ACCESS_KEY?: string;
 
+  @IsOptional()
   @IsString()
-  CLOUDFLARE_ACCESS_SECRET_KEY!: string;
+  CLOUDFLARE_ACCESS_SECRET_KEY?: string;
 
+  @IsOptional()
   @IsString()
-  CLOUDFLARE_BUCKET_NAME!: string;
+  CLOUDFLARE_BUCKET_NAME?: string;
 
+  @IsOptional()
   @IsString()
-  CLOUDFLARE_PUBLIC_BASE_URL!: string;
+  CLOUDFLARE_PUBLIC_BASE_URL?: string;
 
   @IsOptional()
   @Transform(({ value }) => Number(value))

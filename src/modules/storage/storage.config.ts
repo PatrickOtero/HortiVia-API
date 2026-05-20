@@ -1,3 +1,4 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 export type StorageConfig = {
@@ -9,7 +10,28 @@ export type StorageConfig = {
   endpoint: string;
 };
 
+const REQUIRED_STORAGE_ENV_KEYS = [
+  'CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_ACCESS_KEY',
+  'CLOUDFLARE_ACCESS_SECRET_KEY',
+  'CLOUDFLARE_BUCKET_NAME',
+  'CLOUDFLARE_PUBLIC_BASE_URL',
+] as const;
+
 export function getStorageConfig(configService: ConfigService): StorageConfig {
+  const missingKeys = REQUIRED_STORAGE_ENV_KEYS.filter(key => {
+    const value = configService.get<string>(key);
+
+    return typeof value !== 'string' || value.trim().length === 0;
+  });
+
+  if (missingKeys.length > 0) {
+    throw new InternalServerErrorException({
+      message: 'Upload de avatar indisponivel no momento.',
+      error: 'Internal Server Error',
+    });
+  }
+
   const accountId = configService.getOrThrow<string>('CLOUDFLARE_ACCOUNT_ID');
   const accessKey = configService.getOrThrow<string>('CLOUDFLARE_ACCESS_KEY');
   const accessSecretKey = configService.getOrThrow<string>(

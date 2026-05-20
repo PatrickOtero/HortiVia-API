@@ -5,31 +5,24 @@ import { getStorageConfig } from './storage.config';
 import type { UploadFile } from './types/upload-file';
 import type { UploadResult } from './types/upload-result';
 
+type StorageClientContext = {
+  client: S3Client;
+  bucketName: string;
+  publicBaseUrl: string;
+};
+
 @Injectable()
 export class CloudflareR2StorageService {
-  private readonly client: S3Client;
-  private readonly bucketName: string;
-  private readonly publicBaseUrl: string;
+  private context: StorageClientContext | null = null;
 
-  constructor(configService: ConfigService) {
-    const config = getStorageConfig(configService);
-
-    this.bucketName = config.bucketName;
-    this.publicBaseUrl = config.publicBaseUrl;
-    this.client = new S3Client({
-      region: 'auto',
-      endpoint: config.endpoint,
-      credentials: {
-        accessKeyId: config.accessKey,
-        secretAccessKey: config.accessSecretKey,
-      },
-    });
-  }
+  constructor(private readonly configService: ConfigService) {}
 
   async uploadFile(objectKey: string, file: UploadFile): Promise<UploadResult> {
-    await this.client.send(
+    const { client, bucketName, publicBaseUrl } = this.getContext();
+
+    await client.send(
       new PutObjectCommand({
-        Bucket: this.bucketName,
+        Bucket: bucketName,
         Key: objectKey,
         Body: file.buffer,
         ContentType: file.mimeType,
@@ -37,7 +30,30 @@ export class CloudflareR2StorageService {
     );
 
     return {
-      url: `${this.publicBaseUrl}/${objectKey}`,
+      url: `${publicBaseUrl}/${objectKey}`,
     };
+  }
+
+  private getContext(): StorageClientContext {
+    if (this.context) {
+      return this.context;
+    }
+
+    const config = getStorageConfig(this.configService);
+
+    this.context = {
+      bucketName: config.bucketName,
+      publicBaseUrl: config.publicBaseUrl,
+      client: new S3Client({
+        region: 'auto',
+        endpoint: config.endpoint,
+        credentials: {
+          accessKeyId: config.accessKey,
+          secretAccessKey: config.accessSecretKey,
+        },
+      }),
+    };
+
+    return this.context;
   }
 }
