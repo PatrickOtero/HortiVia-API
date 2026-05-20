@@ -1,85 +1,84 @@
 # HortiVia API
 
-NestJS API backed by Prisma and PostgreSQL, prepared for Docker and Northflank deployment.
+Backend da HortiVia construído com NestJS, Prisma e PostgreSQL.
 
-## Local
+## Stack
 
-1. Install dependencies:
+- NestJS
+- Prisma
+- PostgreSQL / Supabase
+- JWT auth
+- Docker
+
+## Módulos atuais
+
+- Auth
+- Users
+- Products
+- Articles
+- Health
+
+## Rodando localmente
+
+1. Instale as dependências:
 
 ```bash
 npm install
 ```
 
-2. Create `.env` from `.env.example` and fill in the real values locally.
+2. Configure o arquivo `.env`.
 
-3. Generate the Prisma client:
+3. Gere o Prisma Client:
 
 ```bash
 npm run prisma:generate
 ```
 
-4. Run local migrations against your development database:
+4. Rode as migrations:
 
 ```bash
 npm run prisma:migrate:dev -- --name init
 ```
 
-5. Start the development server:
+5. Inicie a API:
 
 ```bash
 npm run start:dev
 ```
 
-The API health endpoint is available at `GET /health`.
+Health check:
+
+```bash
+GET /health
+```
 
 ## Docker
 
-Build from inside the backend folder:
+Build:
 
 ```bash
 docker build -t hortivia-api .
 ```
 
-Build from the repository root:
-
-```bash
-docker build -t hortivia-api ./backend
-```
-
-Run the container with runtime environment variables. Do not copy `.env` into the image:
+Run:
 
 ```bash
 docker run --env-file .env -p 3000:3000 hortivia-api
 ```
 
-The container runs only the compiled API with `node dist/main.js`. It listens on `process.env.PORT || 3000` and binds to `0.0.0.0`.
-
 ## Docker Compose
-
-For local testing, you can use Docker Compose to reuse the existing `.env` file and port configuration:
 
 ```bash
 docker compose up --build
 ```
 
-To stop and remove the container:
+Para parar:
 
 ```bash
 docker compose down
 ```
 
-## Northflank
-
-- Use the Dockerfile deployment flow.
-- Set the build context to the backend folder and the Dockerfile path to `backend/Dockerfile` if deploying from the repository root.
-- Configure all runtime environment variables in the Northflank service settings.
-- Expose the same `PORT` the app listens on.
-- Set the health check path to `/health`.
-- Run `npm run prisma:migrate:deploy` separately when production migrations are needed.
-- Do not run `prisma migrate dev` in production.
-- Do not run migrations automatically on container startup.
-
-## Useful Commands
+## Comandos úteis
 
 ```bash
 npm run lint
