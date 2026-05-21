@@ -79,6 +79,16 @@ export class ArticlesRepository {
     });
   }
 
+  async updateImageUrl(id: string, imageUrl: string) {
+    return this.prisma.article.update({
+      where: { id },
+      data: {
+        imageUrl,
+      },
+      include: articleWithAuthorInclude,
+    });
+  }
+
   async unpublish(id: string) {
     return this.prisma.article.update({
       where: { id },

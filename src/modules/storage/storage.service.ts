@@ -17,10 +17,33 @@ export class StorageService {
   ) {}
 
   async uploadAvatar(userId: string, file: UploadFile): Promise<UploadResult> {
-    const extension = FILE_EXTENSION_BY_MIME_TYPE[file.mimeType] ?? 'bin';
-    const randomSuffix = randomBytes(4).toString('hex');
-    const objectKey = `avatars/${userId}/${Date.now()}-${randomSuffix}.${extension}`;
+    const objectKey = this.buildObjectKey('avatars', userId, file.mimeType);
 
     return this.cloudflareR2StorageService.uploadFile(objectKey, file);
+  }
+
+  async uploadProductImage(
+    productId: string,
+    file: UploadFile,
+  ): Promise<UploadResult> {
+    const objectKey = this.buildObjectKey('products', productId, file.mimeType);
+
+    return this.cloudflareR2StorageService.uploadFile(objectKey, file);
+  }
+
+  async uploadArticleImage(
+    articleId: string,
+    file: UploadFile,
+  ): Promise<UploadResult> {
+    const objectKey = this.buildObjectKey('articles', articleId, file.mimeType);
+
+    return this.cloudflareR2StorageService.uploadFile(objectKey, file);
+  }
+
+  private buildObjectKey(prefix: string, entityId: string, mimeType: string) {
+    const extension = FILE_EXTENSION_BY_MIME_TYPE[mimeType] ?? 'bin';
+    const randomSuffix = randomBytes(4).toString('hex');
+
+    return `${prefix}/${entityId}/${Date.now()}-${randomSuffix}.${extension}`;
   }
 }

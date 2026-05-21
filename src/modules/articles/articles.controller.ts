@@ -7,14 +7,21 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
+  UseFilters,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { UserRole } from '../../generated/prisma/enums';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
+import { CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
+import { ImageUploadExceptionFilter } from '../storage/image-upload.exception-filter';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
@@ -56,5 +63,42 @@ export class ArticlesController {
   @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
     return this.articlesService.remove(id);
+  }
+
+  @Post(':id/image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @UseFilters(new ImageUploadExceptionFilter('5 MB'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: CONTENT_IMAGE_MAX_FILE_SIZE,
+      },
+    }),
+  )
+  async uploadImage(
+    @Param('id') id: string,
+    @UploadedFile()
+    file?:
+      | {
+          buffer: Buffer;
+          mimetype: string;
+          size: number;
+          originalname?: string;
+        }
+      | undefined,
+  ) {
+    return this.articlesService.uploadImage(
+      id,
+      file
+        ? {
+            buffer: file.buffer,
+            mimeType: file.mimetype,
+            size: file.size,
+            originalName: file.originalname,
+          }
+        : undefined,
+    );
   }
 }

@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 import { ArticlesRepository } from './articles.repository';
@@ -19,14 +22,21 @@ import type {
 } from './types/article-response';
 import { calculateReadingTimeMinutes } from './utils/reading-time.util';
 import { slugifyProductName } from '../products/utils/slug.util';
+import { StorageService } from '../storage/storage.service';
+import { ALLOWED_CONTENT_IMAGE_MIME_TYPES, CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
+import type { UploadFile } from '../storage/types/upload-file';
 
 @Injectable()
 export class ArticlesService {
+  private readonly logger = new Logger(ArticlesService.name);
   private readonly defaultPage = 1;
   private readonly defaultLimit = 10;
   private readonly maxLimit = 50;
 
-  constructor(private readonly articlesRepository: ArticlesRepository) {}
+  constructor(
+    private readonly articlesRepository: ArticlesRepository,
+    private readonly storageService: StorageService,
+  ) {}
 
   async list(query: ListArticlesQueryDto): Promise<ArticlesListResponse> {
     const page = query.page ?? this.defaultPage;
@@ -200,6 +210,42 @@ export class ArticlesService {
     };
   }
 
+  async uploadImage(id: string, file?: UploadFile): Promise<ArticleDetailResponse> {
+    this.logger.log(`Article image upload requested for article ${id}`);
+
+    await this.requireArticle(id, true);
+    const imageFile = this.validateImageFile(file);
+
+    try {
+      const uploadResult = await this.storageService.uploadArticleImage(id, imageFile);
+      const updatedArticle = await this.articlesRepository.updateImageUrl(
+        id,
+        uploadResult.url,
+      );
+
+      this.logger.log(`Article image upload completed for article ${id}`);
+
+      return toArticleDetailResponse(
+        updatedArticle,
+        calculateReadingTimeMinutes(updatedArticle.content),
+      );
+    } catch (error) {
+      if (this.isRecordNotFoundError(error)) {
+        throw this.buildArticleNotFoundException();
+      }
+
+      this.logger.error(
+        `Article image upload failed for article ${id}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+
+      throw new InternalServerErrorException({
+        message: 'Nao foi possivel enviar a imagem.',
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
   private buildListWhereInput(query: ListArticlesQueryDto): Prisma.ArticleWhereInput {
     const trimmedSearch = query.search?.trim();
 
@@ -326,6 +372,31 @@ export class ArticlesService {
 
   private normalizeTags(tags?: string[]) {
     return (tags ?? []).map(tag => tag.trim()).filter(Boolean);
+  }
+
+  private validateImageFile(file?: UploadFile): UploadFile {
+    if (!file) {
+      throw new BadRequestException({
+        message: 'Envie uma imagem valida.',
+        error: 'Bad Request',
+      });
+    }
+
+    if (file.size > CONTENT_IMAGE_MAX_FILE_SIZE) {
+      throw new BadRequestException({
+        message: 'A imagem deve ter no maximo 5 MB.',
+        error: 'Bad Request',
+      });
+    }
+
+    if (!ALLOWED_CONTENT_IMAGE_MIME_TYPES.has(file.mimeType)) {
+      throw new BadRequestException({
+        message: 'Formato de imagem nao permitido.',
+        error: 'Bad Request',
+      });
+    }
+
+    return file;
   }
 
   private buildArticleNotFoundException() {

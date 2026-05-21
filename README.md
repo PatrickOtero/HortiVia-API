@@ -72,6 +72,22 @@ GET /health
 
 No Northflank, configure essas variaveis como runtime env vars do servico.
 
+## Product and Article image upload
+
+- Endpoints: `POST /products/:id/image` e `POST /articles/:id/image`
+- Auth: JWT obrigatorio
+- Role: `ADMIN`
+- Content-Type: `multipart/form-data`
+- Campo do arquivo: `image`
+- Formatos aceitos: `image/jpeg`, `image/png`, `image/webp`
+- Tamanho maximo: `5 MB`
+- Variaveis obrigatorias:
+  - `CLOUDFLARE_ACCOUNT_ID`
+  - `CLOUDFLARE_ACCESS_KEY`
+  - `CLOUDFLARE_ACCESS_SECRET_KEY`
+  - `CLOUDFLARE_BUCKET_NAME`
+  - `CLOUDFLARE_PUBLIC_BASE_URL`
+
 ## Docker
 
 Build:

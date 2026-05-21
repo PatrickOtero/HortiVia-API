@@ -1,5 +1,6 @@
 import { ProductCategory } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
+import { StorageService } from '../storage/storage.service';
 import { ProductsRepository } from './products.repository';
 import { ProductsService } from './products.service';
 
@@ -29,6 +30,7 @@ describe('ProductsService', () => {
     findBySlug: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+    updateImageUrl: jest.fn(),
     deactivate: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
@@ -39,9 +41,14 @@ describe('ProductsService', () => {
       | 'findBySlug'
       | 'create'
       | 'update'
+      | 'updateImageUrl'
       | 'deactivate'
     >
   >;
+
+  const storageService = {
+    uploadProductImage: jest.fn(),
+  } as unknown as jest.Mocked<Pick<StorageService, 'uploadProductImage'>>;
 
   let service: ProductsService;
 
@@ -49,6 +56,7 @@ describe('ProductsService', () => {
     jest.clearAllMocks();
     service = new ProductsService(
       productsRepository as unknown as ProductsRepository,
+      storageService as unknown as StorageService,
     );
   });
 
@@ -219,5 +227,62 @@ describe('ProductsService', () => {
     expect(productsRepository.findBySlug).toHaveBeenNthCalledWith(1, 'abacate');
     expect(productsRepository.findBySlug).toHaveBeenNthCalledWith(2, 'abacate-2');
     expect(result.slug).toBe('abacate-2');
+  });
+
+  it('rejects product image upload without a file', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+
+    await expect(service.uploadImage(baseProduct.id)).rejects.toMatchObject({
+      response: {
+        message: 'Envie uma imagem valida.',
+      },
+    });
+  });
+
+  it('rejects product image upload with an invalid mime type', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+
+    await expect(
+      service.uploadImage(baseProduct.id, {
+        buffer: Buffer.from('fake-image'),
+        mimeType: 'application/pdf',
+        size: 256,
+        originalName: 'product.pdf',
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Formato de imagem nao permitido.',
+      },
+    });
+  });
+
+  it('uploads product image and returns the updated product detail', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    storageService.uploadProductImage.mockResolvedValue({
+      url: 'https://cdn.hortivia.com/products/product-1/cover.webp',
+    });
+    productsRepository.updateImageUrl.mockResolvedValue({
+      ...baseProduct,
+      imageUrl: 'https://cdn.hortivia.com/products/product-1/cover.webp',
+    });
+
+    const result = await service.uploadImage(baseProduct.id, {
+      buffer: Buffer.from('fake-image'),
+      mimeType: 'image/webp',
+      size: 256,
+      originalName: 'cover.webp',
+    });
+
+    expect(storageService.uploadProductImage).toHaveBeenCalledWith(baseProduct.id, {
+      buffer: Buffer.from('fake-image'),
+      mimeType: 'image/webp',
+      size: 256,
+      originalName: 'cover.webp',
+    });
+    expect(productsRepository.updateImageUrl).toHaveBeenCalledWith(
+      baseProduct.id,
+      'https://cdn.hortivia.com/products/product-1/cover.webp',
+    );
+    expect(result.imageUrl).toBe('https://cdn.hortivia.com/products/product-1/cover.webp');
   });
 });

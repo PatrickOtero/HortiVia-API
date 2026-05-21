@@ -51,6 +51,15 @@ export class ProductsRepository {
     });
   }
 
+  async updateImageUrl(id: string, imageUrl: string) {
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        imageUrl,
+      },
+    });
+  }
+
   async deactivate(id: string) {
     return this.prisma.product.update({
       where: { id },

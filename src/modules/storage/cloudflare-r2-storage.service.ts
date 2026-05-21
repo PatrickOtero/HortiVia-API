@@ -21,7 +21,7 @@ export class CloudflareR2StorageService {
   async uploadFile(objectKey: string, file: UploadFile): Promise<UploadResult> {
     const { client, bucketName, publicBaseUrl } = this.getContext();
 
-    this.logger.log(`Uploading avatar object ${objectKey}`);
+    this.logger.log(`Uploading object ${objectKey}`);
 
     await client.send(
       new PutObjectCommand({

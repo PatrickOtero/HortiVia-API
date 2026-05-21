@@ -1,6 +1,7 @@
 import { ArticleCategory } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
+import { StorageService } from '../storage/storage.service';
 import { ArticlesRepository } from './articles.repository';
 import { ArticlesService } from './articles.service';
 
@@ -40,6 +41,7 @@ describe('ArticlesService', () => {
     findBySlug: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+    updateImageUrl: jest.fn(),
     unpublish: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
@@ -50,9 +52,14 @@ describe('ArticlesService', () => {
       | 'findBySlug'
       | 'create'
       | 'update'
+      | 'updateImageUrl'
       | 'unpublish'
     >
   >;
+
+  const storageService = {
+    uploadArticleImage: jest.fn(),
+  } as unknown as jest.Mocked<Pick<StorageService, 'uploadArticleImage'>>;
 
   let service: ArticlesService;
 
@@ -60,6 +67,7 @@ describe('ArticlesService', () => {
     jest.clearAllMocks();
     service = new ArticlesService(
       articlesRepository as unknown as ArticlesRepository,
+      storageService as unknown as StorageService,
     );
   });
 
@@ -269,5 +277,62 @@ describe('ArticlesService', () => {
         publishedAt: expect.any(Date),
       }),
     );
+  });
+
+  it('rejects article image upload without a file', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+
+    await expect(service.uploadImage(baseArticle.id)).rejects.toMatchObject({
+      response: {
+        message: 'Envie uma imagem valida.',
+      },
+    });
+  });
+
+  it('rejects article image upload with an invalid mime type', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+
+    await expect(
+      service.uploadImage(baseArticle.id, {
+        buffer: Buffer.from('fake-image'),
+        mimeType: 'application/pdf',
+        size: 256,
+        originalName: 'article.pdf',
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Formato de imagem nao permitido.',
+      },
+    });
+  });
+
+  it('uploads article image and returns the updated article detail', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    storageService.uploadArticleImage.mockResolvedValue({
+      url: 'https://cdn.hortivia.com/articles/article-1/cover.webp',
+    });
+    articlesRepository.updateImageUrl.mockResolvedValue({
+      ...baseArticle,
+      imageUrl: 'https://cdn.hortivia.com/articles/article-1/cover.webp',
+    });
+
+    const result = await service.uploadImage(baseArticle.id, {
+      buffer: Buffer.from('fake-image'),
+      mimeType: 'image/webp',
+      size: 256,
+      originalName: 'cover.webp',
+    });
+
+    expect(storageService.uploadArticleImage).toHaveBeenCalledWith(baseArticle.id, {
+      buffer: Buffer.from('fake-image'),
+      mimeType: 'image/webp',
+      size: 256,
+      originalName: 'cover.webp',
+    });
+    expect(articlesRepository.updateImageUrl).toHaveBeenCalledWith(
+      baseArticle.id,
+      'https://cdn.hortivia.com/articles/article-1/cover.webp',
+    );
+    expect(result.imageUrl).toBe('https://cdn.hortivia.com/articles/article-1/cover.webp');
   });
 });
