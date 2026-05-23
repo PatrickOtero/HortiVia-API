@@ -35,17 +35,23 @@ enum Gender {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  name           String
-  email          String          @unique
-  passwordHash   String
-  avatarUrl      String?
-  gender         Gender?
-  role           UserRole        @default(USER)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  articles       Article[]
-  preferences    UserPreference?
+  id                              String          @id @default(uuid())
+  name                            String
+  email                           String          @unique
+  passwordHash                    String
+  avatarUrl                       String?
+  gender                          Gender?
+  role                            UserRole        @default(USER)
+  emailVerified                   Boolean         @default(false)
+  emailVerifiedAt                 DateTime?
+  emailConfirmationCodeHash       String?
+  emailConfirmationCodeExpiresAt  DateTime?
+  emailConfirmationCodeSentAt     DateTime?
+  emailConfirmationAttempts       Int             @default(0)
+  createdAt                       DateTime        @default(now())
+  updatedAt                       DateTime        @updatedAt
+  articles                        Article[]
+  preferences                     UserPreference?
 }
 
 model Product {

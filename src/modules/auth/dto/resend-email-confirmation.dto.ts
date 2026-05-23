@@ -1,8 +1,8 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
 import { normalizeEmail } from '../../../common/utils/normalize-email';
 
-export class LoginDto {
+export class ResendEmailConfirmationDto {
   @IsEmail({}, { message: 'Informe um e-mail v\u00e1lido.' })
   @IsNotEmpty({ message: 'Informe um e-mail v\u00e1lido.' })
   @MaxLength(254, { message: 'Informe um e-mail v\u00e1lido.' })
@@ -10,8 +10,4 @@ export class LoginDto {
     typeof value === 'string' ? normalizeEmail(value) : value,
   )
   email!: string;
-
-  @IsString()
-  @IsNotEmpty({ message: 'Informe a senha.' })
-  password!: string;
 }

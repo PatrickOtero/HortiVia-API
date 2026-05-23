@@ -542,10 +542,6 @@ export type ArticleUpdatetagsInput = {
   push?: string | string[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type ArticleCreateWithoutAuthorInput = {
   id?: string
   title: string

@@ -1,0 +1,664 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-05-22T23:30:00.000Z",
+  "__export_source": "codex.manual-export",
+  "resources": [
+    {
+      "_id": "wrk_hortivia_api",
+      "_type": "workspace",
+      "name": "HortiVia API",
+      "description": "Colecao completa da API HortiVia para testes manuais no Insomnia."
+    },
+    {
+      "_id": "env_hortivia_base",
+      "_type": "environment",
+      "parentId": "wrk_hortivia_api",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "register_name": "Usuario Teste",
+        "register_email": "usuario@hortivia.com",
+        "register_password": "SenhaForte!123",
+        "user_email": "usuario@hortivia.com",
+        "user_password": "SenhaForte!123",
+        "admin_email": "admin@hortivia.com",
+        "admin_password": "AdminForte!123",
+        "access_token": "",
+        "admin_access_token": "",
+        "confirmation_code": "",
+        "managed_user_id": "",
+        "product_id": "",
+        "article_id": "",
+        "avatar_file_path": "C:/caminho/para/avatar.jpg",
+        "product_image_file_path": "C:/caminho/para/produto.jpg",
+        "article_image_file_path": "C:/caminho/para/artigo.jpg",
+        "users_search": "",
+        "users_role_filter": "",
+        "users_email_verified": "",
+        "product_search": "",
+        "product_category": "",
+        "article_search": "",
+        "article_category": "",
+        "page": "1",
+        "limit": "10"
+      }
+    },
+    {
+      "_id": "env_hortivia_local",
+      "_type": "environment",
+      "parentId": "env_hortivia_base",
+      "name": "Local",
+      "data": {}
+    },
+    {
+      "_id": "jar_hortivia_api",
+      "_type": "cookie_jar",
+      "parentId": "wrk_hortivia_api",
+      "name": "Default Jar",
+      "cookies": []
+    },
+    {
+      "_id": "fld_health",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "00 Health"
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "01 Auth"
+    },
+    {
+      "_id": "fld_profile",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "02 Profile"
+    },
+    {
+      "_id": "fld_preferences",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "03 Preferences"
+    },
+    {
+      "_id": "fld_products_public",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "04 Products Public"
+    },
+    {
+      "_id": "fld_products_admin",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "05 Products Admin"
+    },
+    {
+      "_id": "fld_articles_public",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "06 Articles Public"
+    },
+    {
+      "_id": "fld_articles_admin",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "07 Articles Admin"
+    },
+    {
+      "_id": "fld_users_info",
+      "_type": "request_group",
+      "parentId": "wrk_hortivia_api",
+      "name": "08 Users Admin",
+      "description": "Rotas administrativas para localizar, editar e excluir usuarios de teste sem precisar abrir o banco."
+    },
+    {
+      "_id": "req_users_list",
+      "_type": "request",
+      "parentId": "fld_users_info",
+      "name": "GET Users",
+      "method": "GET",
+      "url": "{{ _.base_url }}/users",
+      "body": {},
+      "parameters": [
+        {
+          "name": "search",
+          "value": "{{ _.users_search }}"
+        },
+        {
+          "name": "role",
+          "value": "{{ _.users_role_filter }}"
+        },
+        {
+          "name": "emailVerified",
+          "value": "{{ _.users_email_verified }}"
+        },
+        {
+          "name": "page",
+          "value": "{{ _.page }}"
+        },
+        {
+          "name": "limit",
+          "value": "{{ _.limit }}"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_users_get_by_id",
+      "_type": "request",
+      "parentId": "fld_users_info",
+      "name": "GET User By Id",
+      "method": "GET",
+      "url": "{{ _.base_url }}/users/{{ _.managed_user_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_users_update",
+      "_type": "request",
+      "parentId": "fld_users_info",
+      "name": "PATCH Update User",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/users/{{ _.managed_user_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"role\": \"ADMIN\",\n  \"emailVerified\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_users_delete",
+      "_type": "request",
+      "parentId": "fld_users_info",
+      "name": "DELETE User",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/users/{{ _.managed_user_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_health_check",
+      "_type": "request",
+      "parentId": "fld_health",
+      "name": "GET Health",
+      "method": "GET",
+      "url": "{{ _.base_url }}/health",
+      "body": {},
+      "headers": []
+    },
+    {
+      "_id": "req_auth_register",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Register",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/register",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"{{ _.register_name }}\",\n  \"email\": \"{{ _.register_email }}\",\n  \"password\": \"{{ _.register_password }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_auth_login_user",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Login User",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.user_email }}\",\n  \"password\": \"{{ _.user_password }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_auth_login_admin",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Login Admin",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.admin_email }}\",\n  \"password\": \"{{ _.admin_password }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_auth_confirm_email",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Confirm Email",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/confirm-email",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.register_email }}\",\n  \"code\": \"{{ _.confirmation_code }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_auth_resend_confirmation",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Resend Confirmation",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/resend-confirmation",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.register_email }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_auth_me",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "GET Me",
+      "method": "GET",
+      "url": "{{ _.base_url }}/auth/me",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_profile_get",
+      "_type": "request",
+      "parentId": "fld_profile",
+      "name": "GET Profile",
+      "method": "GET",
+      "url": "{{ _.base_url }}/profile",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_profile_update",
+      "_type": "request",
+      "parentId": "fld_profile",
+      "name": "PATCH Profile",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/profile",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Usuario Atualizado\",\n  \"email\": \"novo.email@hortivia.com\",\n  \"gender\": \"PREFER_NOT_TO_SAY\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_profile_upload_avatar",
+      "_type": "request",
+      "parentId": "fld_profile",
+      "name": "POST Upload Avatar",
+      "method": "POST",
+      "url": "{{ _.base_url }}/profile/avatar",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_profile_avatar",
+            "name": "avatar",
+            "type": "file",
+            "fileName": "{{ _.avatar_file_path }}"
+          }
+        ]
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_preferences_get",
+      "_type": "request",
+      "parentId": "fld_preferences",
+      "name": "GET Preferences",
+      "method": "GET",
+      "url": "{{ _.base_url }}/preferences",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_preferences_update",
+      "_type": "request",
+      "parentId": "fld_preferences",
+      "name": "PATCH Preferences",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/preferences",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"notificationsEnabled\": true,\n  \"seasonalTipsEnabled\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_list",
+      "_type": "request",
+      "parentId": "fld_products_public",
+      "name": "GET Products",
+      "method": "GET",
+      "url": "{{ _.base_url }}/products",
+      "body": {},
+      "parameters": [
+        {
+          "name": "search",
+          "value": "{{ _.product_search }}"
+        },
+        {
+          "name": "category",
+          "value": "{{ _.product_category }}"
+        },
+        {
+          "name": "page",
+          "value": "{{ _.page }}"
+        },
+        {
+          "name": "limit",
+          "value": "{{ _.limit }}"
+        }
+      ],
+      "headers": []
+    },
+    {
+      "_id": "req_products_get_by_id",
+      "_type": "request",
+      "parentId": "fld_products_public",
+      "name": "GET Product By Id",
+      "method": "GET",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}",
+      "body": {},
+      "headers": []
+    },
+    {
+      "_id": "req_products_create",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Create Product",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Manga Palmer\",\n  \"category\": \"FRUIT\",\n  \"shortDescription\": \"Doce, suculenta e muito aromatica.\",\n  \"description\": \"Manga Palmer com polpa firme e sabor equilibrado.\",\n  \"benefits\": [\"Rica em vitamina C\", \"Fonte de fibras\"],\n  \"howToChoose\": [\"Prefira casca integra\", \"Observe aroma suave\"],\n  \"howToStore\": [\"Mantenha em local fresco\", \"Refrigere apos madura\"],\n  \"usageTips\": [\"Boa para sucos\", \"Otima para saladas\"],\n  \"nutrients\": [\n    {\n      \"label\": \"Vitamina C\",\n      \"value\": \"36 mg\"\n    },\n    {\n      \"label\": \"Fibras\",\n      \"value\": \"1,6 g\"\n    }\n  ]\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_update",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "PATCH Update Product",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"shortDescription\": \"Doce, suculenta e selecionada para consumo fresco.\",\n  \"usageTips\": [\"Sirva gelada\", \"Use em sobremesas\"],\n  \"nutrients\": [\n    {\n      \"label\": \"Vitamina A\",\n      \"value\": \"54 mcg\"\n    }\n  ]\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_delete",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "DELETE Product",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_upload_image",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Upload Product Image",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/image",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_product_image",
+            "name": "image",
+            "type": "file",
+            "fileName": "{{ _.product_image_file_path }}"
+          }
+        ]
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_list",
+      "_type": "request",
+      "parentId": "fld_articles_public",
+      "name": "GET Articles",
+      "method": "GET",
+      "url": "{{ _.base_url }}/articles",
+      "body": {},
+      "parameters": [
+        {
+          "name": "search",
+          "value": "{{ _.article_search }}"
+        },
+        {
+          "name": "category",
+          "value": "{{ _.article_category }}"
+        },
+        {
+          "name": "page",
+          "value": "{{ _.page }}"
+        },
+        {
+          "name": "limit",
+          "value": "{{ _.limit }}"
+        }
+      ],
+      "headers": []
+    },
+    {
+      "_id": "req_articles_get_by_id",
+      "_type": "request",
+      "parentId": "fld_articles_public",
+      "name": "GET Article By Id",
+      "method": "GET",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
+      "body": {},
+      "headers": []
+    },
+    {
+      "_id": "req_articles_create",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "POST Create Article",
+      "method": "POST",
+      "url": "{{ _.base_url }}/articles",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Como armazenar folhas por mais tempo\",\n  \"summary\": \"Dicas praticas para conservar folhas e manter textura e sabor.\",\n  \"content\": \"Lave apenas no momento do consumo, seque bem e use recipientes ventilados ou forrados com papel-toalha.\",\n  \"category\": \"STORAGE\",\n  \"tags\": [\"folhas\", \"conservacao\", \"geladeira\"],\n  \"isPublished\": true,\n  \"publishedAt\": \"2026-05-22T12:00:00.000Z\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_update",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "PATCH Update Article",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"summary\": \"Dicas praticas para conservar folhas e reduzir desperdicio.\",\n  \"tags\": [\"folhas\", \"conservacao\", \"desperdicio\"],\n  \"isPublished\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_delete",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "DELETE Article",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_upload_image",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "POST Upload Article Image",
+      "method": "POST",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/image",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_article_image",
+            "name": "image",
+            "type": "file",
+            "fileName": "{{ _.article_image_file_path }}"
+          }
+        ]
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    }
+  ]
+}

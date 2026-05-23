@@ -2,17 +2,19 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { MailModule } from '../mail/mail.module';
 import { UsersModule } from '../users/users.module';
+import { AuthController } from './auth.controller';
+import { AUTH_TOKEN_EXPIRES_IN } from './auth.constants';
+import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { AUTH_TOKEN_EXPIRES_IN } from './auth.constants';
 
 @Module({
   imports: [
     UsersModule,
+    MailModule,
     PassportModule.register({
       defaultStrategy: 'jwt',
     }),

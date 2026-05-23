@@ -1,38 +1,85 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  ServiceUnavailableException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcryptjs';
-import { UsersService } from '../users/users.service';
-import { toSafeUser } from '../users/users.mapper';
 import { UserRole } from '../../generated/prisma/enums';
-import { INVALID_CREDENTIALS_MESSAGE } from './auth.constants';
+import { normalizeEmail } from '../../common/utils/normalize-email';
+import { MailService } from '../mail/mail.service';
+import { toSafeUser } from '../users/users.mapper';
+import { UsersService } from '../users/users.service';
+import {
+  CONFIRM_EMAIL_SUCCESS_MESSAGE,
+  EMAIL_CONFIRMATION_SEND_FAILURE_MESSAGE,
+  INVALID_CONFIRMATION_MESSAGE,
+  INVALID_CREDENTIALS_MESSAGE,
+  REGISTER_SUCCESS_MESSAGE,
+  RESEND_CONFIRMATION_COOLDOWN_MESSAGE,
+  RESEND_CONFIRMATION_SUCCESS_MESSAGE,
+  UNVERIFIED_EMAIL_MESSAGE,
+} from './auth.constants';
+import { ConfirmEmailDto } from './dto/confirm-email.dto';
 import type { LoginDto } from './dto/login.dto';
 import type { RegisterDto } from './dto/register.dto';
+import { ResendEmailConfirmationDto } from './dto/resend-email-confirmation.dto';
 import type {
   AuthenticatedUser,
   JwtPayload,
 } from './types/authenticated-user';
+import {
+  generateEmailConfirmationCode,
+  getEmailConfirmationCodeExpiresAt,
+  hashEmailConfirmationCode,
+} from './utils/email-confirmation-code';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(registerDto: RegisterDto) {
     const passwordHash = await hash(registerDto.password, 10);
+    const code = generateEmailConfirmationCode();
+    const email = normalizeEmail(registerDto.email);
+    const emailConfirmationCodeSentAt = new Date();
+    const emailConfirmationCodeExpiresAt = getEmailConfirmationCodeExpiresAt(
+      this.getEmailConfirmationCodeExpiresInMinutes(),
+    );
     const user = await this.usersService.create({
       name: registerDto.name,
-      email: registerDto.email,
+      email,
       passwordHash,
       role: UserRole.USER,
+      emailVerified: false,
+      emailVerifiedAt: null,
+      emailConfirmationCodeHash: hashEmailConfirmationCode(email, code),
+      emailConfirmationCodeExpiresAt,
+      emailConfirmationCodeSentAt,
+      emailConfirmationAttempts: 0,
     });
 
-    return this.buildAuthResponse(user);
+    await this.sendEmailConfirmationCode(user.email, code);
+
+    return {
+      message: REGISTER_SUCCESS_MESSAGE,
+      user: toSafeUser(user),
+    };
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findByEmail(loginDto.email);
+    const normalizedEmail = normalizeEmail(loginDto.email);
+    const user = await this.usersService.findByEmail(normalizedEmail);
 
     if (!user) {
       throw this.buildInvalidCredentialsException();
@@ -44,7 +91,104 @@ export class AuthService {
       throw this.buildInvalidCredentialsException();
     }
 
+    if (!user.emailVerified) {
+      throw new ForbiddenException({
+        message: UNVERIFIED_EMAIL_MESSAGE,
+        error: 'Forbidden',
+      });
+    }
+
     return this.buildAuthResponse(user);
+  }
+
+  async confirmEmail(confirmEmailDto: ConfirmEmailDto) {
+    const normalizedEmail = normalizeEmail(confirmEmailDto.email);
+    const user = await this.usersService.findByEmail(normalizedEmail);
+
+    if (!user) {
+      throw this.buildInvalidConfirmationException();
+    }
+
+    if (user.emailVerified) {
+      return {
+        message: CONFIRM_EMAIL_SUCCESS_MESSAGE,
+      };
+    }
+
+    if (
+      !user.emailConfirmationCodeHash ||
+      !user.emailConfirmationCodeExpiresAt ||
+      user.emailConfirmationCodeExpiresAt.getTime() < Date.now() ||
+      user.emailConfirmationAttempts >= this.getEmailConfirmationMaxAttempts()
+    ) {
+      throw this.buildInvalidConfirmationException();
+    }
+
+    const codeHash = hashEmailConfirmationCode(normalizedEmail, confirmEmailDto.code);
+
+    if (codeHash !== user.emailConfirmationCodeHash) {
+      await this.usersService.incrementEmailConfirmationAttempts(user.id);
+      throw this.buildInvalidConfirmationException();
+    }
+
+    await this.usersService.updateEmailVerification(user.id, {
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
+      emailConfirmationCodeHash: null,
+      emailConfirmationCodeExpiresAt: null,
+      emailConfirmationCodeSentAt: null,
+      emailConfirmationAttempts: 0,
+    });
+
+    return {
+      message: CONFIRM_EMAIL_SUCCESS_MESSAGE,
+    };
+  }
+
+  async resendConfirmation(
+    resendEmailConfirmationDto: ResendEmailConfirmationDto,
+  ) {
+    const normalizedEmail = normalizeEmail(resendEmailConfirmationDto.email);
+    const user = await this.usersService.findByEmail(normalizedEmail);
+
+    if (!user || user.emailVerified) {
+      return {
+        message: RESEND_CONFIRMATION_SUCCESS_MESSAGE,
+      };
+    }
+
+    if (
+      user.emailConfirmationCodeSentAt &&
+      user.emailConfirmationCodeSentAt.getTime() +
+        this.getEmailConfirmationResendCooldownSeconds() * 1_000 >
+        Date.now()
+    ) {
+      throw new HttpException(
+        {
+          message: RESEND_CONFIRMATION_COOLDOWN_MESSAGE,
+          error: 'Too Many Requests',
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
+    const code = generateEmailConfirmationCode();
+    const emailConfirmationCodeSentAt = new Date();
+    const emailConfirmationCodeExpiresAt = getEmailConfirmationCodeExpiresAt(
+      this.getEmailConfirmationCodeExpiresInMinutes(),
+    );
+
+    await this.usersService.updateEmailConfirmation(user.id, {
+      emailConfirmationCodeHash: hashEmailConfirmationCode(normalizedEmail, code),
+      emailConfirmationCodeExpiresAt,
+      emailConfirmationCodeSentAt,
+      emailConfirmationAttempts: 0,
+    });
+    await this.sendEmailConfirmationCode(user.email, code);
+
+    return {
+      message: RESEND_CONFIRMATION_SUCCESS_MESSAGE,
+    };
   }
 
   async getAuthenticatedUser(authenticatedUser: AuthenticatedUser) {
@@ -52,7 +196,7 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException({
-        message: 'Usuário autenticado não encontrado.',
+        message: 'Usu\u00e1rio autenticado n\u00e3o encontrado.',
         error: 'Unauthorized',
       });
     }
@@ -60,7 +204,9 @@ export class AuthService {
     return toSafeUser(user);
   }
 
-  private async buildAuthResponse(user: Awaited<ReturnType<UsersService['findById']>>) {
+  private async buildAuthResponse(
+    user: Awaited<ReturnType<UsersService['findById']>>,
+  ) {
     if (!user) {
       throw this.buildInvalidCredentialsException();
     }
@@ -85,10 +231,46 @@ export class AuthService {
     return this.jwtService.signAsync(payload);
   }
 
+  private getEmailConfirmationCodeExpiresInMinutes() {
+    return this.configService.get<number>(
+      'EMAIL_CONFIRMATION_CODE_EXPIRES_IN_MINUTES',
+      10,
+    );
+  }
+
+  private getEmailConfirmationResendCooldownSeconds() {
+    return this.configService.get<number>(
+      'EMAIL_CONFIRMATION_RESEND_COOLDOWN_SECONDS',
+      60,
+    );
+  }
+
+  private getEmailConfirmationMaxAttempts() {
+    return this.configService.get<number>('EMAIL_CONFIRMATION_MAX_ATTEMPTS', 5);
+  }
+
+  private async sendEmailConfirmationCode(email: string, code: string) {
+    try {
+      await this.mailService.sendEmailConfirmationCode(email, code);
+    } catch {
+      throw new ServiceUnavailableException({
+        message: EMAIL_CONFIRMATION_SEND_FAILURE_MESSAGE,
+        error: 'Service Unavailable',
+      });
+    }
+  }
+
   private buildInvalidCredentialsException() {
     return new UnauthorizedException({
       message: INVALID_CREDENTIALS_MESSAGE,
       error: 'Unauthorized',
+    });
+  }
+
+  private buildInvalidConfirmationException() {
+    return new BadRequestException({
+      message: INVALID_CONFIRMATION_MESSAGE,
+      error: 'Bad Request',
     });
   }
 }

@@ -1,5 +1,12 @@
 import { plainToInstance, Transform } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, Min, validateSync } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+  validateSync,
+} from 'class-validator';
 
 class EnvironmentVariables {
   @IsString()
@@ -7,6 +14,44 @@ class EnvironmentVariables {
 
   @IsString()
   JWT_SECRET!: string;
+
+  @IsString()
+  NODEMAILER_HOST!: string;
+
+  @IsString()
+  NODEMAILER_USER!: string;
+
+  @IsString()
+  NODEMAILER_PASS!: string;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  NODEMAILER_PORT!: number;
+
+  @IsString()
+  NODEMAILER_SECURE!: string;
+
+  @IsString()
+  NODEMAILER_REQUIRE_TLS!: string;
+
+  @IsString()
+  NODEMAILER_FROM!: string;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  EMAIL_CONFIRMATION_CODE_EXPIRES_IN_MINUTES!: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  EMAIL_CONFIRMATION_RESEND_COOLDOWN_SECONDS!: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  EMAIL_CONFIRMATION_MAX_ATTEMPTS!: number;
 
   @IsOptional()
   @IsString()

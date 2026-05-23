@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { ConfirmEmailDto } from './dto/confirm-email.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResendEmailConfirmationDto } from './dto/resend-email-confirmation.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { AuthenticatedUser } from './types/authenticated-user';
@@ -18,6 +20,18 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('confirm-email')
+  async confirmEmail(@Body() confirmEmailDto: ConfirmEmailDto) {
+    return this.authService.confirmEmail(confirmEmailDto);
+  }
+
+  @Post('resend-confirmation')
+  async resendConfirmation(
+    @Body() resendEmailConfirmationDto: ResendEmailConfirmationDto,
+  ) {
+    return this.authService.resendConfirmation(resendEmailConfirmationDto);
   }
 
   @Get('me')

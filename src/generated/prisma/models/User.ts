@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  emailConfirmationAttempts: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  emailConfirmationAttempts: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -32,6 +42,12 @@ export type UserMinAggregateOutputType = {
   avatarUrl: string | null
   gender: $Enums.Gender | null
   role: $Enums.UserRole | null
+  emailVerified: boolean | null
+  emailVerifiedAt: Date | null
+  emailConfirmationCodeHash: string | null
+  emailConfirmationCodeExpiresAt: Date | null
+  emailConfirmationCodeSentAt: Date | null
+  emailConfirmationAttempts: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +60,12 @@ export type UserMaxAggregateOutputType = {
   avatarUrl: string | null
   gender: $Enums.Gender | null
   role: $Enums.UserRole | null
+  emailVerified: boolean | null
+  emailVerifiedAt: Date | null
+  emailConfirmationCodeHash: string | null
+  emailConfirmationCodeExpiresAt: Date | null
+  emailConfirmationCodeSentAt: Date | null
+  emailConfirmationAttempts: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,11 +78,25 @@ export type UserCountAggregateOutputType = {
   avatarUrl: number
   gender: number
   role: number
+  emailVerified: number
+  emailVerifiedAt: number
+  emailConfirmationCodeHash: number
+  emailConfirmationCodeExpiresAt: number
+  emailConfirmationCodeSentAt: number
+  emailConfirmationAttempts: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  emailConfirmationAttempts?: true
+}
+
+export type UserSumAggregateInputType = {
+  emailConfirmationAttempts?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -70,6 +106,12 @@ export type UserMinAggregateInputType = {
   avatarUrl?: true
   gender?: true
   role?: true
+  emailVerified?: true
+  emailVerifiedAt?: true
+  emailConfirmationCodeHash?: true
+  emailConfirmationCodeExpiresAt?: true
+  emailConfirmationCodeSentAt?: true
+  emailConfirmationAttempts?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +124,12 @@ export type UserMaxAggregateInputType = {
   avatarUrl?: true
   gender?: true
   role?: true
+  emailVerified?: true
+  emailVerifiedAt?: true
+  emailConfirmationCodeHash?: true
+  emailConfirmationCodeExpiresAt?: true
+  emailConfirmationCodeSentAt?: true
+  emailConfirmationAttempts?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +142,12 @@ export type UserCountAggregateInputType = {
   avatarUrl?: true
   gender?: true
   role?: true
+  emailVerified?: true
+  emailVerifiedAt?: true
+  emailConfirmationCodeHash?: true
+  emailConfirmationCodeExpiresAt?: true
+  emailConfirmationCodeSentAt?: true
+  emailConfirmationAttempts?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -137,6 +191,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -167,6 +233,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -179,9 +247,17 @@ export type UserGroupByOutputType = {
   avatarUrl: string | null
   gender: $Enums.Gender | null
   role: $Enums.UserRole
+  emailVerified: boolean
+  emailVerifiedAt: Date | null
+  emailConfirmationCodeHash: string | null
+  emailConfirmationCodeExpiresAt: Date | null
+  emailConfirmationCodeSentAt: Date | null
+  emailConfirmationAttempts: number
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -212,6 +288,12 @@ export type UserWhereInput = {
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  emailVerified?: Prisma.BoolFilter<"User"> | boolean
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  emailConfirmationCodeHash?: Prisma.StringNullableFilter<"User"> | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   articles?: Prisma.ArticleListRelationFilter
@@ -226,6 +308,12 @@ export type UserOrderByWithRelationInput = {
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationCodeHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationCodeExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationCodeSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   articles?: Prisma.ArticleOrderByRelationAggregateInput
@@ -243,6 +331,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  emailVerified?: Prisma.BoolFilter<"User"> | boolean
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  emailConfirmationCodeHash?: Prisma.StringNullableFilter<"User"> | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   articles?: Prisma.ArticleListRelationFilter
@@ -257,11 +351,19 @@ export type UserOrderByWithAggregationInput = {
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationCodeHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationCodeExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationCodeSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailConfirmationAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -275,6 +377,12 @@ export type UserScalarWhereWithAggregatesInput = {
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   gender?: Prisma.EnumGenderNullableWithAggregatesFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
+  emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  emailConfirmationCodeHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntWithAggregatesFilter<"User"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -287,6 +395,12 @@ export type UserCreateInput = {
   avatarUrl?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
@@ -301,6 +415,12 @@ export type UserUncheckedCreateInput = {
   avatarUrl?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
@@ -315,6 +435,12 @@ export type UserUpdateInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
@@ -329,6 +455,12 @@ export type UserUncheckedUpdateInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
@@ -343,6 +475,12 @@ export type UserCreateManyInput = {
   avatarUrl?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -355,6 +493,12 @@ export type UserUpdateManyMutationInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -367,6 +511,12 @@ export type UserUncheckedUpdateManyInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -379,8 +529,18 @@ export type UserCountOrderByAggregateInput = {
   avatarUrl?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  emailConfirmationCodeHash?: Prisma.SortOrder
+  emailConfirmationCodeExpiresAt?: Prisma.SortOrder
+  emailConfirmationCodeSentAt?: Prisma.SortOrder
+  emailConfirmationAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  emailConfirmationAttempts?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -391,6 +551,12 @@ export type UserMaxOrderByAggregateInput = {
   avatarUrl?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  emailConfirmationCodeHash?: Prisma.SortOrder
+  emailConfirmationCodeExpiresAt?: Prisma.SortOrder
+  emailConfirmationCodeSentAt?: Prisma.SortOrder
+  emailConfirmationAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -403,8 +569,18 @@ export type UserMinOrderByAggregateInput = {
   avatarUrl?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailVerified?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  emailConfirmationCodeHash?: Prisma.SortOrder
+  emailConfirmationCodeExpiresAt?: Prisma.SortOrder
+  emailConfirmationCodeSentAt?: Prisma.SortOrder
+  emailConfirmationAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  emailConfirmationAttempts?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -426,6 +602,22 @@ export type NullableEnumGenderFieldUpdateOperationsInput = {
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -468,6 +660,12 @@ export type UserCreateWithoutArticlesInput = {
   avatarUrl?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   preferences?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
@@ -481,6 +679,12 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   avatarUrl?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   preferences?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -510,6 +714,12 @@ export type UserUpdateWithoutArticlesInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
@@ -523,6 +733,12 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -536,6 +752,12 @@ export type UserCreateWithoutPreferencesInput = {
   avatarUrl?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
@@ -549,6 +771,12 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   avatarUrl?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
@@ -578,6 +806,12 @@ export type UserUpdateWithoutPreferencesInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
@@ -591,6 +825,12 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
@@ -635,6 +875,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   avatarUrl?: boolean
   gender?: boolean
   role?: boolean
+  emailVerified?: boolean
+  emailVerifiedAt?: boolean
+  emailConfirmationCodeHash?: boolean
+  emailConfirmationCodeExpiresAt?: boolean
+  emailConfirmationCodeSentAt?: boolean
+  emailConfirmationAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
@@ -650,6 +896,12 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatarUrl?: boolean
   gender?: boolean
   role?: boolean
+  emailVerified?: boolean
+  emailVerifiedAt?: boolean
+  emailConfirmationCodeHash?: boolean
+  emailConfirmationCodeExpiresAt?: boolean
+  emailConfirmationCodeSentAt?: boolean
+  emailConfirmationAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -662,6 +914,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatarUrl?: boolean
   gender?: boolean
   role?: boolean
+  emailVerified?: boolean
+  emailVerifiedAt?: boolean
+  emailConfirmationCodeHash?: boolean
+  emailConfirmationCodeExpiresAt?: boolean
+  emailConfirmationCodeSentAt?: boolean
+  emailConfirmationAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -674,11 +932,17 @@ export type UserSelectScalar = {
   avatarUrl?: boolean
   gender?: boolean
   role?: boolean
+  emailVerified?: boolean
+  emailVerifiedAt?: boolean
+  emailConfirmationCodeHash?: boolean
+  emailConfirmationCodeExpiresAt?: boolean
+  emailConfirmationCodeSentAt?: boolean
+  emailConfirmationAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "avatarUrl" | "gender" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "avatarUrl" | "gender" | "role" | "emailVerified" | "emailVerifiedAt" | "emailConfirmationCodeHash" | "emailConfirmationCodeExpiresAt" | "emailConfirmationCodeSentAt" | "emailConfirmationAttempts" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
@@ -701,6 +965,12 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     avatarUrl: string | null
     gender: $Enums.Gender | null
     role: $Enums.UserRole
+    emailVerified: boolean
+    emailVerifiedAt: Date | null
+    emailConfirmationCodeHash: string | null
+    emailConfirmationCodeExpiresAt: Date | null
+    emailConfirmationCodeSentAt: Date | null
+    emailConfirmationAttempts: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1135,6 +1405,12 @@ export interface UserFieldRefs {
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
   readonly gender: Prisma.FieldRef<"User", 'Gender'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
+  readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
+  readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly emailConfirmationCodeHash: Prisma.FieldRef<"User", 'String'>
+  readonly emailConfirmationCodeExpiresAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly emailConfirmationCodeSentAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly emailConfirmationAttempts: Prisma.FieldRef<"User", 'Int'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

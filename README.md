@@ -8,6 +8,7 @@ Backend da HortiVia construido com NestJS, Prisma e PostgreSQL.
 - Prisma
 - PostgreSQL / Supabase
 - JWT auth
+- Nodemailer
 - Docker
 - Cloudflare R2
 
@@ -55,6 +56,53 @@ Health check:
 GET /health
 ```
 
+## Auth
+
+- `POST /auth/register` valida nome, e-mail e senha forte.
+- O e-mail e normalizado com `trim` + `lowercase` antes de verificar duplicidade e salvar.
+- O cadastro cria usuarios com `emailVerified = false` e envia um codigo numerico de 6 digitos por e-mail.
+- `POST /auth/confirm-email` confirma o e-mail com `email + code`.
+- `POST /auth/resend-confirmation` reenvia um novo codigo sem revelar se a conta existe.
+- `POST /auth/login` tambem normaliza o e-mail com `trim` + `lowercase` antes da busca.
+- O login so e liberado depois da confirmacao do e-mail.
+- Falhas de login continuam retornando a mensagem generica `E-mail ou senha invalidos.`.
+- A senha de cadastro deve ter entre `10` e `72` caracteres e incluir letra maiuscula, letra minuscula, numero e caractere especial.
+- O codigo de confirmacao expira, possui cooldown para reenvio e limite maximo de tentativas.
+
+## Users admin
+
+Rotas administrativas disponiveis:
+
+- `GET /users`
+- `GET /users/:id`
+- `PATCH /users/:id`
+- `DELETE /users/:id`
+
+Regras:
+
+- exigem JWT
+- exigem role `ADMIN`
+- permitem localizar usuarios de teste por nome ou e-mail
+- permitem promover usuario para `ADMIN`
+- permitem marcar `emailVerified`
+- nao permitem excluir a propria conta autenticada
+- a exclusao pode ser bloqueada se o usuario tiver dados vinculados, como artigos com autoria associada
+
+Variaveis de ambiente para confirmacao de e-mail:
+
+- `NODEMAILER_HOST`
+- `NODEMAILER_PORT`
+- `NODEMAILER_SECURE`
+- `NODEMAILER_REQUIRE_TLS`
+- `NODEMAILER_USER`
+- `NODEMAILER_PASS`
+- `NODEMAILER_FROM`
+- `EMAIL_CONFIRMATION_CODE_EXPIRES_IN_MINUTES`
+- `EMAIL_CONFIRMATION_RESEND_COOLDOWN_SECONDS`
+- `EMAIL_CONFIRMATION_MAX_ATTEMPTS`
+
+No Northflank, configure essas variaveis de mail como runtime env vars do servico.
+
 ## Avatar upload
 
 - Endpoint: `POST /profile/avatar`
@@ -69,8 +117,6 @@ GET /health
   - `CLOUDFLARE_ACCESS_SECRET_KEY`
   - `CLOUDFLARE_BUCKET_NAME`
   - `CLOUDFLARE_PUBLIC_BASE_URL`
-
-No Northflank, configure essas variaveis como runtime env vars do servico.
 
 ## Product and Article image upload
 

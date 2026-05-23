@@ -11,6 +11,12 @@ describe('PreferencesService', () => {
     avatarUrl: null,
     gender: null,
     role: UserRole.USER,
+    emailVerified: true,
+    emailVerifiedAt: new Date('2026-05-20T00:00:00.000Z'),
+    emailConfirmationCodeHash: null,
+    emailConfirmationCodeExpiresAt: null,
+    emailConfirmationCodeSentAt: null,
+    emailConfirmationAttempts: 0,
     createdAt: new Date('2026-05-20T00:00:00.000Z'),
     updatedAt: new Date('2026-05-20T00:00:00.000Z'),
   };
