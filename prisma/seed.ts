@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { hash } from 'bcryptjs';
+import { randomBytes } from 'crypto';
 import {
   ArticleCategory,
   ProductCategory,
@@ -20,6 +21,8 @@ const prisma = new PrismaClient({
   }),
 });
 
+const seedContentAuthorEmail = 'conteudo.seed@hortivia.local';
+
 const products = [
   {
     name: 'Abacate',
@@ -29,7 +32,7 @@ const products = [
     description: 'Fruta cremosa para vitaminas, torradas e saladas.',
     imageUrl: null,
     benefits: ['Fonte de gorduras boas', 'Ajuda na saciedade'],
-    howToChoose: ['Prefira o fruto firme com casca integra'],
+    howToChoose: ['Prefira o fruto firme com casca íntegra'],
     howToStore: ['Deixe amadurecer fora da geladeira'],
     usageTips: ['Use em vitaminas e cremes'],
     nutrients: [{ label: 'Vitamina principal', value: 'Vitamina E' }],
@@ -38,10 +41,10 @@ const products = [
     name: 'Abacaxi',
     slug: 'abacaxi',
     category: ProductCategory.FRUIT,
-    shortDescription: 'Refrescante e aromatico.',
+    shortDescription: 'Refrescante e aromático.',
     description: 'Fruta tropical para sucos, sobremesas e grelhados.',
     imageUrl: null,
-    benefits: ['Refrescante', 'Versatil em receitas'],
+    benefits: ['Refrescante', 'Versátil em receitas'],
     howToChoose: ['Observe aroma doce na base'],
     howToStore: ['Conserve refrigerado depois de cortar'],
     usageTips: ['Vai bem em sucos e grelhados'],
@@ -52,16 +55,16 @@ const products = [
     slug: 'alface',
     category: ProductCategory.VEGETABLE,
     shortDescription: 'Base leve para saladas.',
-    description: 'Folha crocante para saladas e sanduiches.',
+    description: 'Folha crocante para saladas e sanduíches.',
     imageUrl: null,
-    benefits: ['Leve e hidratante', 'Facil de combinar'],
+    benefits: ['Leve e hidratante', 'Fácil de combinar'],
     howToChoose: ['Prefira folhas verdes e sem manchas'],
     howToStore: ['Guarde seca em pote fechado'],
     usageTips: ['Lave apenas antes de consumir'],
     nutrients: [{ label: 'Destaque', value: 'Fibras' }],
   },
   {
-    name: 'Agriao',
+    name: 'Agrião',
     slug: 'agriao',
     category: ProductCategory.VEGETABLE,
     shortDescription: 'Folha de sabor marcante.',
@@ -77,26 +80,26 @@ const products = [
     name: 'Banana',
     slug: 'banana',
     category: ProductCategory.FRUIT,
-    shortDescription: 'Pratica para o dia a dia.',
-    description: 'Fruta energetica para lanches, bolos e vitaminas.',
+    shortDescription: 'Prática para o dia a dia.',
+    description: 'Fruta energética para lanches, bolos e vitaminas.',
     imageUrl: null,
-    benefits: ['Energia rapida', 'Facil de transportar'],
-    howToChoose: ['Veja se a casca esta uniforme'],
+    benefits: ['Energia rápida', 'Fácil de transportar'],
+    howToChoose: ['Veja se a casca está uniforme'],
     howToStore: ['Conserve em fruteira ventilada'],
     usageTips: ['Boa para lanches e bolos'],
-    nutrients: [{ label: 'Destaque', value: 'Potassio' }],
+    nutrients: [{ label: 'Destaque', value: 'Potássio' }],
   },
   {
     name: 'Cenoura',
     slug: 'cenoura',
     category: ProductCategory.VEGETABLE,
-    shortDescription: 'Raiz versatil e adocicada.',
+    shortDescription: 'Raiz versátil e adocicada.',
     description: 'Pode ser consumida crua, cozida ou assada.',
     imageUrl: null,
-    benefits: ['Versatil', 'Boa para saladas e assados'],
+    benefits: ['Versátil', 'Boa para saladas e assados'],
     howToChoose: ['Prefira unidades firmes e lisas'],
     howToStore: ['Guarde refrigerada'],
-    usageTips: ['Fica otima em sucos e refogados'],
+    usageTips: ['Fica ótima em sucos e refogados'],
     nutrients: [{ label: 'Vitamina principal', value: 'Vitamina A' }],
   },
   {
@@ -104,9 +107,9 @@ const products = [
     slug: 'tomate',
     category: ProductCategory.FRUIT,
     shortDescription: 'Suculento e muito usado na cozinha.',
-    description: 'Perfeito para saladas, molhos e sanduiches.',
+    description: 'Perfeito para saladas, molhos e sanduíches.',
     imageUrl: null,
-    benefits: ['Muito versatil', 'Ideal para molhos'],
+    benefits: ['Muito versátil', 'Ideal para molhos'],
     howToChoose: ['Escolha os firmes e brilhantes'],
     howToStore: ['Mantenha fora da geladeira se estiver verde'],
     usageTips: ['Use cru ou em molhos caseiros'],
@@ -116,33 +119,33 @@ const products = [
     name: 'Batata',
     slug: 'batata',
     category: ProductCategory.LEGUME,
-    shortDescription: 'Ingrediente basico e versatil.',
-    description: 'Funciona em pure, assados, cozidos e sopas.',
+    shortDescription: 'Ingrediente básico e versátil.',
+    description: 'Funciona em purê, assados, cozidos e sopas.',
     imageUrl: null,
-    benefits: ['Alta versatilidade', 'Boa base para refeicoes'],
+    benefits: ['Alta versatilidade', 'Boa base para refeições'],
     howToChoose: ['Evite batatas com brotos'],
     howToStore: ['Guarde em local seco e escuro'],
-    usageTips: ['Use em pure, assados e sopas'],
+    usageTips: ['Use em purê, assados e sopas'],
     nutrients: [{ label: 'Destaque', value: 'Carboidratos' }],
   },
   {
     name: 'Couve',
     slug: 'couve',
     category: ProductCategory.VEGETABLE,
-    shortDescription: 'Folha classica da cozinha brasileira.',
+    shortDescription: 'Folha clássica da cozinha brasileira.',
     description: 'Boa para refogados, sucos e acompanhamentos.',
     imageUrl: null,
     benefits: ['Boa para refogados', 'Combina com sucos verdes'],
     howToChoose: ['Escolha folhas firmes e sem amarelado'],
     howToStore: ['Conserve refrigerada'],
-    usageTips: ['Corte fino para refogar rapido'],
-    nutrients: [{ label: 'Destaque', value: 'Calcio' }],
+    usageTips: ['Corte fino para refogar rápido'],
+    nutrients: [{ label: 'Destaque', value: 'Cálcio' }],
   },
   {
     name: 'Manga',
     slug: 'manga',
     category: ProductCategory.FRUIT,
-    shortDescription: 'Doce e aromatica.',
+    shortDescription: 'Doce e aromática.',
     description: 'Vai bem em sucos, sobremesas e saladas.',
     imageUrl: null,
     benefits: ['Sabor adocicado', 'Boa para sobremesas'],
@@ -157,7 +160,7 @@ const articles = [
   {
     title: 'Como escolher um abacate no ponto certo',
     slug: 'como-escolher-um-abacate-no-ponto-certo',
-    summary: 'Aprenda sinais simples para identificar maturacao.',
+    summary: 'Aprenda sinais simples para identificar maturação.',
     content:
       'Observe a casca, aperte com leveza e prefira frutas sem machucados para acertar no ponto de consumo.',
     category: ArticleCategory.TIPS,
@@ -174,16 +177,16 @@ const articles = [
       'Seque bem as folhas, use pote fechado com papel toalha e evite lavar tudo antes do armazenamento.',
     category: ArticleCategory.STORAGE,
     imageUrl: null,
-    tags: ['folhas', 'conservacao'],
+    tags: ['folhas', 'conservação'],
     isPublished: true,
     publishedAt: new Date('2026-05-21T10:00:00.000Z'),
   },
   {
-    title: 'Frutas da estacao: por que vale a pena observar',
+    title: 'Frutas da estação: por que vale a pena observar',
     slug: 'frutas-da-estacao-por-que-vale-a-pena-observar',
-    summary: 'Entenda como safra influencia sabor e preco.',
+    summary: 'Entenda como a safra influencia sabor e preço.',
     content:
-      'Produtos da estacao costumam chegar mais frescos, com melhor sabor e valores mais equilibrados no dia a dia.',
+      'Produtos da estação costumam chegar mais frescos, com melhor sabor e valores mais equilibrados no dia a dia.',
     category: ArticleCategory.SEASONALITY,
     imageUrl: null,
     tags: ['safra', 'economia'],
@@ -193,12 +196,12 @@ const articles = [
   {
     title: 'Como aproveitar talos e cascas no dia a dia',
     slug: 'como-aproveitar-talos-e-cascas-no-dia-a-dia',
-    summary: 'Aproveitamento simples para reduzir desperdicio.',
+    summary: 'Aproveitamento simples para reduzir desperdício.',
     content:
       'Use talos em refogados, caldos e bolinhos, e experimente cascas higienizadas em chips, farofas e sucos.',
     category: ArticleCategory.WASTE_REDUCTION,
     imageUrl: null,
-    tags: ['aproveitamento', 'desperdicio'],
+    tags: ['aproveitamento', 'desperdício'],
     isPublished: true,
     publishedAt: new Date('2026-05-23T10:00:00.000Z'),
   },
@@ -217,35 +220,52 @@ const articles = [
   {
     title: 'Como reduzir perdas na geladeira',
     slug: 'como-reduzir-perdas-na-geladeira',
-    summary: 'Organizacao simples para evitar desperdicio.',
+    summary: 'Organização simples para evitar desperdício.',
     content:
-      'Separe os alimentos por uso, mantenha recipientes visiveis e revise os itens mais maduros antes de novas compras.',
+      'Separe os alimentos por uso, mantenha recipientes visíveis e revise os itens mais maduros antes de novas compras.',
     category: ArticleCategory.STORAGE,
     imageUrl: null,
-    tags: ['geladeira', 'organizacao'],
+    tags: ['geladeira', 'organização'],
     isPublished: true,
     publishedAt: new Date('2026-05-25T10:00:00.000Z'),
   },
 ];
 
-async function main() {
-  const passwordHash = await hash('hortivia-admin-local', 10);
-  const author = await prisma.user.upsert({
+async function ensureSeedContentAuthor() {
+  const passwordHash = await hash(randomBytes(32).toString('hex'), 10);
+
+  return prisma.user.upsert({
     where: {
-      email: 'admin@hortivia.local',
+      email: seedContentAuthorEmail,
     },
     create: {
       name: 'Equipe HortiVia',
-      email: 'admin@hortivia.local',
+      email: seedContentAuthorEmail,
       passwordHash,
-      role: UserRole.ADMIN,
+      role: UserRole.USER,
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
     },
     update: {
       name: 'Equipe HortiVia',
       passwordHash,
-      role: UserRole.ADMIN,
+      role: UserRole.USER,
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
+      emailConfirmationCodeHash: null,
+      emailConfirmationCodeExpiresAt: null,
+      emailConfirmationCodeSentAt: null,
+      emailConfirmationAttempts: 0,
+      passwordResetCodeHash: null,
+      passwordResetCodeExpiresAt: null,
+      passwordResetCodeSentAt: null,
+      passwordResetAttempts: 0,
     },
   });
+}
+
+async function main() {
+  const author = await ensureSeedContentAuthor();
 
   for (const product of products) {
     await prisma.product.upsert({
