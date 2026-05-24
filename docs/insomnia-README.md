@@ -2,7 +2,7 @@
 
 Esta pasta contem uma collection completa do Insomnia para testar a API HortiVia sem precisar abrir o app nem consultar o banco manualmente.
 
-Importante: a collection cobre todas as rotas HTTP que o backend expoe hoje. Ela nao inventa endpoints que ainda nao existem.
+Importante: a collection cobre todas as rotas HTTP que o backend expoe hoje.
 
 ## Arquivos
 
