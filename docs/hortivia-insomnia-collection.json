@@ -1,7 +1,7 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-05-22T23:30:00.000Z",
+  "__export_date": "2026-05-24T21:20:00.000Z",
   "__export_source": "codex.manual-export",
   "resources": [
     {
@@ -29,9 +29,13 @@
         "confirmation_code": "",
         "managed_user_id": "",
         "product_id": "",
+        "product_image_id": "",
+        "product_guide_section_id": "",
         "article_id": "",
         "avatar_file_path": "C:/caminho/para/avatar.jpg",
         "product_image_file_path": "C:/caminho/para/produto.jpg",
+        "product_gallery_image_file_path": "C:/caminho/para/galeria-produto.jpg",
+        "product_section_image_file_path": "C:/caminho/para/secao-produto.jpg",
         "article_image_file_path": "C:/caminho/para/artigo.jpg",
         "users_search": "",
         "users_role_filter": "",
@@ -531,6 +535,252 @@
           }
         ]
       },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_create_gallery_image_upload",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Create Product Gallery Image Upload",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/upload",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_gallery_image_file",
+            "name": "image",
+            "type": "file",
+            "fileName": "{{ _.product_gallery_image_file_path }}"
+          },
+          {
+            "id": "pair_gallery_kind",
+            "name": "kind",
+            "value": "HERO",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_alt",
+            "name": "alt",
+            "value": "Produto em destaque",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_caption",
+            "name": "caption",
+            "value": "Imagem principal do produto",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_sort_order",
+            "name": "sortOrder",
+            "value": "0",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_is_primary",
+            "name": "isPrimary",
+            "value": "true",
+            "type": "text"
+          }
+        ]
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_update_gallery_image",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "PATCH Update Product Gallery Image",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/{{ _.product_image_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"kind\": \"USAGE\",\n  \"alt\": \"Produto preparado para uso\",\n  \"caption\": \"Nova legenda da imagem\",\n  \"sortOrder\": 1,\n  \"isPrimary\": false\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_replace_gallery_image_file",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Replace Product Gallery Image File",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/{{ _.product_image_id }}/file",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_gallery_replace_file",
+            "name": "image",
+            "type": "file",
+            "fileName": "{{ _.product_gallery_image_file_path }}"
+          },
+          {
+            "id": "pair_gallery_replace_kind",
+            "name": "kind",
+            "value": "WHOLE",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_replace_alt",
+            "name": "alt",
+            "value": "Produto inteiro",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_replace_caption",
+            "name": "caption",
+            "value": "Imagem atualizada da galeria",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_replace_sort",
+            "name": "sortOrder",
+            "value": "1",
+            "type": "text"
+          },
+          {
+            "id": "pair_gallery_replace_primary",
+            "name": "isPrimary",
+            "value": "false",
+            "type": "text"
+          }
+        ]
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_delete_gallery_image",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "DELETE Product Gallery Image",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/{{ _.product_image_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_create_guide_section",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Create Product Guide Section",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"kind\": \"CHOOSE\",\n  \"title\": \"Como escolher\",\n  \"body\": \"Prefira unidades firmes e com boa aparência geral.\",\n  \"imageAlt\": \"Produto em bom estado\",\n  \"imageCaption\": \"Exemplo visual do ponto ideal\",\n  \"bullets\": [\"Observe a casca\", \"Veja a firmeza\"],\n  \"idealPoints\": [\"Cor uniforme\", \"Sem danos\"],\n  \"avoidPoints\": [\"Partes moles\", \"Rachaduras\"],\n  \"sortOrder\": 0\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_update_guide_section",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "PATCH Update Product Guide Section",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.product_guide_section_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Como escolher melhor\",\n  \"body\": \"Revise a aparência, a firmeza e sinais de frescor.\",\n  \"bullets\": [\"Cor uniforme\", \"Textura firme\"],\n  \"idealPoints\": [\"Cheiro fresco\"],\n  \"avoidPoints\": [\"Mofo\", \"Fermentação\"],\n  \"sortOrder\": 1\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_upload_guide_section_image",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Upload Product Guide Section Image",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.product_guide_section_id }}/image",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_section_image_file",
+            "name": "image",
+            "type": "file",
+            "fileName": "{{ _.product_section_image_file_path }}"
+          }
+        ]
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_delete_guide_section_image",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "DELETE Product Guide Section Image",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.product_guide_section_id }}/image",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_delete_guide_section",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "DELETE Product Guide Section",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.product_guide_section_id }}",
+      "body": {},
       "headers": [
         {
           "name": "Authorization",

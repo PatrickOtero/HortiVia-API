@@ -1,13 +1,11 @@
 # HortiVia Insomnia
 
-Esta pasta contém uma collection completa do Insomnia para testar a API HortiVia sem precisar abrir o app nem consultar o banco manualmente.
-
-Importante: a collection cobre todas as rotas HTTP que o backend expõe hoje.
+Esta pasta contém uma collection completa do Insomnia para testar a API HortiVia sem depender do app.
 
 ## Arquivos
 
-- `hortivia-insomnia-collection.json`: export importável no Insomnia.
-- `insomnia-README.md`: guia rápido de uso.
+- `hortivia-insomnia-collection.json`: export para importar no Insomnia
+- `insomnia-README.md`: guia rápido de uso
 
 ## Como importar
 
@@ -21,7 +19,7 @@ Importante: a collection cobre todas as rotas HTTP que o backend expõe hoje.
 
 Preencha no environment conforme o seu contexto:
 
-- `base_url`: URL da API. Exemplo local: `http://localhost:3000`
+- `base_url`
 - `register_name`
 - `register_email`
 - `register_password`
@@ -34,12 +32,25 @@ Preencha no environment conforme o seu contexto:
 - `confirmation_code`
 - `managed_user_id`
 - `product_id`
+- `product_image_id`
+- `product_guide_section_id`
 - `article_id`
 - `avatar_file_path`
 - `product_image_file_path`
+- `product_gallery_image_file_path`
+- `product_section_image_file_path`
 - `article_image_file_path`
+- `users_search`
+- `users_role_filter`
+- `users_email_verified`
+- `product_search`
+- `product_category`
+- `article_search`
+- `article_category`
+- `page`
+- `limit`
 
-## Fluxo sugerido de teste
+## Fluxo sugerido
 
 ### 1. Health
 
@@ -49,25 +60,25 @@ Use `GET Health` para validar se a API está no ar.
 
 1. Rode `POST Register`.
 2. Abra o e-mail recebido.
-3. Copie o código de 6 dígitos enviado por e-mail.
+3. Copie o código de 6 dígitos.
 4. Cole esse valor em `confirmation_code`.
 5. Rode `POST Confirm Email`.
 
-Se quiser gerar um novo e-mail:
+Se quiser reenviar:
 
 1. Garanta que `register_email` está preenchido.
 2. Rode `POST Resend Confirmation`.
 
 ### 3. Login
 
-- Para conta comum, use `POST Login User`.
-- Para conta admin, use `POST Login Admin`.
+- Conta comum: `POST Login User`
+- Conta admin: `POST Login Admin`
 
 Depois do login:
 
-1. Copie o `accessToken` retornado.
+1. Copie o `accessToken`.
 2. Cole em `access_token` para rotas autenticadas comuns.
-3. Cole em `admin_access_token` para rotas admin.
+3. Cole em `admin_access_token` para rotas administrativas.
 
 ## Fluxo de produtos
 
@@ -76,7 +87,7 @@ Depois do login:
 - `GET Products`
 - `GET Product By Id`
 
-Use `product_search`, `product_category`, `page` e `limit` se quiser filtrar listagem.
+Use `product_search`, `product_category`, `page` e `limit` se quiser filtrar a listagem.
 
 Categorias aceitas:
 
@@ -84,7 +95,7 @@ Categorias aceitas:
 - `VEGETABLE`
 - `LEGUME`
 
-### Rotas admin
+### Rotas admin de produto
 
 - `POST Create Product`
 - `PATCH Update Product`
@@ -93,12 +104,66 @@ Categorias aceitas:
 
 Depois de criar um produto, copie o `id` retornado para `product_id`.
 
-Para upload de imagem:
+### Galeria visual do produto
 
-1. Ajuste `product_image_file_path`.
-2. Rode `POST Upload Product Image`.
+Requests incluídos:
 
-O campo multipart já está configurado como `image`.
+- `POST Create Product Gallery Image Upload`
+- `PATCH Update Product Gallery Image`
+- `POST Replace Product Gallery Image File`
+- `DELETE Product Gallery Image`
+
+Fluxo recomendado:
+
+1. Ajuste `product_id`.
+2. Ajuste `product_gallery_image_file_path`.
+3. Rode `POST Create Product Gallery Image Upload`.
+4. Copie o `id` da imagem retornada para `product_image_id`.
+5. Use `PATCH Update Product Gallery Image` para trocar legenda, tipo, ordem ou imagem principal.
+6. Use `POST Replace Product Gallery Image File` quando quiser trocar o arquivo da imagem.
+7. Use `DELETE Product Gallery Image` para remover o item da galeria.
+
+Tipos aceitos para `kind`:
+
+- `HERO`
+- `WHOLE`
+- `CUT`
+- `IDEAL_STATE`
+- `UNRIPE_STATE`
+- `DEFECT`
+- `STORAGE`
+- `USAGE`
+- `OTHER`
+
+### Seções do guia do produto
+
+Requests incluídos:
+
+- `POST Create Product Guide Section`
+- `PATCH Update Product Guide Section`
+- `POST Upload Product Guide Section Image`
+- `DELETE Product Guide Section Image`
+- `DELETE Product Guide Section`
+
+Fluxo recomendado:
+
+1. Ajuste `product_id`.
+2. Rode `POST Create Product Guide Section`.
+3. Copie o `id` retornado para `product_guide_section_id`.
+4. Se quiser imagem na seção, ajuste `product_section_image_file_path`.
+5. Rode `POST Upload Product Guide Section Image`.
+6. Use `PATCH Update Product Guide Section` para revisar título, texto, bullets, sinais ideais, sinais de atenção e ordem.
+7. Use `DELETE Product Guide Section Image` para remover só a imagem da seção.
+8. Use `DELETE Product Guide Section` para remover a seção inteira.
+
+Tipos aceitos para `kind` da seção:
+
+- `CHOOSE`
+- `OBSERVE`
+- `STORE`
+- `USE`
+- `QUICK_FACTS`
+- `OTHER`
 
 ## Fluxo de artigos
 
@@ -107,7 +172,7 @@ O campo multipart já está configurado como `image`.
 - `GET Articles`
 - `GET Article By Id`
 
-Use `article_search`, `article_category`, `page` e `limit` se quiser filtrar listagem.
+Use `article_search`, `article_category`, `page` e `limit` se quiser filtrar a listagem.
 
 Categorias aceitas:
 
@@ -126,13 +191,6 @@ Categorias aceitas:
 
 Depois de criar um artigo, copie o `id` retornado para `article_id`.
 
-Para upload de imagem:
-
-1. Ajuste `article_image_file_path`.
-2. Rode `POST Upload Article Image`.
-
-O campo multipart já está configurado como `image`.
-
 ## Perfil e preferências
 
 Rotas autenticadas com `access_token`:
@@ -144,13 +202,6 @@ Rotas autenticadas com `access_token`:
 - `GET Preferences`
 - `PATCH Preferences`
 
-Para upload de avatar:
-
-1. Ajuste `avatar_file_path`.
-2. Rode `POST Upload Avatar`.
-
-O campo multipart já está configurado como `avatar`.
-
 ## Usuários admin
 
 Rotas autenticadas com `admin_access_token`:
@@ -160,24 +211,18 @@ Rotas autenticadas com `admin_access_token`:
 - `PATCH Update User`
 - `DELETE User`
 
-Fluxo útil para substituir o DBeaver em testes:
+Fluxo útil:
 
-1. Crie um usuário pelo `POST Register`.
+1. Crie um usuário com `POST Register`.
 2. Confirme o e-mail, se necessário.
-3. Use `GET Users` com `users_search` preenchido com o e-mail ou nome.
+3. Use `GET Users` com `users_search`.
 4. Copie o `id` para `managed_user_id`.
 5. Use `PATCH Update User` para promover a conta a `ADMIN` ou marcar `emailVerified`.
-6. Use `DELETE User` para remover a conta de teste quando terminar.
-
-Filtros aceitos em `GET Users`:
-
-- `users_search`
-- `users_role_filter`: `USER` ou `ADMIN`
-- `users_email_verified`: `true` ou `false`
+6. Use `DELETE User` para remover a conta de teste.
 
 ## Observações
 
-- O cadastro não autentica automaticamente. Confirme o e-mail antes de fazer login.
+- O cadastro não autentica automaticamente.
 - As rotas admin exigem um usuário com role `ADMIN`.
-- Os uploads exigem que a configuração de armazenamento da API esteja válida.
-- A exclusão de usuário falha de forma segura se a conta tiver dados vinculados, como artigos com autoria associada.
+- Os uploads exigem configuração válida de armazenamento.
+- A collection já cobre o fluxo antigo de `imageUrl` do produto e o fluxo novo de galeria e seções visuais.

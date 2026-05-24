@@ -14,10 +14,12 @@ import {
 import type { UploadFile } from '../storage/types/upload-file';
 import type { CreateProductGuideSectionDto } from './dto/create-product-guide-section.dto';
 import type { CreateProductImageDto } from './dto/create-product-image.dto';
+import type { CreateProductImageUploadDto } from './dto/create-product-image-upload.dto';
 import type { CreateProductDto } from './dto/create-product.dto';
 import type { ListProductsQueryDto } from './dto/list-products-query.dto';
 import type { ProductNutrientDto } from './dto/product-nutrient.dto';
 import type { UpdateProductGuideSectionDto } from './dto/update-product-guide-section.dto';
+import type { UpdateProductImageFileDto } from './dto/update-product-image-file.dto';
 import type { UpdateProductImageDto } from './dto/update-product-image.dto';
 import type { UpdateProductDto } from './dto/update-product.dto';
 import {
@@ -251,6 +253,62 @@ export class ProductsService {
     return toProductImageResponse(createdImage);
   }
 
+  async createImageWithUpload(
+    productId: string,
+    createProductImageUploadDto: CreateProductImageUploadDto,
+    file?: UploadFile,
+  ): Promise<ProductImageResponse> {
+    await this.requireActiveProduct(productId);
+    const imageFile = this.validateImageFile(file);
+    let createdImageId: string | null = null;
+
+    try {
+      const createdImage = await this.productsRepository.createProductImage(productId, {
+        productId,
+        url: '',
+        alt: this.normalizeOptionalText(createProductImageUploadDto.alt),
+        caption: this.normalizeOptionalText(createProductImageUploadDto.caption),
+        kind: createProductImageUploadDto.kind,
+        sortOrder: createProductImageUploadDto.sortOrder ?? 0,
+        isPrimary: createProductImageUploadDto.isPrimary ?? false,
+      });
+      createdImageId = createdImage.id;
+
+      const uploadResult = await this.storageService.uploadProductGalleryImage(
+        productId,
+        createdImage.id,
+        imageFile,
+      );
+
+      const updatedImage = await this.productsRepository.updateProductImage(
+        createdImage.id,
+        {
+          url: uploadResult.url,
+        },
+      );
+
+      if (updatedImage.isPrimary) {
+        await this.productsRepository.clearPrimaryProductImages(
+          productId,
+          updatedImage.id,
+        );
+      }
+
+      return toProductImageResponse(updatedImage);
+    } catch {
+      if (createdImageId) {
+        await this.productsRepository
+          .deleteProductImage(createdImageId)
+          .catch(() => undefined);
+      }
+
+      throw new InternalServerErrorException({
+        message: 'Não foi possível enviar a imagem.',
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
   async updateImage(
     productId: string,
     imageId: string,
@@ -295,6 +353,65 @@ export class ProductsService {
     }
 
     return toProductImageResponse(updatedImage);
+  }
+
+  async replaceImageFile(
+    productId: string,
+    imageId: string,
+    updateProductImageFileDto: UpdateProductImageFileDto,
+    file?: UploadFile,
+  ): Promise<ProductImageResponse> {
+    await this.requireActiveProduct(productId);
+    await this.requireProductImage(productId, imageId);
+    const imageFile = this.validateImageFile(file);
+
+    try {
+      const uploadResult = await this.storageService.uploadProductGalleryImage(
+        productId,
+        imageId,
+        imageFile,
+      );
+
+      const data: Prisma.ProductImageUpdateInput = {
+        url: uploadResult.url,
+      };
+
+      if (updateProductImageFileDto.kind !== undefined) {
+        data.kind = updateProductImageFileDto.kind;
+      }
+
+      if (updateProductImageFileDto.alt !== undefined) {
+        data.alt = this.normalizeOptionalText(updateProductImageFileDto.alt);
+      }
+
+      if (updateProductImageFileDto.caption !== undefined) {
+        data.caption = this.normalizeOptionalText(updateProductImageFileDto.caption);
+      }
+
+      if (updateProductImageFileDto.sortOrder !== undefined) {
+        data.sortOrder = updateProductImageFileDto.sortOrder;
+      }
+
+      if (updateProductImageFileDto.isPrimary !== undefined) {
+        data.isPrimary = updateProductImageFileDto.isPrimary;
+      }
+
+      const updatedImage = await this.productsRepository.updateProductImage(
+        imageId,
+        data,
+      );
+
+      if (updatedImage.isPrimary) {
+        await this.productsRepository.clearPrimaryProductImages(productId, imageId);
+      }
+
+      return toProductImageResponse(updatedImage);
+    } catch {
+      throw new InternalServerErrorException({
+        message: 'Não foi possível enviar a imagem.',
+        error: 'Internal Server Error',
+      });
+    }
   }
 
   async deleteImage(productId: string, imageId: string) {
@@ -402,6 +519,55 @@ export class ProductsService {
       sectionId,
       data,
     );
+
+    return toProductGuideSectionResponse(updatedSection);
+  }
+
+  async uploadGuideSectionImage(
+    productId: string,
+    sectionId: string,
+    file?: UploadFile,
+  ): Promise<ProductGuideSectionResponse> {
+    await this.requireActiveProduct(productId);
+    const existingSection = await this.requireGuideSection(productId, sectionId);
+    const imageFile = this.validateImageFile(file);
+
+    try {
+      const uploadResult = await this.storageService.uploadProductGuideSectionImage(
+        productId,
+        sectionId,
+        imageFile,
+      );
+
+      const updatedSection =
+        await this.productsRepository.updateProductGuideSectionImage(
+          sectionId,
+          uploadResult.url,
+          existingSection.imageAlt,
+        );
+
+      return toProductGuideSectionResponse(updatedSection);
+    } catch {
+      throw new InternalServerErrorException({
+        message: 'Não foi possível enviar a imagem.',
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  async removeGuideSectionImage(
+    productId: string,
+    sectionId: string,
+  ): Promise<ProductGuideSectionResponse> {
+    await this.requireActiveProduct(productId);
+    await this.requireGuideSection(productId, sectionId);
+
+    const updatedSection =
+      await this.productsRepository.updateProductGuideSectionImage(
+        sectionId,
+        null,
+        null,
+      );
 
     return toProductGuideSectionResponse(updatedSection);
   }

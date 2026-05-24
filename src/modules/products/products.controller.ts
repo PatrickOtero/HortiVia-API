@@ -23,8 +23,10 @@ import { ImageUploadExceptionFilter } from '../storage/image-upload.exception-fi
 import { CreateProductDto } from './dto/create-product.dto';
 import { CreateProductGuideSectionDto } from './dto/create-product-guide-section.dto';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
+import { CreateProductImageUploadDto } from './dto/create-product-image-upload.dto';
 import { ListProductsQueryDto } from './dto/list-products-query.dto';
 import { UpdateProductGuideSectionDto } from './dto/update-product-guide-section.dto';
+import { UpdateProductImageFileDto } from './dto/update-product-image-file.dto';
 import { UpdateProductImageDto } from './dto/update-product-image.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
@@ -114,6 +116,45 @@ export class ProductsController {
     return this.productsService.createImage(productId, createProductImageDto);
   }
 
+  @Post(':productId/images/upload')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @UseFilters(new ImageUploadExceptionFilter('5 MB'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: CONTENT_IMAGE_MAX_FILE_SIZE,
+      },
+    }),
+  )
+  async createImageWithUpload(
+    @Param('productId') productId: string,
+    @Body() createProductImageUploadDto: CreateProductImageUploadDto,
+    @UploadedFile()
+    file?:
+      | {
+          buffer: Buffer;
+          mimetype: string;
+          size: number;
+          originalname?: string;
+        }
+      | undefined,
+  ) {
+    return this.productsService.createImageWithUpload(
+      productId,
+      createProductImageUploadDto,
+      file
+        ? {
+            buffer: file.buffer,
+            mimeType: file.mimetype,
+            size: file.size,
+            originalName: file.originalname,
+          }
+        : undefined,
+    );
+  }
+
   @Patch(':productId/images/:imageId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -126,6 +167,47 @@ export class ProductsController {
       productId,
       imageId,
       updateProductImageDto,
+    );
+  }
+
+  @Post(':productId/images/:imageId/file')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @UseFilters(new ImageUploadExceptionFilter('5 MB'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: CONTENT_IMAGE_MAX_FILE_SIZE,
+      },
+    }),
+  )
+  async replaceImageFile(
+    @Param('productId') productId: string,
+    @Param('imageId') imageId: string,
+    @Body() updateProductImageFileDto: UpdateProductImageFileDto,
+    @UploadedFile()
+    file?:
+      | {
+          buffer: Buffer;
+          mimetype: string;
+          size: number;
+          originalname?: string;
+        }
+      | undefined,
+  ) {
+    return this.productsService.replaceImageFile(
+      productId,
+      imageId,
+      updateProductImageFileDto,
+      file
+        ? {
+            buffer: file.buffer,
+            mimeType: file.mimetype,
+            size: file.size,
+            originalName: file.originalname,
+          }
+        : undefined,
     );
   }
 
@@ -165,6 +247,55 @@ export class ProductsController {
       sectionId,
       updateProductGuideSectionDto,
     );
+  }
+
+  @Post(':productId/guide-sections/:sectionId/image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @UseFilters(new ImageUploadExceptionFilter('5 MB'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: CONTENT_IMAGE_MAX_FILE_SIZE,
+      },
+    }),
+  )
+  async uploadGuideSectionImage(
+    @Param('productId') productId: string,
+    @Param('sectionId') sectionId: string,
+    @UploadedFile()
+    file?:
+      | {
+          buffer: Buffer;
+          mimetype: string;
+          size: number;
+          originalname?: string;
+        }
+      | undefined,
+  ) {
+    return this.productsService.uploadGuideSectionImage(
+      productId,
+      sectionId,
+      file
+        ? {
+            buffer: file.buffer,
+            mimeType: file.mimetype,
+            size: file.size,
+            originalName: file.originalname,
+          }
+        : undefined,
+    );
+  }
+
+  @Delete(':productId/guide-sections/:sectionId/image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async removeGuideSectionImage(
+    @Param('productId') productId: string,
+    @Param('sectionId') sectionId: string,
+  ) {
+    return this.productsService.removeGuideSectionImage(productId, sectionId);
   }
 
   @Delete(':productId/guide-sections/:sectionId')

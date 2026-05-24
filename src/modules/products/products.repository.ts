@@ -160,6 +160,22 @@ export class ProductsRepository {
     });
   }
 
+  async updateProductGuideSectionImage(
+    sectionId: string,
+    imageUrl: string | null,
+    imageAlt?: string | null,
+  ) {
+    return this.prisma.productGuideSection.update({
+      where: {
+        id: sectionId,
+      },
+      data: {
+        imageUrl,
+        imageAlt: imageAlt ?? null,
+      },
+    });
+  }
+
   async deleteProductGuideSection(sectionId: string) {
     return this.prisma.productGuideSection.delete({
       where: {

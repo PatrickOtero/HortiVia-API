@@ -31,6 +31,34 @@ export class StorageService {
     return this.cloudflareR2StorageService.uploadFile(objectKey, file);
   }
 
+  async uploadProductGalleryImage(
+    productId: string,
+    imageId: string,
+    file: UploadFile,
+  ): Promise<UploadResult> {
+    const objectKey = this.buildObjectKey(
+      `products/${productId}/gallery`,
+      imageId,
+      file.mimeType,
+    );
+
+    return this.cloudflareR2StorageService.uploadFile(objectKey, file);
+  }
+
+  async uploadProductGuideSectionImage(
+    productId: string,
+    sectionId: string,
+    file: UploadFile,
+  ): Promise<UploadResult> {
+    const objectKey = this.buildObjectKey(
+      `products/${productId}/guide-sections`,
+      sectionId,
+      file.mimeType,
+    );
+
+    return this.cloudflareR2StorageService.uploadFile(objectKey, file);
+  }
+
   async uploadArticleImage(
     articleId: string,
     file: UploadFile,
