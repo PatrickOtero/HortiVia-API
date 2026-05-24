@@ -11,6 +11,8 @@ import { toSafeUser } from './users.mapper';
 import type {
   CreateUserInput,
   UpdateEmailConfirmationInput,
+  UpdatePasswordHashAndClearResetCodeInput,
+  UpdatePasswordResetCodeInput,
   UpdateUserInput,
   VerifyEmailInput,
   UsersListResponse,
@@ -165,7 +167,7 @@ export class UsersService {
   async remove(id: string, currentUserId: string) {
     if (id === currentUserId) {
       throw new ForbiddenException({
-        message: 'Voce nao pode excluir a propria conta.',
+        message: 'Você não pode excluir a própria conta.',
         error: 'Forbidden',
       });
     }
@@ -185,7 +187,8 @@ export class UsersService {
 
       if (this.isRelationConstraintError(error)) {
         throw new ConflictException({
-          message: 'Nao foi possivel remover o usuario porque ele possui dados vinculados.',
+          message:
+            'Não foi possível remover o usuário porque ele possui dados vinculados.',
           error: 'Conflict',
         });
       }
@@ -194,7 +197,7 @@ export class UsersService {
     }
 
     return {
-      message: 'Usuario removido.',
+      message: 'Usuário removido.',
     };
   }
 
@@ -211,6 +214,24 @@ export class UsersService {
 
   async incrementEmailConfirmationAttempts(userId: string) {
     return this.usersRepository.incrementEmailConfirmationAttempts(userId);
+  }
+
+  async updatePasswordResetCode(
+    userId: string,
+    data: UpdatePasswordResetCodeInput,
+  ) {
+    return this.usersRepository.updatePasswordResetCode(userId, data);
+  }
+
+  async incrementPasswordResetAttempts(userId: string) {
+    return this.usersRepository.incrementPasswordResetAttempts(userId);
+  }
+
+  async updatePasswordHashAndClearResetCode(
+    userId: string,
+    data: UpdatePasswordHashAndClearResetCodeInput,
+  ) {
+    return this.usersRepository.updatePasswordHashAndClearResetCode(userId, data);
   }
 
   private buildListWhereInput(query: ListUsersQueryDto): Prisma.UserWhereInput {
@@ -254,14 +275,14 @@ export class UsersService {
 
   private buildUserNotFoundException() {
     return new NotFoundException({
-      message: 'Usuario nao encontrado.',
+      message: 'Usuário não encontrado.',
       error: 'Not Found',
     });
   }
 
   private buildDuplicateEmailException() {
     return new ConflictException({
-      message: 'Este e-mail j\u00e1 est\u00e1 em uso.',
+      message: 'Este e-mail já está em uso.',
       error: 'Conflict',
     });
   }

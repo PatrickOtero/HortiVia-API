@@ -36,6 +36,10 @@ export interface CreateUserInput {
   emailConfirmationCodeExpiresAt?: Date | null;
   emailConfirmationCodeSentAt?: Date | null;
   emailConfirmationAttempts?: number;
+  passwordResetCodeHash?: string | null;
+  passwordResetCodeExpiresAt?: Date | null;
+  passwordResetCodeSentAt?: Date | null;
+  passwordResetAttempts?: number;
 }
 
 export interface UpdateEmailConfirmationInput {
@@ -54,6 +58,21 @@ export interface VerifyEmailInput {
   emailConfirmationAttempts: number;
 }
 
+export interface UpdatePasswordResetCodeInput {
+  passwordResetCodeHash: string | null;
+  passwordResetCodeExpiresAt: Date | null;
+  passwordResetCodeSentAt: Date | null;
+  passwordResetAttempts: number;
+}
+
+export interface UpdatePasswordHashAndClearResetCodeInput {
+  passwordHash: string;
+  passwordResetCodeHash: null;
+  passwordResetCodeExpiresAt: null;
+  passwordResetCodeSentAt: null;
+  passwordResetAttempts: number;
+}
+
 export interface UpdateUserInput {
   name?: string;
   email?: string;
@@ -66,6 +85,10 @@ export interface UpdateUserInput {
   emailConfirmationCodeExpiresAt?: Date | null;
   emailConfirmationCodeSentAt?: Date | null;
   emailConfirmationAttempts?: number;
+  passwordResetCodeHash?: string | null;
+  passwordResetCodeExpiresAt?: Date | null;
+  passwordResetCodeSentAt?: Date | null;
+  passwordResetAttempts?: number;
 }
 
 export type UnsafeUser = UserModel;

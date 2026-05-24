@@ -16,3 +16,13 @@ export const RESEND_CONFIRMATION_COOLDOWN_MESSAGE =
   'Aguarde um momento antes de solicitar outro c\u00f3digo.';
 export const EMAIL_CONFIRMATION_SEND_FAILURE_MESSAGE =
   'N\u00e3o foi poss\u00edvel enviar o c\u00f3digo de confirma\u00e7\u00e3o agora. Tente novamente mais tarde.';
+export const FORGOT_PASSWORD_SUCCESS_MESSAGE =
+  'Se o e-mail estiver cadastrado, enviaremos um c\u00f3digo para redefinir sua senha.';
+export const RESET_PASSWORD_SUCCESS_MESSAGE =
+  'Senha redefinida com sucesso.';
+export const RESEND_PASSWORD_RESET_CODE_SUCCESS_MESSAGE =
+  'Se o e-mail estiver cadastrado, enviaremos um novo c\u00f3digo.';
+export const PASSWORD_RESET_COOLDOWN_MESSAGE =
+  'Aguarde um momento antes de solicitar outro c\u00f3digo.';
+export const PASSWORD_RESET_SEND_FAILURE_MESSAGE =
+  'N\u00e3o foi poss\u00edvel enviar o c\u00f3digo de redefini\u00e7\u00e3o agora. Tente novamente mais tarde.';

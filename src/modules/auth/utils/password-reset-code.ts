@@ -4,14 +4,14 @@ import {
   hashNumericCodeForEmail,
 } from './numeric-code';
 
-export function generateEmailConfirmationCode() {
+export function generatePasswordResetCode() {
   return generateSixDigitNumericCode();
 }
 
-export function hashEmailConfirmationCode(email: string, code: string) {
+export function hashPasswordResetCode(email: string, code: string) {
   return hashNumericCodeForEmail(email, code);
 }
 
-export function getEmailConfirmationCodeExpiresAt(expiresInMinutes?: number) {
+export function getPasswordResetCodeExpiresAt(expiresInMinutes?: number) {
   return getNumericCodeExpiresAt(expiresInMinutes);
 }

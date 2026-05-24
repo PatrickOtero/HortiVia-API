@@ -1,9 +1,12 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfirmEmailDto } from './dto/confirm-email.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResendEmailConfirmationDto } from './dto/resend-email-confirmation.dto';
+import { ResendPasswordResetCodeDto } from './dto/resend-password-reset-code.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { AuthenticatedUser } from './types/authenticated-user';
@@ -32,6 +35,25 @@ export class AuthController {
     @Body() resendEmailConfirmationDto: ResendEmailConfirmationDto,
   ) {
     return this.authService.resendConfirmation(resendEmailConfirmationDto);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Post('resend-password-reset-code')
+  async resendPasswordResetCode(
+    @Body() resendPasswordResetCodeDto: ResendPasswordResetCodeDto,
+  ) {
+    return this.authService.resendPasswordResetCode(
+      resendPasswordResetCodeDto,
+    );
   }
 
   @Get('me')

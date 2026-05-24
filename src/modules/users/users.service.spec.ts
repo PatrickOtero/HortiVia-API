@@ -15,6 +15,9 @@ describe('UsersService', () => {
     incrementEmailConfirmationAttempts: jest.fn(),
     updateEmailConfirmation: jest.fn(),
     updateEmailVerification: jest.fn(),
+    updatePasswordResetCode: jest.fn(),
+    incrementPasswordResetAttempts: jest.fn(),
+    updatePasswordHashAndClearResetCode: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
       UsersRepository,
@@ -28,6 +31,9 @@ describe('UsersService', () => {
       | 'incrementEmailConfirmationAttempts'
       | 'updateEmailConfirmation'
       | 'updateEmailVerification'
+      | 'updatePasswordResetCode'
+      | 'incrementPasswordResetAttempts'
+      | 'updatePasswordHashAndClearResetCode'
     >
   >;
 
@@ -53,6 +59,10 @@ describe('UsersService', () => {
       emailConfirmationCodeExpiresAt: null,
       emailConfirmationCodeSentAt: null,
       emailConfirmationAttempts: 0,
+      passwordResetCodeHash: null,
+      passwordResetCodeExpiresAt: null,
+      passwordResetCodeSentAt: null,
+      passwordResetAttempts: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -89,6 +99,10 @@ describe('UsersService', () => {
       emailConfirmationCodeSentAt:
         input.emailConfirmationCodeSentAt ?? null,
       emailConfirmationAttempts: input.emailConfirmationAttempts ?? 0,
+      passwordResetCodeHash: input.passwordResetCodeHash ?? null,
+      passwordResetCodeExpiresAt: input.passwordResetCodeExpiresAt ?? null,
+      passwordResetCodeSentAt: input.passwordResetCodeSentAt ?? null,
+      passwordResetAttempts: input.passwordResetAttempts ?? 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
@@ -124,6 +138,10 @@ describe('UsersService', () => {
       emailConfirmationCodeExpiresAt: new Date('2026-05-23T00:00:00.000Z'),
       emailConfirmationCodeSentAt: new Date('2026-05-22T00:00:00.000Z'),
       emailConfirmationAttempts: 2,
+      passwordResetCodeHash: null,
+      passwordResetCodeExpiresAt: null,
+      passwordResetCodeSentAt: null,
+      passwordResetAttempts: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -144,6 +162,10 @@ describe('UsersService', () => {
       emailConfirmationCodeSentAt:
         input.emailConfirmationCodeSentAt ?? null,
       emailConfirmationAttempts: input.emailConfirmationAttempts ?? 0,
+      passwordResetCodeHash: input.passwordResetCodeHash ?? null,
+      passwordResetCodeExpiresAt: input.passwordResetCodeExpiresAt ?? null,
+      passwordResetCodeSentAt: input.passwordResetCodeSentAt ?? null,
+      passwordResetAttempts: input.passwordResetAttempts ?? 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
@@ -172,7 +194,7 @@ describe('UsersService', () => {
   it('does not allow deleting the current user', async () => {
     await expect(service.remove('user-1', 'user-1')).rejects.toMatchObject({
       response: {
-        message: 'Voce nao pode excluir a propria conta.',
+        message: 'Você não pode excluir a própria conta.',
       },
     });
 

@@ -4,6 +4,8 @@ import type { Prisma } from '../../generated/prisma/client';
 import type {
   CreateUserInput,
   UpdateEmailConfirmationInput,
+  UpdatePasswordHashAndClearResetCodeInput,
+  UpdatePasswordResetCodeInput,
   UpdateUserInput,
   VerifyEmailInput,
 } from './types/user-response';
@@ -77,6 +79,37 @@ export class UsersRepository {
           increment: 1,
         },
       },
+    });
+  }
+
+  async updatePasswordResetCode(
+    userId: string,
+    data: UpdatePasswordResetCodeInput,
+  ) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  async incrementPasswordResetAttempts(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordResetAttempts: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  async updatePasswordHashAndClearResetCode(
+    userId: string,
+    data: UpdatePasswordHashAndClearResetCodeInput,
+  ) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
     });
   }
 

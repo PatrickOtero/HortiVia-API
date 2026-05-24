@@ -28,10 +28,12 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   emailConfirmationAttempts: number | null
+  passwordResetAttempts: number | null
 }
 
 export type UserSumAggregateOutputType = {
   emailConfirmationAttempts: number | null
+  passwordResetAttempts: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -48,6 +50,10 @@ export type UserMinAggregateOutputType = {
   emailConfirmationCodeExpiresAt: Date | null
   emailConfirmationCodeSentAt: Date | null
   emailConfirmationAttempts: number | null
+  passwordResetCodeHash: string | null
+  passwordResetCodeExpiresAt: Date | null
+  passwordResetCodeSentAt: Date | null
+  passwordResetAttempts: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,6 +72,10 @@ export type UserMaxAggregateOutputType = {
   emailConfirmationCodeExpiresAt: Date | null
   emailConfirmationCodeSentAt: Date | null
   emailConfirmationAttempts: number | null
+  passwordResetCodeHash: string | null
+  passwordResetCodeExpiresAt: Date | null
+  passwordResetCodeSentAt: Date | null
+  passwordResetAttempts: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -84,6 +94,10 @@ export type UserCountAggregateOutputType = {
   emailConfirmationCodeExpiresAt: number
   emailConfirmationCodeSentAt: number
   emailConfirmationAttempts: number
+  passwordResetCodeHash: number
+  passwordResetCodeExpiresAt: number
+  passwordResetCodeSentAt: number
+  passwordResetAttempts: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -92,10 +106,12 @@ export type UserCountAggregateOutputType = {
 
 export type UserAvgAggregateInputType = {
   emailConfirmationAttempts?: true
+  passwordResetAttempts?: true
 }
 
 export type UserSumAggregateInputType = {
   emailConfirmationAttempts?: true
+  passwordResetAttempts?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -112,6 +128,10 @@ export type UserMinAggregateInputType = {
   emailConfirmationCodeExpiresAt?: true
   emailConfirmationCodeSentAt?: true
   emailConfirmationAttempts?: true
+  passwordResetCodeHash?: true
+  passwordResetCodeExpiresAt?: true
+  passwordResetCodeSentAt?: true
+  passwordResetAttempts?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -130,6 +150,10 @@ export type UserMaxAggregateInputType = {
   emailConfirmationCodeExpiresAt?: true
   emailConfirmationCodeSentAt?: true
   emailConfirmationAttempts?: true
+  passwordResetCodeHash?: true
+  passwordResetCodeExpiresAt?: true
+  passwordResetCodeSentAt?: true
+  passwordResetAttempts?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -148,6 +172,10 @@ export type UserCountAggregateInputType = {
   emailConfirmationCodeExpiresAt?: true
   emailConfirmationCodeSentAt?: true
   emailConfirmationAttempts?: true
+  passwordResetCodeHash?: true
+  passwordResetCodeExpiresAt?: true
+  passwordResetCodeSentAt?: true
+  passwordResetAttempts?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -253,6 +281,10 @@ export type UserGroupByOutputType = {
   emailConfirmationCodeExpiresAt: Date | null
   emailConfirmationCodeSentAt: Date | null
   emailConfirmationAttempts: number
+  passwordResetCodeHash: string | null
+  passwordResetCodeExpiresAt: Date | null
+  passwordResetCodeSentAt: Date | null
+  passwordResetAttempts: number
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -294,6 +326,10 @@ export type UserWhereInput = {
   emailConfirmationCodeExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFilter<"User"> | number
+  passwordResetCodeHash?: Prisma.StringNullableFilter<"User"> | string | null
+  passwordResetCodeExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  passwordResetCodeSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  passwordResetAttempts?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   articles?: Prisma.ArticleListRelationFilter
@@ -314,6 +350,10 @@ export type UserOrderByWithRelationInput = {
   emailConfirmationCodeExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   emailConfirmationCodeSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   emailConfirmationAttempts?: Prisma.SortOrder
+  passwordResetCodeHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordResetCodeExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordResetCodeSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordResetAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   articles?: Prisma.ArticleOrderByRelationAggregateInput
@@ -337,6 +377,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   emailConfirmationCodeExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFilter<"User"> | number
+  passwordResetCodeHash?: Prisma.StringNullableFilter<"User"> | string | null
+  passwordResetCodeExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  passwordResetCodeSentAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  passwordResetAttempts?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   articles?: Prisma.ArticleListRelationFilter
@@ -357,6 +401,10 @@ export type UserOrderByWithAggregationInput = {
   emailConfirmationCodeExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   emailConfirmationCodeSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   emailConfirmationAttempts?: Prisma.SortOrder
+  passwordResetCodeHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordResetCodeExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordResetCodeSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  passwordResetAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -383,6 +431,10 @@ export type UserScalarWhereWithAggregatesInput = {
   emailConfirmationCodeExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   emailConfirmationAttempts?: Prisma.IntWithAggregatesFilter<"User"> | number
+  passwordResetCodeHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  passwordResetCodeExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  passwordResetCodeSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  passwordResetAttempts?: Prisma.IntWithAggregatesFilter<"User"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -401,6 +453,10 @@ export type UserCreateInput = {
   emailConfirmationCodeExpiresAt?: Date | string | null
   emailConfirmationCodeSentAt?: Date | string | null
   emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
@@ -421,6 +477,10 @@ export type UserUncheckedCreateInput = {
   emailConfirmationCodeExpiresAt?: Date | string | null
   emailConfirmationCodeSentAt?: Date | string | null
   emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
@@ -441,6 +501,10 @@ export type UserUpdateInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
@@ -461,6 +525,10 @@ export type UserUncheckedUpdateInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
@@ -481,6 +549,10 @@ export type UserCreateManyInput = {
   emailConfirmationCodeExpiresAt?: Date | string | null
   emailConfirmationCodeSentAt?: Date | string | null
   emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -499,6 +571,10 @@ export type UserUpdateManyMutationInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -517,6 +593,10 @@ export type UserUncheckedUpdateManyInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -535,12 +615,17 @@ export type UserCountOrderByAggregateInput = {
   emailConfirmationCodeExpiresAt?: Prisma.SortOrder
   emailConfirmationCodeSentAt?: Prisma.SortOrder
   emailConfirmationAttempts?: Prisma.SortOrder
+  passwordResetCodeHash?: Prisma.SortOrder
+  passwordResetCodeExpiresAt?: Prisma.SortOrder
+  passwordResetCodeSentAt?: Prisma.SortOrder
+  passwordResetAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   emailConfirmationAttempts?: Prisma.SortOrder
+  passwordResetAttempts?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -557,6 +642,10 @@ export type UserMaxOrderByAggregateInput = {
   emailConfirmationCodeExpiresAt?: Prisma.SortOrder
   emailConfirmationCodeSentAt?: Prisma.SortOrder
   emailConfirmationAttempts?: Prisma.SortOrder
+  passwordResetCodeHash?: Prisma.SortOrder
+  passwordResetCodeExpiresAt?: Prisma.SortOrder
+  passwordResetCodeSentAt?: Prisma.SortOrder
+  passwordResetAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -575,12 +664,17 @@ export type UserMinOrderByAggregateInput = {
   emailConfirmationCodeExpiresAt?: Prisma.SortOrder
   emailConfirmationCodeSentAt?: Prisma.SortOrder
   emailConfirmationAttempts?: Prisma.SortOrder
+  passwordResetCodeHash?: Prisma.SortOrder
+  passwordResetCodeExpiresAt?: Prisma.SortOrder
+  passwordResetCodeSentAt?: Prisma.SortOrder
+  passwordResetAttempts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   emailConfirmationAttempts?: Prisma.SortOrder
+  passwordResetAttempts?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -666,6 +760,10 @@ export type UserCreateWithoutArticlesInput = {
   emailConfirmationCodeExpiresAt?: Date | string | null
   emailConfirmationCodeSentAt?: Date | string | null
   emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   preferences?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
@@ -685,6 +783,10 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   emailConfirmationCodeExpiresAt?: Date | string | null
   emailConfirmationCodeSentAt?: Date | string | null
   emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   preferences?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
@@ -720,6 +822,10 @@ export type UserUpdateWithoutArticlesInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
@@ -739,6 +845,10 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
@@ -758,6 +868,10 @@ export type UserCreateWithoutPreferencesInput = {
   emailConfirmationCodeExpiresAt?: Date | string | null
   emailConfirmationCodeSentAt?: Date | string | null
   emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
@@ -777,6 +891,10 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   emailConfirmationCodeExpiresAt?: Date | string | null
   emailConfirmationCodeSentAt?: Date | string | null
   emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
@@ -812,6 +930,10 @@ export type UserUpdateWithoutPreferencesInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
@@ -831,6 +953,10 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
@@ -881,6 +1007,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   emailConfirmationCodeExpiresAt?: boolean
   emailConfirmationCodeSentAt?: boolean
   emailConfirmationAttempts?: boolean
+  passwordResetCodeHash?: boolean
+  passwordResetCodeExpiresAt?: boolean
+  passwordResetCodeSentAt?: boolean
+  passwordResetAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
@@ -902,6 +1032,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailConfirmationCodeExpiresAt?: boolean
   emailConfirmationCodeSentAt?: boolean
   emailConfirmationAttempts?: boolean
+  passwordResetCodeHash?: boolean
+  passwordResetCodeExpiresAt?: boolean
+  passwordResetCodeSentAt?: boolean
+  passwordResetAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -920,6 +1054,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailConfirmationCodeExpiresAt?: boolean
   emailConfirmationCodeSentAt?: boolean
   emailConfirmationAttempts?: boolean
+  passwordResetCodeHash?: boolean
+  passwordResetCodeExpiresAt?: boolean
+  passwordResetCodeSentAt?: boolean
+  passwordResetAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -938,11 +1076,15 @@ export type UserSelectScalar = {
   emailConfirmationCodeExpiresAt?: boolean
   emailConfirmationCodeSentAt?: boolean
   emailConfirmationAttempts?: boolean
+  passwordResetCodeHash?: boolean
+  passwordResetCodeExpiresAt?: boolean
+  passwordResetCodeSentAt?: boolean
+  passwordResetAttempts?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "avatarUrl" | "gender" | "role" | "emailVerified" | "emailVerifiedAt" | "emailConfirmationCodeHash" | "emailConfirmationCodeExpiresAt" | "emailConfirmationCodeSentAt" | "emailConfirmationAttempts" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "avatarUrl" | "gender" | "role" | "emailVerified" | "emailVerifiedAt" | "emailConfirmationCodeHash" | "emailConfirmationCodeExpiresAt" | "emailConfirmationCodeSentAt" | "emailConfirmationAttempts" | "passwordResetCodeHash" | "passwordResetCodeExpiresAt" | "passwordResetCodeSentAt" | "passwordResetAttempts" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
@@ -971,6 +1113,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     emailConfirmationCodeExpiresAt: Date | null
     emailConfirmationCodeSentAt: Date | null
     emailConfirmationAttempts: number
+    passwordResetCodeHash: string | null
+    passwordResetCodeExpiresAt: Date | null
+    passwordResetCodeSentAt: Date | null
+    passwordResetAttempts: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1411,6 +1557,10 @@ export interface UserFieldRefs {
   readonly emailConfirmationCodeExpiresAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly emailConfirmationCodeSentAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly emailConfirmationAttempts: Prisma.FieldRef<"User", 'Int'>
+  readonly passwordResetCodeHash: Prisma.FieldRef<"User", 'String'>
+  readonly passwordResetCodeExpiresAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly passwordResetCodeSentAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly passwordResetAttempts: Prisma.FieldRef<"User", 'Int'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

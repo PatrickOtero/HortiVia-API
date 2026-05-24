@@ -53,6 +53,21 @@ class EnvironmentVariables {
   @Min(1)
   EMAIL_CONFIRMATION_MAX_ATTEMPTS!: number;
 
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  PASSWORD_RESET_CODE_EXPIRES_IN_MINUTES!: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  PASSWORD_RESET_RESEND_COOLDOWN_SECONDS!: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  PASSWORD_RESET_MAX_ATTEMPTS!: number;
+
   @IsOptional()
   @IsString()
   CLOUDFLARE_ACCOUNT_ID?: string;

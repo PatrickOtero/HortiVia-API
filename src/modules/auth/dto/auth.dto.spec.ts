@@ -2,9 +2,12 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { STRONG_PASSWORD_VALIDATION_MESSAGE } from '../../../common/validators/password.validator';
 import { ConfirmEmailDto } from './confirm-email.dto';
+import { ForgotPasswordDto } from './forgot-password.dto';
 import { LoginDto } from './login.dto';
 import { RegisterDto } from './register.dto';
 import { ResendEmailConfirmationDto } from './resend-email-confirmation.dto';
+import { ResendPasswordResetCodeDto } from './resend-password-reset-code.dto';
+import { ResetPasswordDto } from './reset-password.dto';
 
 async function getValidationMessages(input: object, dto: new () => object) {
   const instance = plainToInstance(dto, input);
@@ -186,6 +189,58 @@ describe('Auth DTO validation', () => {
 
   it('resend confirmation trims and lowercases the e-mail', () => {
     const dto = plainToInstance(ResendEmailConfirmationDto, {
+      email: '  Patrick@Email.com  ',
+    });
+
+    expect(dto.email).toBe('patrick@email.com');
+  });
+
+  it('forgot password trims and lowercases the e-mail', () => {
+    const dto = plainToInstance(ForgotPasswordDto, {
+      email: '  Patrick@Email.com  ',
+    });
+
+    expect(dto.email).toBe('patrick@email.com');
+  });
+
+  it('reset password normalizes the e-mail', () => {
+    const dto = plainToInstance(ResetPasswordDto, {
+      email: '  Patrick@Email.com  ',
+      code: '123456',
+      password: 'SenhaForte@123',
+    });
+
+    expect(dto.email).toBe('patrick@email.com');
+  });
+
+  it('reset password requires a 6-digit code', async () => {
+    await expect(
+      getValidationMessages(
+        {
+          email: 'patrick@email.com',
+          code: '12A34',
+          password: 'SenhaForte@123',
+        },
+        ResetPasswordDto,
+      ),
+    ).resolves.toContain('C\u00f3digo inv\u00e1lido ou expirado.');
+  });
+
+  it('reset password rejects a weak password', async () => {
+    await expect(
+      getValidationMessages(
+        {
+          email: 'patrick@email.com',
+          code: '123456',
+          password: 'senhafraca',
+        },
+        ResetPasswordDto,
+      ),
+    ).resolves.toContain(STRONG_PASSWORD_VALIDATION_MESSAGE);
+  });
+
+  it('resend password reset code trims and lowercases the e-mail', () => {
+    const dto = plainToInstance(ResendPasswordResetCodeDto, {
       email: '  Patrick@Email.com  ',
     });
 

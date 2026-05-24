@@ -48,6 +48,10 @@ model User {
   emailConfirmationCodeExpiresAt  DateTime?
   emailConfirmationCodeSentAt     DateTime?
   emailConfirmationAttempts       Int             @default(0)
+  passwordResetCodeHash           String?
+  passwordResetCodeExpiresAt      DateTime?
+  passwordResetCodeSentAt         DateTime?
+  passwordResetAttempts           Int             @default(0)
   createdAt                       DateTime        @default(now())
   updatedAt                       DateTime        @updatedAt
   articles                        Article[]
