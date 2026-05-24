@@ -1,6 +1,10 @@
+import { ProductImageKind } from '../../../generated/prisma/enums';
 import type { ProductModel } from '../../../generated/prisma/models/Product';
+import type { ProductDetailModel } from '../types/product-model';
 import type {
   ProductDetailResponse,
+  ProductGuideSectionResponse,
+  ProductImageResponse,
   ProductListItemResponse,
   ProductNutrientResponse,
 } from '../types/product-response';
@@ -37,8 +41,91 @@ function toProductNutrients(value: ProductModel['nutrients']): ProductNutrientRe
   });
 }
 
+function toFallbackMainImage(product: ProductDetailModel): ProductImageResponse[] {
+  if (!product.imageUrl) {
+    return [];
+  }
+
+  return [
+    {
+      id: `${product.id}-legacy-image`,
+      url: product.imageUrl,
+      alt: product.name,
+      caption: null,
+      kind: ProductImageKind.HERO,
+      sortOrder: 0,
+      isPrimary: true,
+    },
+  ];
+}
+
+export function toProductImageResponse(
+  image: Pick<
+    ProductDetailModel['images'][number],
+    'id' | 'url' | 'alt' | 'caption' | 'kind' | 'sortOrder' | 'isPrimary'
+  >,
+): ProductImageResponse {
+  return {
+    id: image.id,
+    url: image.url,
+    alt: image.alt,
+    caption: image.caption,
+    kind: image.kind,
+    sortOrder: image.sortOrder,
+    isPrimary: image.isPrimary,
+  };
+}
+
+function toMainImages(product: ProductDetailModel): ProductImageResponse[] {
+  if (product.images.length === 0) {
+    return toFallbackMainImage(product);
+  }
+
+  return product.images.map(toProductImageResponse);
+}
+
+export function toProductGuideSectionResponse(
+  section: Pick<
+    ProductDetailModel['guideSections'][number],
+    | 'id'
+    | 'kind'
+    | 'title'
+    | 'body'
+    | 'imageUrl'
+    | 'imageAlt'
+    | 'imageCaption'
+    | 'bullets'
+    | 'idealPoints'
+    | 'avoidPoints'
+    | 'sortOrder'
+  >,
+): ProductGuideSectionResponse {
+  return {
+    id: section.id,
+    kind: section.kind,
+    title: section.title,
+    body: section.body,
+    imageUrl: section.imageUrl,
+    imageAlt: section.imageAlt,
+    imageCaption: section.imageCaption,
+    bullets: [...section.bullets],
+    idealPoints: [...section.idealPoints],
+    avoidPoints: [...section.avoidPoints],
+    sortOrder: section.sortOrder,
+  };
+}
+
+function toGuideSections(
+  product: ProductDetailModel,
+): ProductGuideSectionResponse[] {
+  return product.guideSections.map(toProductGuideSectionResponse);
+}
+
 export function toProductListItemResponse(
-  product: ProductModel,
+  product: Pick<
+    ProductModel,
+    'id' | 'name' | 'slug' | 'category' | 'shortDescription' | 'imageUrl'
+  >,
 ): ProductListItemResponse {
   return {
     id: product.id,
@@ -51,7 +138,7 @@ export function toProductListItemResponse(
 }
 
 export function toProductDetailResponse(
-  product: ProductModel,
+  product: ProductDetailModel,
 ): ProductDetailResponse {
   return {
     ...toProductListItemResponse(product),
@@ -61,6 +148,8 @@ export function toProductDetailResponse(
     howToStore: product.howToStore,
     usageTips: product.usageTips,
     nutrients: toProductNutrients(product.nutrients),
+    mainImages: toMainImages(product),
+    guideSections: toGuideSections(product),
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
   };

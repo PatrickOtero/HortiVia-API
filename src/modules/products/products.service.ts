@@ -12,20 +12,28 @@ import {
   CONTENT_IMAGE_MAX_FILE_SIZE,
 } from '../storage/image-upload.constants';
 import type { UploadFile } from '../storage/types/upload-file';
-import { ProductsRepository } from './products.repository';
-import {
-  toProductDetailResponse,
-  toProductListItemResponse,
-} from './mappers/product-response.mapper';
-import { slugifyProductName } from './utils/slug.util';
+import type { CreateProductGuideSectionDto } from './dto/create-product-guide-section.dto';
+import type { CreateProductImageDto } from './dto/create-product-image.dto';
 import type { CreateProductDto } from './dto/create-product.dto';
 import type { ListProductsQueryDto } from './dto/list-products-query.dto';
 import type { ProductNutrientDto } from './dto/product-nutrient.dto';
+import type { UpdateProductGuideSectionDto } from './dto/update-product-guide-section.dto';
+import type { UpdateProductImageDto } from './dto/update-product-image.dto';
 import type { UpdateProductDto } from './dto/update-product.dto';
+import {
+  toProductDetailResponse,
+  toProductGuideSectionResponse,
+  toProductImageResponse,
+  toProductListItemResponse,
+} from './mappers/product-response.mapper';
+import { ProductsRepository } from './products.repository';
 import type {
   ProductDetailResponse,
+  ProductGuideSectionResponse,
+  ProductImageResponse,
   ProductsListResponse,
 } from './types/product-response';
+import { slugifyProductName } from './utils/slug.util';
 
 @Injectable()
 export class ProductsService {
@@ -217,6 +225,197 @@ export class ProductsService {
     }
   }
 
+  async createImage(
+    productId: string,
+    createProductImageDto: CreateProductImageDto,
+  ): Promise<ProductImageResponse> {
+    await this.requireActiveProduct(productId);
+
+    const createdImage = await this.productsRepository.createProductImage(productId, {
+      productId,
+      url: createProductImageDto.url.trim(),
+      alt: this.normalizeOptionalText(createProductImageDto.alt),
+      caption: this.normalizeOptionalText(createProductImageDto.caption),
+      kind: createProductImageDto.kind,
+      sortOrder: createProductImageDto.sortOrder ?? 0,
+      isPrimary: createProductImageDto.isPrimary ?? false,
+    });
+
+    if (createdImage.isPrimary) {
+      await this.productsRepository.clearPrimaryProductImages(
+        productId,
+        createdImage.id,
+      );
+    }
+
+    return toProductImageResponse(createdImage);
+  }
+
+  async updateImage(
+    productId: string,
+    imageId: string,
+    updateProductImageDto: UpdateProductImageDto,
+  ): Promise<ProductImageResponse> {
+    await this.requireActiveProduct(productId);
+    const existingImage = await this.requireProductImage(productId, imageId);
+    const data: Prisma.ProductImageUpdateInput = {};
+
+    if (updateProductImageDto.url !== undefined) {
+      data.url = updateProductImageDto.url.trim();
+    }
+
+    if (updateProductImageDto.alt !== undefined) {
+      data.alt = this.normalizeOptionalText(updateProductImageDto.alt);
+    }
+
+    if (updateProductImageDto.caption !== undefined) {
+      data.caption = this.normalizeOptionalText(updateProductImageDto.caption);
+    }
+
+    if (updateProductImageDto.kind !== undefined) {
+      data.kind = updateProductImageDto.kind;
+    }
+
+    if (updateProductImageDto.sortOrder !== undefined) {
+      data.sortOrder = updateProductImageDto.sortOrder;
+    }
+
+    if (updateProductImageDto.isPrimary !== undefined) {
+      data.isPrimary = updateProductImageDto.isPrimary;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return toProductImageResponse(existingImage);
+    }
+
+    const updatedImage = await this.productsRepository.updateProductImage(imageId, data);
+
+    if (updatedImage.isPrimary) {
+      await this.productsRepository.clearPrimaryProductImages(productId, imageId);
+    }
+
+    return toProductImageResponse(updatedImage);
+  }
+
+  async deleteImage(productId: string, imageId: string) {
+    await this.requireActiveProduct(productId);
+    await this.requireProductImage(productId, imageId);
+    await this.productsRepository.deleteProductImage(imageId);
+
+    return {
+      message: 'Imagem removida.',
+    };
+  }
+
+  async createGuideSection(
+    productId: string,
+    createProductGuideSectionDto: CreateProductGuideSectionDto,
+  ): Promise<ProductGuideSectionResponse> {
+    await this.requireActiveProduct(productId);
+
+    const createdSection = await this.productsRepository.createProductGuideSection(
+      productId,
+      {
+        productId,
+        kind: createProductGuideSectionDto.kind,
+        title: this.normalizeText(createProductGuideSectionDto.title),
+        body: this.normalizeText(createProductGuideSectionDto.body),
+        imageUrl: this.normalizeOptionalText(createProductGuideSectionDto.imageUrl),
+        imageAlt: this.normalizeOptionalText(createProductGuideSectionDto.imageAlt),
+        imageCaption: this.normalizeOptionalText(
+          createProductGuideSectionDto.imageCaption,
+        ),
+        bullets: this.normalizeStringArray(createProductGuideSectionDto.bullets),
+        idealPoints: this.normalizeStringArray(
+          createProductGuideSectionDto.idealPoints,
+        ),
+        avoidPoints: this.normalizeStringArray(
+          createProductGuideSectionDto.avoidPoints,
+        ),
+        sortOrder: createProductGuideSectionDto.sortOrder ?? 0,
+      },
+    );
+
+    return toProductGuideSectionResponse(createdSection);
+  }
+
+  async updateGuideSection(
+    productId: string,
+    sectionId: string,
+    updateProductGuideSectionDto: UpdateProductGuideSectionDto,
+  ): Promise<ProductGuideSectionResponse> {
+    await this.requireActiveProduct(productId);
+    const existingSection = await this.requireGuideSection(productId, sectionId);
+    const data: Prisma.ProductGuideSectionUpdateInput = {};
+
+    if (updateProductGuideSectionDto.kind !== undefined) {
+      data.kind = updateProductGuideSectionDto.kind;
+    }
+
+    if (updateProductGuideSectionDto.title !== undefined) {
+      data.title = this.normalizeText(updateProductGuideSectionDto.title);
+    }
+
+    if (updateProductGuideSectionDto.body !== undefined) {
+      data.body = this.normalizeText(updateProductGuideSectionDto.body);
+    }
+
+    if (updateProductGuideSectionDto.imageUrl !== undefined) {
+      data.imageUrl = this.normalizeOptionalText(updateProductGuideSectionDto.imageUrl);
+    }
+
+    if (updateProductGuideSectionDto.imageAlt !== undefined) {
+      data.imageAlt = this.normalizeOptionalText(updateProductGuideSectionDto.imageAlt);
+    }
+
+    if (updateProductGuideSectionDto.imageCaption !== undefined) {
+      data.imageCaption = this.normalizeOptionalText(
+        updateProductGuideSectionDto.imageCaption,
+      );
+    }
+
+    if (updateProductGuideSectionDto.bullets !== undefined) {
+      data.bullets = this.normalizeStringArray(updateProductGuideSectionDto.bullets);
+    }
+
+    if (updateProductGuideSectionDto.idealPoints !== undefined) {
+      data.idealPoints = this.normalizeStringArray(
+        updateProductGuideSectionDto.idealPoints,
+      );
+    }
+
+    if (updateProductGuideSectionDto.avoidPoints !== undefined) {
+      data.avoidPoints = this.normalizeStringArray(
+        updateProductGuideSectionDto.avoidPoints,
+      );
+    }
+
+    if (updateProductGuideSectionDto.sortOrder !== undefined) {
+      data.sortOrder = updateProductGuideSectionDto.sortOrder;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return toProductGuideSectionResponse(existingSection);
+    }
+
+    const updatedSection = await this.productsRepository.updateProductGuideSection(
+      sectionId,
+      data,
+    );
+
+    return toProductGuideSectionResponse(updatedSection);
+  }
+
+  async deleteGuideSection(productId: string, sectionId: string) {
+    await this.requireActiveProduct(productId);
+    await this.requireGuideSection(productId, sectionId);
+    await this.productsRepository.deleteProductGuideSection(sectionId);
+
+    return {
+      message: 'Seção removida.',
+    };
+  }
+
   private buildListWhereInput(query: ListProductsQueryDto): Prisma.ProductWhereInput {
     const trimmedSearch = query.search?.trim();
 
@@ -242,6 +441,27 @@ export class ProductsService {
     }
 
     return product;
+  }
+
+  private async requireProductImage(productId: string, imageId: string) {
+    const image = await this.productsRepository.findProductImageById(imageId);
+
+    if (!image || image.productId !== productId) {
+      throw this.buildProductImageNotFoundException();
+    }
+
+    return image;
+  }
+
+  private async requireGuideSection(productId: string, sectionId: string) {
+    const section =
+      await this.productsRepository.findProductGuideSectionById(sectionId);
+
+    if (!section || section.productId !== productId) {
+      throw this.buildProductGuideSectionNotFoundException();
+    }
+
+    return section;
   }
 
   private async generateUniqueSlug(name: string, currentProductId?: string) {
@@ -318,6 +538,20 @@ export class ProductsService {
   private buildProductNotFoundException() {
     return new NotFoundException({
       message: 'Produto não encontrado.',
+      error: 'Not Found',
+    });
+  }
+
+  private buildProductImageNotFoundException() {
+    return new NotFoundException({
+      message: 'Imagem do produto não encontrada.',
+      error: 'Not Found',
+    });
+  }
+
+  private buildProductGuideSectionNotFoundException() {
+    return new NotFoundException({
+      message: 'Seção do produto não encontrada.',
       error: 'Not Found',
     });
   }

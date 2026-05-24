@@ -127,6 +127,88 @@ Produto e artigo:
 - tipos: `image/jpeg`, `image/png`, `image/webp`
 - limite: `5 MB`
 
+## Guias visuais de produto
+
+O módulo de produtos agora aceita dois blocos estruturados para enriquecer o detalhe:
+
+- `ProductImage`
+- `ProductGuideSection`
+
+### ProductImage
+
+Campos principais:
+
+- `url`
+- `alt`
+- `caption`
+- `kind`
+- `sortOrder`
+- `isPrimary`
+
+Enums disponíveis em `ProductImageKind`:
+
+- `HERO`
+- `WHOLE`
+- `CUT`
+- `IDEAL_STATE`
+- `UNRIPE_STATE`
+- `DEFECT`
+- `STORAGE`
+- `USAGE`
+- `OTHER`
+
+Regra:
+
+- quando uma imagem é salva com `isPrimary=true`, as outras imagens do mesmo produto passam a `false`
+
+### ProductGuideSection
+
+Campos principais:
+
+- `kind`
+- `title`
+- `body`
+- `imageUrl`
+- `imageAlt`
+- `imageCaption`
+- `bullets`
+- `idealPoints`
+- `avoidPoints`
+- `sortOrder`
+
+Enums disponíveis em `ProductGuideSectionKind`:
+
+- `CHOOSE`
+- `OBSERVE`
+- `STORE`
+- `USE`
+- `QUICK_FACTS`
+- `OTHER`
+
+### Resposta do detalhe de produto
+
+Além dos campos já existentes, `GET /products/:id` agora retorna:
+
+- `mainImages`
+- `guideSections`
+
+Compatibilidade:
+
+- `imageUrl` permanece no payload
+- quando não houver registros em `ProductImage`, `mainImages` faz fallback para `imageUrl`
+- a listagem `GET /products` continua leve e não carrega seções completas
+
+### Endpoints administrativos
+
+JWT obrigatório e role `ADMIN`:
+
+- `POST /products/:productId/images`
+- `PATCH /products/:productId/images/:imageId`
+- `DELETE /products/:productId/images/:imageId`
+- `POST /products/:productId/guide-sections`
+- `PATCH /products/:productId/guide-sections/:sectionId`
+- `DELETE /products/:productId/guide-sections/:sectionId`
+
 ## Docker
 
 Build:

@@ -19,6 +19,27 @@ enum ProductCategory {
   LEGUME
 }
 
+enum ProductImageKind {
+  HERO
+  WHOLE
+  CUT
+  IDEAL_STATE
+  UNRIPE_STATE
+  DEFECT
+  STORAGE
+  USAGE
+  OTHER
+}
+
+enum ProductGuideSectionKind {
+  CHOOSE
+  OBSERVE
+  STORE
+  USE
+  QUICK_FACTS
+  OTHER
+}
+
 enum ArticleCategory {
   TIPS
   STORAGE
@@ -74,6 +95,44 @@ model Product {
   isActive         Boolean          @default(true)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
+  images           ProductImage[]
+  guideSections    ProductGuideSection[]
+}
+
+model ProductImage {
+  id         String           @id @default(cuid())
+  productId  String
+  product    Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url        String
+  alt        String?
+  caption    String?
+  kind       ProductImageKind
+  sortOrder  Int              @default(0)
+  isPrimary  Boolean          @default(false)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([productId, sortOrder])
+}
+
+model ProductGuideSection {
+  id           String                  @id @default(cuid())
+  productId    String
+  product      Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  kind         ProductGuideSectionKind
+  title        String
+  body         String
+  imageUrl     String?
+  imageAlt     String?
+  imageCaption String?
+  bullets      String[]
+  idealPoints  String[]
+  avoidPoints  String[]
+  sortOrder    Int                     @default(0)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  @@index([productId, sortOrder])
 }
 
 model Article {

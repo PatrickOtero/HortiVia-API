@@ -277,6 +277,40 @@ export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
   _max?: Prisma.NestedJsonNullableFilter<$PrismaModel>
 }
 
+export type EnumProductImageKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductImageKind | Prisma.EnumProductImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductImageKindFilter<$PrismaModel> | $Enums.ProductImageKind
+}
+
+export type EnumProductImageKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductImageKind | Prisma.EnumProductImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductImageKindWithAggregatesFilter<$PrismaModel> | $Enums.ProductImageKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProductImageKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProductImageKindFilter<$PrismaModel>
+}
+
+export type EnumProductGuideSectionKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductGuideSectionKind | Prisma.EnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductGuideSectionKindFilter<$PrismaModel> | $Enums.ProductGuideSectionKind
+}
+
+export type EnumProductGuideSectionKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductGuideSectionKind | Prisma.EnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductGuideSectionKindWithAggregatesFilter<$PrismaModel> | $Enums.ProductGuideSectionKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProductGuideSectionKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProductGuideSectionKindFilter<$PrismaModel>
+}
+
 export type EnumArticleCategoryFilter<$PrismaModel = never> = {
   equals?: $Enums.ArticleCategory | Prisma.EnumArticleCategoryFieldRefInput<$PrismaModel>
   in?: $Enums.ArticleCategory[] | Prisma.ListEnumArticleCategoryFieldRefInput<$PrismaModel>
@@ -541,6 +575,40 @@ export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
   gt?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   gte?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
+}
+
+export type NestedEnumProductImageKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductImageKind | Prisma.EnumProductImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductImageKindFilter<$PrismaModel> | $Enums.ProductImageKind
+}
+
+export type NestedEnumProductImageKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductImageKind | Prisma.EnumProductImageKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductImageKind[] | Prisma.ListEnumProductImageKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductImageKindWithAggregatesFilter<$PrismaModel> | $Enums.ProductImageKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProductImageKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProductImageKindFilter<$PrismaModel>
+}
+
+export type NestedEnumProductGuideSectionKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductGuideSectionKind | Prisma.EnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductGuideSectionKindFilter<$PrismaModel> | $Enums.ProductGuideSectionKind
+}
+
+export type NestedEnumProductGuideSectionKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ProductGuideSectionKind | Prisma.EnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ProductGuideSectionKind[] | Prisma.ListEnumProductGuideSectionKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumProductGuideSectionKindWithAggregatesFilter<$PrismaModel> | $Enums.ProductGuideSectionKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumProductGuideSectionKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumProductGuideSectionKindFilter<$PrismaModel>
 }
 
 export type NestedEnumArticleCategoryFilter<$PrismaModel = never> = {

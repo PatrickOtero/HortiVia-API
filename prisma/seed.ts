@@ -5,6 +5,8 @@ import { randomBytes } from 'crypto';
 import {
   ArticleCategory,
   ProductCategory,
+  ProductGuideSectionKind,
+  ProductImageKind,
   UserRole,
 } from '../src/generated/prisma/enums';
 import { PrismaClient } from '../src/generated/prisma/client';
@@ -23,6 +25,31 @@ const prisma = new PrismaClient({
 
 const seedContentAuthorEmail = 'conteudo.seed@hortivia.local';
 
+function createGuideSection(
+  kind: ProductGuideSectionKind,
+  title: string,
+  body: string,
+  options?: {
+    bullets?: string[];
+    idealPoints?: string[];
+    avoidPoints?: string[];
+    sortOrder?: number;
+  },
+) {
+  return {
+    kind,
+    title,
+    body,
+    imageUrl: null,
+    imageAlt: null,
+    imageCaption: null,
+    bullets: options?.bullets ?? [],
+    idealPoints: options?.idealPoints ?? [],
+    avoidPoints: options?.avoidPoints ?? [],
+    sortOrder: options?.sortOrder ?? 0,
+  };
+}
+
 const products = [
   {
     name: 'Abacate',
@@ -36,6 +63,61 @@ const products = [
     howToStore: ['Deixe fora da geladeira até amadurecer', 'Depois de aberto, conserve refrigerado'],
     usageTips: ['Use com limão para reduzir o escurecimento', 'Vai bem em vitaminas, pastas e saladas'],
     nutrients: [{ label: 'Destaque', value: 'Gorduras boas' }],
+    mainImages: [] as Array<{
+      url: string;
+      alt?: string | null;
+      caption?: string | null;
+      kind: ProductImageKind;
+      sortOrder?: number;
+      isPrimary?: boolean;
+    }>,
+    guideSections: [
+      createGuideSection(
+        ProductGuideSectionKind.CHOOSE,
+        'Como escolher',
+        'Prefira frutos com casca íntegra e sem rachaduras. Ao apertar levemente, o abacate deve ceder um pouco sem afundar demais.',
+        {
+          bullets: [
+            'Deve ceder levemente ao toque',
+            'Evite frutos duros demais se quiser usar no mesmo dia',
+            'Evite partes muito afundadas ou com rachaduras',
+          ],
+          sortOrder: 0,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.OBSERVE,
+        'O que observar',
+        'Manchas muito escuras, rachaduras e áreas moles demais podem indicar excesso de maturação ou dano no transporte.',
+        {
+          idealPoints: ['Casca íntegra', 'Textura firme com leve maciez'],
+          avoidPoints: ['Rachaduras', 'Áreas afundadas', 'Cheiro fermentado'],
+          sortOrder: 1,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.STORE,
+        'Como conservar',
+        'Deixe fora da geladeira até amadurecer. Depois de maduro ou aberto, conserve refrigerado.',
+        {
+          bullets: [
+            'Inteiro e verde: temperatura ambiente',
+            'Maduro: geladeira por pouco tempo',
+            'Aberto: refrigerado e bem protegido',
+          ],
+          sortOrder: 2,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.USE,
+        'Como aproveitar',
+        'Pode ser usado em preparos doces ou salgados, como vitaminas, cremes, torradas, saladas e guacamole.',
+        {
+          bullets: ['Amasse com limão para pastas', 'Use em cubos para saladas', 'Aproveite o ponto maduro em vitaminas'],
+          sortOrder: 3,
+        },
+      ),
+    ],
   },
   {
     name: 'Abacaxi',
@@ -62,6 +144,58 @@ const products = [
     howToStore: ['Guarde seca em pote ou saco bem fechado', 'Lave apenas perto do consumo'],
     usageTips: ['Use as folhas mais firmes em sanduíches', 'Rasgue com as mãos para servir na hora'],
     nutrients: [{ label: 'Destaque', value: 'Fibras' }],
+    mainImages: [],
+    guideSections: [
+      createGuideSection(
+        ProductGuideSectionKind.CHOOSE,
+        'Como escolher',
+        'Observe a cor e a firmeza das folhas. A alface deve parecer fresca, crocante e sem sinais de murcha.',
+        {
+          bullets: [
+            'Folhas firmes e com cor viva',
+            'Miolo mais fechado costuma conservar melhor',
+            'Evite folhas muito amassadas',
+          ],
+          sortOrder: 0,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.OBSERVE,
+        'O que observar',
+        'Umidade excessiva, escurecimento e pontos transparentes costumam indicar perda de frescor.',
+        {
+          idealPoints: ['Folhas crocantes', 'Sem manchas escuras', 'Sem excesso de umidade'],
+          avoidPoints: ['Folhas murchas', 'Pontos escuros', 'Cheiro forte'],
+          sortOrder: 1,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.STORE,
+        'Como conservar',
+        'Guarde na geladeira, bem seca e protegida em recipiente ou saco fechado.',
+        {
+          bullets: [
+            'Seque antes de guardar',
+            'Use papel para absorver umidade',
+            'Lave perto do consumo quando possível',
+          ],
+          sortOrder: 2,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.USE,
+        'Como aproveitar',
+        'Vai bem em saladas, sanduíches, wraps e acompanhamentos frios do dia a dia.',
+        {
+          bullets: [
+            'Misture folhas maiores e menores',
+            'Use as mais firmes em sanduíches',
+            'Tempere perto de servir para manter a textura',
+          ],
+          sortOrder: 3,
+        },
+      ),
+    ],
   },
   {
     name: 'Agrião',
@@ -88,6 +222,123 @@ const products = [
     howToStore: ['Conserve em fruteira ventilada'],
     usageTips: ['Use madura em bolos e vitaminas', 'Se passar do ponto, congele para receitas'],
     nutrients: [{ label: 'Destaque', value: 'Potássio' }],
+    mainImages: [],
+    guideSections: [
+      createGuideSection(
+        ProductGuideSectionKind.CHOOSE,
+        'Como escolher',
+        'A cor da casca ajuda a decidir o melhor uso. Bananas mais verdes duram mais; as mais amarelas estão prontas para consumo.',
+        {
+          bullets: [
+            'Amarela: boa para comer no dia',
+            'Levemente verde: dura mais em casa',
+            'Muito escura: melhor para receitas',
+          ],
+          sortOrder: 0,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.OBSERVE,
+        'O que observar',
+        'Machucados profundos e rachaduras aceleram o amadurecimento e podem reduzir a durabilidade.',
+        {
+          idealPoints: ['Casca sem rachaduras', 'Cacho firme', 'Cor compatível com o uso desejado'],
+          avoidPoints: ['Partes rompidas', 'Áreas muito escuras e úmidas', 'Cheiro fermentado'],
+          sortOrder: 1,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.STORE,
+        'Como conservar',
+        'Mantenha em fruteira ventilada e longe do sol direto. Quando amadurecer demais, vale refrigerar ou congelar.',
+        {
+          bullets: [
+            'Temperatura ambiente para amadurecer',
+            'Geladeira apenas quando estiver no ponto',
+            'Congele em rodelas para vitaminas e bolos',
+          ],
+          sortOrder: 2,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.USE,
+        'Como aproveitar',
+        'Funciona bem pura, em vitaminas, bolos, mingaus e panquecas.',
+        {
+          bullets: [
+            'Banana madura rende bem em massas',
+            'Congele para smoothies',
+            'Use amassada em panquecas e mingaus',
+          ],
+          sortOrder: 3,
+        },
+      ),
+    ],
+  },
+  {
+    name: 'Cebola',
+    slug: 'cebola',
+    category: ProductCategory.LEGUME,
+    shortDescription: 'Base aromática para refogados, molhos e assados.',
+    description: 'Ajuda a construir sabor em preparos simples do dia a dia e combina com receitas cruas ou cozidas.',
+    imageUrl: null,
+    benefits: ['Serve de base para muitos pratos', 'Vai bem crua, refogada, assada ou caramelizada'],
+    howToChoose: ['Prefira unidades firmes e secas', 'Evite cebolas com brotos ou áreas moles'],
+    howToStore: ['Guarde em local seco, fresco e ventilado'],
+    usageTips: ['Use crua em saladas e vinagretes', 'Refogue para molhos, arroz, feijão e sopas'],
+    nutrients: [{ label: 'Destaque', value: 'Versatilidade no preparo' }],
+    mainImages: [],
+    guideSections: [
+      createGuideSection(
+        ProductGuideSectionKind.CHOOSE,
+        'Como escolher',
+        'A cebola deve estar firme, com casca seca e sem partes amolecidas.',
+        {
+          bullets: [
+            'Prefira unidades pesadas para o tamanho',
+            'Casca seca ajuda na conservação',
+            'Evite brotos se quiser guardar por mais tempo',
+          ],
+          sortOrder: 0,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.OBSERVE,
+        'O que observar',
+        'Umidade, mofo, áreas afundadas e cheiro muito forte podem indicar deterioração.',
+        {
+          idealPoints: ['Casca seca', 'Firmeza uniforme', 'Sem brotos'],
+          avoidPoints: ['Mofo', 'Partes moles', 'Umidade excessiva'],
+          sortOrder: 1,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.STORE,
+        'Como conservar',
+        'Conserve inteira em local seco e arejado. Depois de cortada, mantenha refrigerada e bem fechada.',
+        {
+          bullets: [
+            'Inteira: fora da geladeira',
+            'Cortada: pote fechado na geladeira',
+            'Evite guardar perto de batatas',
+          ],
+          sortOrder: 2,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.USE,
+        'Como aproveitar',
+        'Entra em refogados, molhos, assados, saladas e recheios.',
+        {
+          bullets: [
+            'Pique fino para bases de preparo',
+            'Use em rodelas para assados',
+            'Aproveite crua em vinagretes e saladas',
+          ],
+          sortOrder: 3,
+        },
+      ),
+    ],
   },
   {
     name: 'Cenoura',
@@ -114,6 +365,58 @@ const products = [
     howToStore: ['Mantenha fora da geladeira se estiver verde'],
     usageTips: ['Use cru em saladas e sanduíches', 'Quando amadurecer bem, aproveite em molhos e refogados'],
     nutrients: [{ label: 'Destaque', value: 'Licopeno' }],
+    mainImages: [],
+    guideSections: [
+      createGuideSection(
+        ProductGuideSectionKind.CHOOSE,
+        'Como escolher',
+        'Escolha tomates firmes, com casca lisa e cor compatível com o uso que você quer fazer.',
+        {
+          bullets: [
+            'Mais firmes para saladas e sanduíches',
+            'Mais maduros para molhos e refogados',
+            'Casca lisa costuma indicar melhor conservação',
+          ],
+          sortOrder: 0,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.OBSERVE,
+        'O que observar',
+        'Rachaduras, áreas muito moles e sinais de amassado reduzem a durabilidade e podem atrapalhar o preparo.',
+        {
+          idealPoints: ['Cor uniforme', 'Casca lisa', 'Firmeza ao toque'],
+          avoidPoints: ['Rachaduras', 'Partes afundadas', 'Mofo próximo ao cabo'],
+          sortOrder: 1,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.STORE,
+        'Como conservar',
+        'Tomates verdes ou firmes podem ficar fora da geladeira. Depois de maduros, o consumo deve ser mais rápido.',
+        {
+          bullets: [
+            'Fora da geladeira enquanto amadurece',
+            'Maduro: use em pouco tempo',
+            'Cortado: refrigere em pote fechado',
+          ],
+          sortOrder: 2,
+        },
+      ),
+      createGuideSection(
+        ProductGuideSectionKind.USE,
+        'Como aproveitar',
+        'Pode ser usado cru, assado, refogado ou em molhos do dia a dia.',
+        {
+          bullets: [
+            'Cru em saladas e sanduíches',
+            'Maduro em molhos e sopas',
+            'Assado para concentrar sabor',
+          ],
+          sortOrder: 3,
+        },
+      ),
+    ],
   },
   {
     name: 'Batata',
@@ -268,25 +571,82 @@ async function main() {
   const author = await ensureSeedContentAuthor();
 
   for (const product of products) {
-    await prisma.product.upsert({
+    const savedProduct = await prisma.product.upsert({
       where: {
         slug: product.slug,
       },
       create: {
-        ...product,
+        name: product.name,
+        slug: product.slug,
+        category: product.category,
+        shortDescription: product.shortDescription,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        benefits: product.benefits,
         howToChoose: product.howToChoose,
         howToStore: product.howToStore,
         usageTips: product.usageTips,
+        nutrients: product.nutrients,
         isActive: true,
       },
       update: {
-        ...product,
+        name: product.name,
+        category: product.category,
+        shortDescription: product.shortDescription,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        benefits: product.benefits,
         howToChoose: product.howToChoose,
         howToStore: product.howToStore,
         usageTips: product.usageTips,
+        nutrients: product.nutrients,
         isActive: true,
       },
     });
+
+    await prisma.productImage.deleteMany({
+      where: {
+        productId: savedProduct.id,
+      },
+    });
+
+    if ((product.mainImages ?? []).length > 0) {
+      await prisma.productImage.createMany({
+        data: product.mainImages.map((image, index) => ({
+          productId: savedProduct.id,
+          url: image.url,
+          alt: image.alt ?? null,
+          caption: image.caption ?? null,
+          kind: image.kind,
+          sortOrder: image.sortOrder ?? index,
+          isPrimary: image.isPrimary ?? index === 0,
+        })),
+      });
+    }
+
+    await prisma.productGuideSection.deleteMany({
+      where: {
+        productId: savedProduct.id,
+      },
+    });
+
+    if ((product.guideSections ?? []).length > 0) {
+      await prisma.productGuideSection.createMany({
+        data: product.guideSections.map((section, index) => ({
+          productId: savedProduct.id,
+          kind: section.kind,
+          title: section.title,
+          body: section.body,
+          imageUrl: section.imageUrl,
+          imageAlt: section.imageAlt,
+          imageCaption: section.imageCaption,
+          bullets: section.bullets,
+          idealPoints: section.idealPoints,
+          avoidPoints: section.avoidPoints,
+          sortOrder: section.sortOrder ?? index,
+        })),
+      });
+    }
   }
 
   for (const article of articles) {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { productDetailInclude } from './types/product-model';
 
 @Injectable()
 export class ProductsRepository {
@@ -31,6 +32,7 @@ export class ProductsRepository {
         id,
         ...(includeInactive ? {} : { isActive: true }),
       },
+      include: productDetailInclude,
     });
   }
 
@@ -41,13 +43,17 @@ export class ProductsRepository {
   }
 
   async create(data: Prisma.ProductCreateInput) {
-    return this.prisma.product.create({ data });
+    return this.prisma.product.create({
+      data,
+      include: productDetailInclude,
+    });
   }
 
   async update(id: string, data: Prisma.ProductUpdateInput) {
     return this.prisma.product.update({
       where: { id },
       data,
+      include: productDetailInclude,
     });
   }
 
@@ -57,6 +63,7 @@ export class ProductsRepository {
       data: {
         imageUrl,
       },
+      include: productDetailInclude,
     });
   }
 
@@ -65,6 +72,98 @@ export class ProductsRepository {
       where: { id },
       data: {
         isActive: false,
+      },
+    });
+  }
+
+  async findProductImageById(imageId: string) {
+    return this.prisma.productImage.findUnique({
+      where: {
+        id: imageId,
+      },
+    });
+  }
+
+  async createProductImage(productId: string, data: Prisma.ProductImageUncheckedCreateInput) {
+    return this.prisma.productImage.create({
+      data: {
+        ...data,
+        productId,
+      },
+    });
+  }
+
+  async updateProductImage(imageId: string, data: Prisma.ProductImageUpdateInput) {
+    return this.prisma.productImage.update({
+      where: {
+        id: imageId,
+      },
+      data,
+    });
+  }
+
+  async clearPrimaryProductImages(productId: string, excludeImageId?: string) {
+    return this.prisma.productImage.updateMany({
+      where: {
+        productId,
+        ...(excludeImageId
+          ? {
+              id: {
+                not: excludeImageId,
+              },
+            }
+          : {}),
+      },
+      data: {
+        isPrimary: false,
+      },
+    });
+  }
+
+  async deleteProductImage(imageId: string) {
+    return this.prisma.productImage.delete({
+      where: {
+        id: imageId,
+      },
+    });
+  }
+
+  async findProductGuideSectionById(sectionId: string) {
+    return this.prisma.productGuideSection.findUnique({
+      where: {
+        id: sectionId,
+      },
+    });
+  }
+
+  async createProductGuideSection(
+    productId: string,
+    data: Prisma.ProductGuideSectionUncheckedCreateInput,
+  ) {
+    return this.prisma.productGuideSection.create({
+      data: {
+        ...data,
+        productId,
+      },
+    });
+  }
+
+  async updateProductGuideSection(
+    sectionId: string,
+    data: Prisma.ProductGuideSectionUpdateInput,
+  ) {
+    return this.prisma.productGuideSection.update({
+      where: {
+        id: sectionId,
+      },
+      data,
+    });
+  }
+
+  async deleteProductGuideSection(sectionId: string) {
+    return this.prisma.productGuideSection.delete({
+      where: {
+        id: sectionId,
       },
     });
   }

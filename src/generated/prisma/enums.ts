@@ -26,6 +26,33 @@ export const ProductCategory = {
 export type ProductCategory = (typeof ProductCategory)[keyof typeof ProductCategory]
 
 
+export const ProductImageKind = {
+  HERO: 'HERO',
+  WHOLE: 'WHOLE',
+  CUT: 'CUT',
+  IDEAL_STATE: 'IDEAL_STATE',
+  UNRIPE_STATE: 'UNRIPE_STATE',
+  DEFECT: 'DEFECT',
+  STORAGE: 'STORAGE',
+  USAGE: 'USAGE',
+  OTHER: 'OTHER'
+} as const
+
+export type ProductImageKind = (typeof ProductImageKind)[keyof typeof ProductImageKind]
+
+
+export const ProductGuideSectionKind = {
+  CHOOSE: 'CHOOSE',
+  OBSERVE: 'OBSERVE',
+  STORE: 'STORE',
+  USE: 'USE',
+  QUICK_FACTS: 'QUICK_FACTS',
+  OTHER: 'OTHER'
+} as const
+
+export type ProductGuideSectionKind = (typeof ProductGuideSectionKind)[keyof typeof ProductGuideSectionKind]
+
+
 export const ArticleCategory = {
   TIPS: 'TIPS',
   STORAGE: 'STORAGE',

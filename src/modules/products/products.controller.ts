@@ -21,7 +21,11 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
 import { ImageUploadExceptionFilter } from '../storage/image-upload.exception-filter';
 import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductGuideSectionDto } from './dto/create-product-guide-section.dto';
+import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { ListProductsQueryDto } from './dto/list-products-query.dto';
+import { UpdateProductGuideSectionDto } from './dto/update-product-guide-section.dto';
+import { UpdateProductImageDto } from './dto/update-product-image.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 
@@ -98,5 +102,78 @@ export class ProductsController {
           }
         : undefined,
     );
+  }
+
+  @Post(':productId/images')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async createImage(
+    @Param('productId') productId: string,
+    @Body() createProductImageDto: CreateProductImageDto,
+  ) {
+    return this.productsService.createImage(productId, createProductImageDto);
+  }
+
+  @Patch(':productId/images/:imageId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async updateImageMetadata(
+    @Param('productId') productId: string,
+    @Param('imageId') imageId: string,
+    @Body() updateProductImageDto: UpdateProductImageDto,
+  ) {
+    return this.productsService.updateImage(
+      productId,
+      imageId,
+      updateProductImageDto,
+    );
+  }
+
+  @Delete(':productId/images/:imageId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async deleteImage(
+    @Param('productId') productId: string,
+    @Param('imageId') imageId: string,
+  ) {
+    return this.productsService.deleteImage(productId, imageId);
+  }
+
+  @Post(':productId/guide-sections')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async createGuideSection(
+    @Param('productId') productId: string,
+    @Body() createProductGuideSectionDto: CreateProductGuideSectionDto,
+  ) {
+    return this.productsService.createGuideSection(
+      productId,
+      createProductGuideSectionDto,
+    );
+  }
+
+  @Patch(':productId/guide-sections/:sectionId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async updateGuideSection(
+    @Param('productId') productId: string,
+    @Param('sectionId') sectionId: string,
+    @Body() updateProductGuideSectionDto: UpdateProductGuideSectionDto,
+  ) {
+    return this.productsService.updateGuideSection(
+      productId,
+      sectionId,
+      updateProductGuideSectionDto,
+    );
+  }
+
+  @Delete(':productId/guide-sections/:sectionId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async deleteGuideSection(
+    @Param('productId') productId: string,
+    @Param('sectionId') sectionId: string,
+  ) {
+    return this.productsService.deleteGuideSection(productId, sectionId);
   }
 }
