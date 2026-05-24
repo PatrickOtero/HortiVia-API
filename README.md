@@ -2,22 +2,23 @@
 
 ## Papel da API no produto
 
-A API da HortiVia sustenta a experiência do aplicativo mobile, centralizando autenticação, catálogo de produtos, artigos educativos, perfil, preferências e envio de imagens. Ela é a camada que mantém o conteúdo consistente e permite que o app entregue informações úteis de forma organizada para o usuário final.
+A API da HortiVia sustenta a experiência do aplicativo mobile, centralizando conteúdo, contas, perfil, preferências e imagens. Ela é a camada que mantém as informações organizadas para que o app entregue orientações práticas de forma consistente ao usuário final.
 
-No produto, isso significa dar suporte ao acesso seguro das contas, ao conteúdo consultado no app e à operação administrativa que mantém produtos e artigos atualizados.
+No produto, isso significa dar suporte ao conteúdo consultado no app, ao acesso das contas e à área interna que mantém produtos e artigos atualizados.
 
 ## Funcionalidades atendidas
 
-- autenticação de usuários
-- confirmação de e-mail por código
-- recuperação de senha por código
 - catálogo de produtos hortifruti
+- detalhes práticos de escolha, conservação e aproveitamento
 - artigos educativos
 - perfil e preferências
-- uploads de avatar, produtos e artigos
-- administração de conteúdos
+- acesso de conta
+- confirmação de e-mail por código
+- recuperação de senha por código
+- imagens de perfil, produtos e artigos
+- área interna para manutenção de conteúdos
 
-## Segurança e conta
+## Conta e acesso
 
 A API aplica regras de conta e acesso alinhadas ao uso real do produto:
 

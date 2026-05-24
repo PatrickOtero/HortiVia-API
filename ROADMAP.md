@@ -3,18 +3,17 @@
 ## Próximas evoluções
 
 - Favoritos integrados à experiência do aplicativo
-- Comentários e curtidas em artigos
-- Histórico de consultas do usuário
-- Troca de e-mail com confirmação
-- Sessões com refresh token
-- Gestão avançada de mídia para conteúdos e imagens
+- Histórico de produtos consultados
+- Conteúdos relacionados por categoria
+- Recomendações com base nas preferências do usuário
+- Recursos sociais em conteúdos educativos
 
 ## Escopo atual
 
 A versão atual está concentrada em:
 
-- autenticação segura
-- guia de produtos hortifruti
-- artigos educativos
-- perfil e preferências
-- administração de conteúdo
+- guia de frutas, verduras e legumes
+- orientações de escolha, conservação e aproveitamento
+- leituras educativas sobre hortifruti
+- perfil e preferências de uso
+- manutenção de conteúdo que abastece o aplicativo
