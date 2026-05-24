@@ -1,23 +1,23 @@
 # HortiVia Insomnia
 
-Esta pasta contem uma collection completa do Insomnia para testar a API HortiVia sem precisar abrir o app nem consultar o banco manualmente.
+Esta pasta contém uma collection completa do Insomnia para testar a API HortiVia sem precisar abrir o app nem consultar o banco manualmente.
 
-Importante: a collection cobre todas as rotas HTTP que o backend expoe hoje.
+Importante: a collection cobre todas as rotas HTTP que o backend expõe hoje.
 
 ## Arquivos
 
-- `hortivia-insomnia-collection.json`: export importavel no Insomnia.
-- `insomnia-README.md`: guia rapido de uso.
+- `hortivia-insomnia-collection.json`: export importável no Insomnia.
+- `insomnia-README.md`: guia rápido de uso.
 
 ## Como importar
 
 1. Abra o Insomnia.
-2. Va em `Create` ou `Import`.
+2. Vá em `Create` ou `Import`.
 3. Escolha `File`.
 4. Importe `backend/docs/hortivia-insomnia-collection.json`.
 5. Selecione o environment `Local`.
 
-## Variaveis importantes
+## Variáveis importantes
 
 Preencha no environment conforme o seu contexto:
 
@@ -43,19 +43,19 @@ Preencha no environment conforme o seu contexto:
 
 ### 1. Health
 
-Use `GET Health` para validar se a API esta no ar.
+Use `GET Health` para validar se a API está no ar.
 
-### 2. Cadastro e confirmacao de e-mail
+### 2. Cadastro e confirmação de e-mail
 
 1. Rode `POST Register`.
 2. Abra o e-mail recebido.
-3. Copie o codigo de 6 digitos enviado por e-mail.
+3. Copie o código de 6 dígitos enviado por e-mail.
 4. Cole esse valor em `confirmation_code`.
 5. Rode `POST Confirm Email`.
 
 Se quiser gerar um novo e-mail:
 
-1. Garanta que `register_email` esta preenchido.
+1. Garanta que `register_email` está preenchido.
 2. Rode `POST Resend Confirmation`.
 
 ### 3. Login
@@ -71,7 +71,7 @@ Depois do login:
 
 ## Fluxo de produtos
 
-### Rotas publicas
+### Rotas públicas
 
 - `GET Products`
 - `GET Product By Id`
@@ -98,11 +98,11 @@ Para upload de imagem:
 1. Ajuste `product_image_file_path`.
 2. Rode `POST Upload Product Image`.
 
-O campo multipart ja esta configurado como `image`.
+O campo multipart já está configurado como `image`.
 
 ## Fluxo de artigos
 
-### Rotas publicas
+### Rotas públicas
 
 - `GET Articles`
 - `GET Article By Id`
@@ -131,9 +131,9 @@ Para upload de imagem:
 1. Ajuste `article_image_file_path`.
 2. Rode `POST Upload Article Image`.
 
-O campo multipart ja esta configurado como `image`.
+O campo multipart já está configurado como `image`.
 
-## Perfil e preferencias
+## Perfil e preferências
 
 Rotas autenticadas com `access_token`:
 
@@ -149,9 +149,9 @@ Para upload de avatar:
 1. Ajuste `avatar_file_path`.
 2. Rode `POST Upload Avatar`.
 
-O campo multipart ja esta configurado como `avatar`.
+O campo multipart já está configurado como `avatar`.
 
-## Usuarios admin
+## Usuários admin
 
 Rotas autenticadas com `admin_access_token`:
 
@@ -160,10 +160,10 @@ Rotas autenticadas com `admin_access_token`:
 - `PATCH Update User`
 - `DELETE User`
 
-Fluxo util para substituir o DBeaver em testes:
+Fluxo útil para substituir o DBeaver em testes:
 
-1. Crie um usuario pelo `POST Register`.
-2. Confirme o e-mail, se necessario.
+1. Crie um usuário pelo `POST Register`.
+2. Confirme o e-mail, se necessário.
 3. Use `GET Users` com `users_search` preenchido com o e-mail ou nome.
 4. Copie o `id` para `managed_user_id`.
 5. Use `PATCH Update User` para promover a conta a `ADMIN` ou marcar `emailVerified`.
@@ -175,9 +175,9 @@ Filtros aceitos em `GET Users`:
 - `users_role_filter`: `USER` ou `ADMIN`
 - `users_email_verified`: `true` ou `false`
 
-## Observacoes
+## Observações
 
-- O cadastro nao autentica automaticamente. Confirme o e-mail antes de fazer login.
-- As rotas admin exigem um usuario com role `ADMIN`.
-- Os uploads exigem que a configuracao de armazenamento da API esteja valida.
-- A exclusao de usuario falha de forma segura se a conta tiver dados vinculados, como artigos com autoria associada.
+- O cadastro não autentica automaticamente. Confirme o e-mail antes de fazer login.
+- As rotas admin exigem um usuário com role `ADMIN`.
+- Os uploads exigem que a configuração de armazenamento da API esteja válida.
+- A exclusão de usuário falha de forma segura se a conta tiver dados vinculados, como artigos com autoria associada.
