@@ -49,7 +49,7 @@ export class PreferencesService {
 
     if (!user) {
       throw new UnauthorizedException({
-        message: 'Usuario autenticado nao encontrado.',
+        message: 'Usuário autenticado não encontrado.',
         error: 'Unauthorized',
       });
     }

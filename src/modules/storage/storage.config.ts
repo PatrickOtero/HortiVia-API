@@ -27,7 +27,7 @@ export function getStorageConfig(configService: ConfigService): StorageConfig {
 
   if (missingKeys.length > 0) {
     throw new InternalServerErrorException({
-      message: 'Upload de imagem indisponivel no momento.',
+      message: 'Upload de imagem indisponível no momento.',
       error: 'Internal Server Error',
     });
   }

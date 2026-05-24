@@ -4,7 +4,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Logger,
 } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 import { ArticlesRepository } from './articles.repository';
@@ -23,12 +22,14 @@ import type {
 import { calculateReadingTimeMinutes } from './utils/reading-time.util';
 import { slugifyProductName } from '../products/utils/slug.util';
 import { StorageService } from '../storage/storage.service';
-import { ALLOWED_CONTENT_IMAGE_MIME_TYPES, CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
+import {
+  ALLOWED_CONTENT_IMAGE_MIME_TYPES,
+  CONTENT_IMAGE_MAX_FILE_SIZE,
+} from '../storage/image-upload.constants';
 import type { UploadFile } from '../storage/types/upload-file';
 
 @Injectable()
 export class ArticlesService {
-  private readonly logger = new Logger(ArticlesService.name);
   private readonly defaultPage = 1;
   private readonly defaultLimit = 10;
   private readonly maxLimit = 50;
@@ -211,8 +212,6 @@ export class ArticlesService {
   }
 
   async uploadImage(id: string, file?: UploadFile): Promise<ArticleDetailResponse> {
-    this.logger.log(`Article image upload requested for article ${id}`);
-
     await this.requireArticle(id, true);
     const imageFile = this.validateImageFile(file);
 
@@ -223,8 +222,6 @@ export class ArticlesService {
         uploadResult.url,
       );
 
-      this.logger.log(`Article image upload completed for article ${id}`);
-
       return toArticleDetailResponse(
         updatedArticle,
         calculateReadingTimeMinutes(updatedArticle.content),
@@ -234,13 +231,8 @@ export class ArticlesService {
         throw this.buildArticleNotFoundException();
       }
 
-      this.logger.error(
-        `Article image upload failed for article ${id}`,
-        error instanceof Error ? error.stack : undefined,
-      );
-
       throw new InternalServerErrorException({
-        message: 'Nao foi possivel enviar a imagem.',
+        message: 'Não foi possível enviar a imagem.',
         error: 'Internal Server Error',
       });
     }
@@ -377,21 +369,21 @@ export class ArticlesService {
   private validateImageFile(file?: UploadFile): UploadFile {
     if (!file) {
       throw new BadRequestException({
-        message: 'Envie uma imagem valida.',
+        message: 'Envie uma imagem válida.',
         error: 'Bad Request',
       });
     }
 
     if (file.size > CONTENT_IMAGE_MAX_FILE_SIZE) {
       throw new BadRequestException({
-        message: 'A imagem deve ter no maximo 5 MB.',
+        message: 'A imagem deve ter no máximo 5 MB.',
         error: 'Bad Request',
       });
     }
 
     if (!ALLOWED_CONTENT_IMAGE_MIME_TYPES.has(file.mimeType)) {
       throw new BadRequestException({
-        message: 'Formato de imagem nao permitido.',
+        message: 'Formato de imagem não permitido.',
         error: 'Bad Request',
       });
     }
@@ -401,14 +393,14 @@ export class ArticlesService {
 
   private buildArticleNotFoundException() {
     return new NotFoundException({
-      message: 'Artigo nao encontrado.',
+      message: 'Artigo não encontrado.',
       error: 'Not Found',
     });
   }
 
   private buildSlugConflictException() {
     return new ConflictException({
-      message: 'Nao foi possivel salvar o artigo com um slug unico.',
+      message: 'Não foi possível salvar o artigo com um slug único.',
       error: 'Conflict',
     });
   }

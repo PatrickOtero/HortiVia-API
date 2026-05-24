@@ -186,7 +186,7 @@ describe('ArticlesService', () => {
 
     await expect(service.getById('missing')).rejects.toMatchObject({
       response: {
-        message: 'Artigo nao encontrado.',
+        message: 'Artigo não encontrado.',
       },
     });
   });
@@ -262,9 +262,9 @@ describe('ArticlesService', () => {
 
     await service.create(
       {
-        title: 'Frutas da estacao',
+        title: 'Frutas da estação',
         summary: 'Vale observar a safra.',
-        content: 'Produtos da estacao costumam ter melhor sabor e preco.',
+        content: 'Produtos da estação costumam ter melhor sabor e preço.',
         category: ArticleCategory.SEASONALITY,
         isPublished: true,
       },
@@ -284,7 +284,7 @@ describe('ArticlesService', () => {
 
     await expect(service.uploadImage(baseArticle.id)).rejects.toMatchObject({
       response: {
-        message: 'Envie uma imagem valida.',
+        message: 'Envie uma imagem válida.',
       },
     });
   });
@@ -301,7 +301,7 @@ describe('ArticlesService', () => {
       }),
     ).rejects.toMatchObject({
       response: {
-        message: 'Formato de imagem nao permitido.',
+        message: 'Formato de imagem não permitido.',
       },
     });
   });

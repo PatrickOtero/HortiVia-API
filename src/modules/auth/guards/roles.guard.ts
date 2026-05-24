@@ -32,7 +32,7 @@ export class RolesGuard implements CanActivate {
     }
 
     throw new ForbiddenException({
-      message: 'Voce nao tem permissao para executar esta acao.',
+      message: 'Você não tem permissão para executar esta ação.',
       error: 'Forbidden',
     });
   }

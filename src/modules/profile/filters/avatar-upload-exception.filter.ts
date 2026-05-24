@@ -15,7 +15,7 @@ export class AvatarUploadExceptionFilter implements ExceptionFilter {
     if (exception.code === 'LIMIT_FILE_SIZE') {
       response.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
-        message: 'A imagem deve ter no maximo 2 MB.',
+        message: 'A imagem deve ter no máximo 2 MB.',
         error: 'Bad Request',
       });
 
@@ -24,7 +24,7 @@ export class AvatarUploadExceptionFilter implements ExceptionFilter {
 
     response.status(HttpStatus.BAD_REQUEST).json({
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Envie uma imagem valida.',
+      message: 'Envie uma imagem válida.',
       error: 'Bad Request',
     });
   }

@@ -183,7 +183,7 @@ describe('ProductsService', () => {
 
     await expect(service.getById('missing')).rejects.toMatchObject({
       response: {
-        message: 'Produto nao encontrado.',
+        message: 'Produto não encontrado.',
       },
     });
   });
@@ -234,7 +234,7 @@ describe('ProductsService', () => {
 
     await expect(service.uploadImage(baseProduct.id)).rejects.toMatchObject({
       response: {
-        message: 'Envie uma imagem valida.',
+        message: 'Envie uma imagem válida.',
       },
     });
   });
@@ -251,7 +251,7 @@ describe('ProductsService', () => {
       }),
     ).rejects.toMatchObject({
       response: {
-        message: 'Formato de imagem nao permitido.',
+        message: 'Formato de imagem não permitido.',
       },
     });
   });

@@ -4,11 +4,13 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Logger,
 } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 import { StorageService } from '../storage/storage.service';
-import { ALLOWED_CONTENT_IMAGE_MIME_TYPES, CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
+import {
+  ALLOWED_CONTENT_IMAGE_MIME_TYPES,
+  CONTENT_IMAGE_MAX_FILE_SIZE,
+} from '../storage/image-upload.constants';
 import type { UploadFile } from '../storage/types/upload-file';
 import { ProductsRepository } from './products.repository';
 import {
@@ -27,7 +29,6 @@ import type {
 
 @Injectable()
 export class ProductsService {
-  private readonly logger = new Logger(ProductsService.name);
   private readonly defaultPage = 1;
   private readonly defaultLimit = 10;
   private readonly maxLimit = 50;
@@ -193,8 +194,6 @@ export class ProductsService {
   }
 
   async uploadImage(id: string, file?: UploadFile): Promise<ProductDetailResponse> {
-    this.logger.log(`Product image upload requested for product ${id}`);
-
     await this.requireActiveProduct(id);
     const imageFile = this.validateImageFile(file);
 
@@ -205,21 +204,14 @@ export class ProductsService {
         uploadResult.url,
       );
 
-      this.logger.log(`Product image upload completed for product ${id}`);
-
       return toProductDetailResponse(updatedProduct);
     } catch (error) {
       if (this.isRecordNotFoundError(error)) {
         throw this.buildProductNotFoundException();
       }
 
-      this.logger.error(
-        `Product image upload failed for product ${id}`,
-        error instanceof Error ? error.stack : undefined,
-      );
-
       throw new InternalServerErrorException({
-        message: 'Nao foi possivel enviar a imagem.',
+        message: 'Não foi possível enviar a imagem.',
         error: 'Internal Server Error',
       });
     }
@@ -301,21 +293,21 @@ export class ProductsService {
   private validateImageFile(file?: UploadFile): UploadFile {
     if (!file) {
       throw new BadRequestException({
-        message: 'Envie uma imagem valida.',
+        message: 'Envie uma imagem válida.',
         error: 'Bad Request',
       });
     }
 
     if (file.size > CONTENT_IMAGE_MAX_FILE_SIZE) {
       throw new BadRequestException({
-        message: 'A imagem deve ter no maximo 5 MB.',
+        message: 'A imagem deve ter no máximo 5 MB.',
         error: 'Bad Request',
       });
     }
 
     if (!ALLOWED_CONTENT_IMAGE_MIME_TYPES.has(file.mimeType)) {
       throw new BadRequestException({
-        message: 'Formato de imagem nao permitido.',
+        message: 'Formato de imagem não permitido.',
         error: 'Bad Request',
       });
     }
@@ -325,14 +317,14 @@ export class ProductsService {
 
   private buildProductNotFoundException() {
     return new NotFoundException({
-      message: 'Produto nao encontrado.',
+      message: 'Produto não encontrado.',
       error: 'Not Found',
     });
   }
 
   private buildSlugConflictException() {
     return new ConflictException({
-      message: 'Nao foi possivel salvar o produto com um slug unico.',
+      message: 'Não foi possível salvar o produto com um slug único.',
       error: 'Conflict',
     });
   }

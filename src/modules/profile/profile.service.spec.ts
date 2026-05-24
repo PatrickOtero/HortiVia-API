@@ -18,6 +18,10 @@ describe('ProfileService', () => {
     emailConfirmationCodeExpiresAt: null,
     emailConfirmationCodeSentAt: null,
     emailConfirmationAttempts: 0,
+    passwordResetCodeHash: null,
+    passwordResetCodeExpiresAt: null,
+    passwordResetCodeSentAt: null,
+    passwordResetAttempts: 0,
     createdAt: new Date('2026-05-20T00:00:00.000Z'),
     updatedAt: new Date('2026-05-20T00:00:00.000Z'),
   };
@@ -117,7 +121,7 @@ describe('ProfileService', () => {
       }),
     ).rejects.toMatchObject({
       response: {
-        message: 'Ja existe um usuario com este e-mail.',
+        message: 'Já existe um usuário com este e-mail.',
       },
     });
   });
@@ -144,7 +148,7 @@ describe('ProfileService', () => {
 
     await expect(service.uploadAvatar(baseUser.id)).rejects.toMatchObject({
       response: {
-        message: 'Envie uma imagem valida.',
+        message: 'Envie uma imagem válida.',
       },
     });
   });
@@ -161,7 +165,7 @@ describe('ProfileService', () => {
       }),
     ).rejects.toMatchObject({
       response: {
-        message: 'Formato de imagem nao permitido.',
+        message: 'Formato de imagem não permitido.',
       },
     });
   });
@@ -178,7 +182,7 @@ describe('ProfileService', () => {
       }),
     ).rejects.toMatchObject({
       response: {
-        message: 'A imagem deve ter no maximo 2 MB.',
+        message: 'A imagem deve ter no máximo 2 MB.',
       },
     });
   });

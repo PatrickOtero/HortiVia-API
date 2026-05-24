@@ -17,6 +17,10 @@ describe('PreferencesService', () => {
     emailConfirmationCodeExpiresAt: null,
     emailConfirmationCodeSentAt: null,
     emailConfirmationAttempts: 0,
+    passwordResetCodeHash: null,
+    passwordResetCodeExpiresAt: null,
+    passwordResetCodeSentAt: null,
+    passwordResetAttempts: 0,
     createdAt: new Date('2026-05-20T00:00:00.000Z'),
     updatedAt: new Date('2026-05-20T00:00:00.000Z'),
   };

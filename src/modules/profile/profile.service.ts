@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { StorageService } from '../storage/storage.service';
@@ -23,8 +22,6 @@ const ALLOWED_PROFILE_AVATAR_MIME_TYPES = new Set([
 
 @Injectable()
 export class ProfileService {
-  private readonly logger = new Logger(ProfileService.name);
-
   constructor(
     private readonly profileRepository: ProfileRepository,
     private readonly storageService: StorageService,
@@ -82,7 +79,10 @@ export class ProfileService {
     }
 
     try {
-      const updatedUser = await this.profileRepository.updateUserProfile(userId, data);
+      const updatedUser = await this.profileRepository.updateUserProfile(
+        userId,
+        data,
+      );
 
       return toProfileResponse(updatedUser);
     } catch (error) {
@@ -98,8 +98,6 @@ export class ProfileService {
     userId: string,
     file?: UploadFile,
   ): Promise<ProfileResponse> {
-    this.logger.log(`Avatar upload requested for user ${userId}`);
-
     const existingUser = await this.profileRepository.findUserById(userId);
 
     if (!existingUser) {
@@ -118,21 +116,14 @@ export class ProfileService {
         uploadResult.url,
       );
 
-      this.logger.log(`Avatar upload completed for user ${userId}`);
-
       return toProfileResponse(updatedUser);
     } catch (error) {
       if (this.isDuplicateEmailError(error)) {
         throw this.buildDuplicateEmailException();
       }
 
-      this.logger.error(
-        `Avatar upload failed for user ${userId}`,
-        error instanceof Error ? error.stack : undefined,
-      );
-
       throw new InternalServerErrorException({
-        message: 'Nao foi possivel enviar a imagem agora.',
+        message: 'Não foi possível enviar a imagem agora.',
         error: 'Internal Server Error',
       });
     }
@@ -150,14 +141,14 @@ export class ProfileService {
 
   private buildDuplicateEmailException() {
     return new ConflictException({
-      message: 'Ja existe um usuario com este e-mail.',
+      message: 'Já existe um usuário com este e-mail.',
       error: 'Conflict',
     });
   }
 
   private buildAuthenticatedUserNotFoundException() {
     return new UnauthorizedException({
-      message: 'Usuario autenticado nao encontrado.',
+      message: 'Usuário autenticado não encontrado.',
       error: 'Unauthorized',
     });
   }
@@ -165,21 +156,21 @@ export class ProfileService {
   private validateAvatarFile(file?: UploadFile): UploadFile {
     if (!file) {
       throw new BadRequestException({
-        message: 'Envie uma imagem valida.',
+        message: 'Envie uma imagem válida.',
         error: 'Bad Request',
       });
     }
 
     if (file.size > PROFILE_AVATAR_MAX_FILE_SIZE) {
       throw new BadRequestException({
-        message: 'A imagem deve ter no maximo 2 MB.',
+        message: 'A imagem deve ter no máximo 2 MB.',
         error: 'Bad Request',
       });
     }
 
     if (!ALLOWED_PROFILE_AVATAR_MIME_TYPES.has(file.mimeType)) {
       throw new BadRequestException({
-        message: 'Formato de imagem nao permitido.',
+        message: 'Formato de imagem não permitido.',
         error: 'Bad Request',
       });
     }
