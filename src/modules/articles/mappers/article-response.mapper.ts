@@ -7,6 +7,7 @@ import type {
   ArticleDetailResponse,
   ArticleListItemResponse,
   RelatedProductResponse,
+  SavedArticleItemResponse,
 } from '../types/article-response';
 
 function toArticleAuthorResponse(
@@ -39,6 +40,9 @@ function toRelatedProducts(
 export function toArticleListItemResponse(
   article: ArticleListRecord | ArticleDetailRecord,
   readingTimeMinutes: number,
+  options?: {
+    isSaved?: boolean;
+  },
 ): ArticleListItemResponse {
   return {
     id: article.id,
@@ -51,18 +55,34 @@ export function toArticleListItemResponse(
     publishedAt: resolvePublishedAt(article),
     readingTimeMinutes,
     author: toArticleAuthorResponse(article),
+    isSaved: options?.isSaved,
   };
 }
 
 export function toArticleDetailResponse(
   article: ArticleDetailRecord,
   readingTimeMinutes: number,
+  options?: {
+    isSaved?: boolean;
+  },
 ): ArticleDetailResponse {
   return {
-    ...toArticleListItemResponse(article, readingTimeMinutes),
+    ...toArticleListItemResponse(article, readingTimeMinutes, options),
     content: article.content,
     relatedProducts: toRelatedProducts(article),
     createdAt: article.createdAt.toISOString(),
     updatedAt: article.updatedAt.toISOString(),
+  };
+}
+
+export function toSavedArticleItemResponse(
+  article: ArticleListRecord | ArticleDetailRecord,
+  readingTimeMinutes: number,
+): SavedArticleItemResponse {
+  return {
+    ...toArticleListItemResponse(article, readingTimeMinutes, {
+      isSaved: true,
+    }),
+    isSaved: true,
   };
 }

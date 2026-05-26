@@ -41,6 +41,24 @@ export class ArticlesController {
     return this.articlesService.getById(id);
   }
 
+  @Post(':articleId/save')
+  @UseGuards(JwtAuthGuard)
+  async saveArticle(
+    @Param('articleId') articleId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.saveArticle(user.userId, articleId);
+  }
+
+  @Delete(':articleId/save')
+  @UseGuards(JwtAuthGuard)
+  async unsaveArticle(
+    @Param('articleId') articleId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.unsaveArticle(user.userId, articleId);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)

@@ -66,6 +66,12 @@ describe('ArticlesService', () => {
     update: jest.fn(),
     updateImageUrl: jest.fn(),
     unpublish: jest.fn(),
+    findSavedArticleByUserAndArticle: jest.fn(),
+    createSavedArticle: jest.fn(),
+    deleteSavedArticle: jest.fn(),
+    listSavedArticlesByUser: jest.fn(),
+    countSavedArticlesByUser: jest.fn(),
+    getSavedArticleIdsForUser: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
       ArticlesRepository,
@@ -77,6 +83,12 @@ describe('ArticlesService', () => {
       | 'update'
       | 'updateImageUrl'
       | 'unpublish'
+      | 'findSavedArticleByUserAndArticle'
+      | 'createSavedArticle'
+      | 'deleteSavedArticle'
+      | 'listSavedArticlesByUser'
+      | 'countSavedArticlesByUser'
+      | 'getSavedArticleIdsForUser'
     >
   >;
 
@@ -137,6 +149,7 @@ describe('ArticlesService', () => {
       slug: baseArticle.slug,
       category: baseArticle.category,
       author: baseArticle.author,
+      isSaved: false,
     });
     expect(result.data[0]).not.toHaveProperty('relatedProducts');
   });
@@ -214,6 +227,7 @@ describe('ArticlesService', () => {
       slug: baseArticle.slug,
       author: baseArticle.author,
       readingTimeMinutes: 1,
+      isSaved: false,
     });
     expect(result.relatedProducts).toEqual([
       {
@@ -234,6 +248,96 @@ describe('ArticlesService', () => {
       response: {
         message: 'Artigo não encontrado.',
       },
+    });
+  });
+
+  it('saves an article idempotently', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findSavedArticleByUserAndArticle.mockResolvedValue(null);
+
+    const result = await service.saveArticle('user-1', baseArticle.id);
+
+    expect(articlesRepository.findSavedArticleByUserAndArticle).toHaveBeenCalledWith(
+      'user-1',
+      baseArticle.id,
+    );
+    expect(articlesRepository.createSavedArticle).toHaveBeenCalledWith(
+      'user-1',
+      baseArticle.id,
+    );
+    expect(result).toEqual({
+      message: 'Artigo salvo.',
+    });
+  });
+
+  it('does not create duplicate saved articles', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findSavedArticleByUserAndArticle.mockResolvedValue({
+      id: 'saved-1',
+      userId: 'user-1',
+      articleId: baseArticle.id,
+      createdAt: new Date('2026-05-26T00:00:00.000Z'),
+    });
+
+    await service.saveArticle('user-1', baseArticle.id);
+
+    expect(articlesRepository.createSavedArticle).not.toHaveBeenCalled();
+  });
+
+  it('removes a saved article idempotently', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findSavedArticleByUserAndArticle.mockResolvedValue({
+      id: 'saved-1',
+      userId: 'user-1',
+      articleId: baseArticle.id,
+      createdAt: new Date('2026-05-26T00:00:00.000Z'),
+    });
+
+    const result = await service.unsaveArticle('user-1', baseArticle.id);
+
+    expect(articlesRepository.deleteSavedArticle).toHaveBeenCalledWith(
+      'user-1',
+      baseArticle.id,
+    );
+    expect(result).toEqual({
+      message: 'Artigo removido das leituras salvas.',
+    });
+  });
+
+  it('lists saved articles with pagination metadata', async () => {
+    articlesRepository.listSavedArticlesByUser.mockResolvedValue([
+      {
+        id: 'saved-1',
+        userId: 'user-1',
+        articleId: baseArticle.id,
+        createdAt: new Date('2026-05-26T00:00:00.000Z'),
+        article: baseArticle,
+      },
+    ]);
+    articlesRepository.countSavedArticlesByUser.mockResolvedValue(1);
+
+    const result = await service.listSavedArticles('user-1', {
+      page: 1,
+      limit: 20,
+    });
+
+    expect(articlesRepository.listSavedArticlesByUser).toHaveBeenCalledWith({
+      userId: 'user-1',
+      skip: 0,
+      take: 20,
+    });
+    expect(result).toEqual({
+      items: [
+        expect.objectContaining({
+          id: baseArticle.id,
+          title: baseArticle.title,
+          isSaved: true,
+        }),
+      ],
+      page: 1,
+      limit: 20,
+      total: 1,
+      totalPages: 1,
     });
   });
 

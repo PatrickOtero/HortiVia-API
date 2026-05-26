@@ -223,6 +223,22 @@ Regras:
 - a listagem retorna os itens paginados em ordem de favorito mais recente
 - o catálogo público continua público e não depende de autenticação para listar produtos
 
+## Leituras salvas
+
+JWT obrigatório:
+
+- `POST /articles/:articleId/save`
+- `DELETE /articles/:articleId/save`
+- `GET /saved/articles`
+
+Regras:
+
+- salvar e remover são operações idempotentes por usuário e artigo
+- a listagem retorna os itens paginados em ordem de salvamento mais recente
+- apenas artigos publicados entram na listagem
+- `GET /articles` e `GET /articles/:id` continuam públicos
+- o campo `isSaved` pode vir como `false` fora do contexto autenticado e como `true` na listagem de leituras salvas
+
 ## RelaÃ§Ã£o entre produtos e artigos
 
 O backend usa a relaÃ§Ã£o explÃ­cita `ProductArticle` para conectar guias de produto e conteÃºdos educativos.

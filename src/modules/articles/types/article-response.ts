@@ -28,6 +28,7 @@ export interface ArticleListItemResponse {
   publishedAt: string;
   readingTimeMinutes: number;
   author: ArticleAuthorResponse;
+  isSaved?: boolean;
 }
 
 export interface ArticleDetailResponse extends ArticleListItemResponse {
@@ -47,4 +48,16 @@ export interface ArticlesListMeta {
 export interface ArticlesListResponse {
   data: ArticleListItemResponse[];
   meta: ArticlesListMeta;
+}
+
+export interface SavedArticleItemResponse extends ArticleListItemResponse {
+  isSaved: true;
+}
+
+export interface SavedArticlesListResponse {
+  items: SavedArticleItemResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }

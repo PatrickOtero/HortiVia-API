@@ -44,6 +44,16 @@ export type ArticleDetailRecord = Prisma.ArticleGetPayload<{
   include: typeof articleDetailInclude;
 }>;
 
+export const savedArticleInclude = articleListInclude;
+
+export type SavedArticleRecord = Prisma.SavedArticleGetPayload<{
+  include: {
+    article: {
+      include: typeof savedArticleInclude;
+    };
+  };
+}>;
+
 @Injectable()
 export class ArticlesRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -122,5 +132,100 @@ export class ArticlesRepository {
       },
       include: articleDetailInclude,
     });
+  }
+
+  async findSavedArticleByUserAndArticle(userId: string, articleId: string) {
+    return this.prisma.savedArticle.findUnique({
+      where: {
+        userId_articleId: {
+          userId,
+          articleId,
+        },
+      },
+    });
+  }
+
+  async createSavedArticle(userId: string, articleId: string) {
+    return this.prisma.savedArticle.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        article: {
+          connect: {
+            id: articleId,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteSavedArticle(userId: string, articleId: string) {
+    return this.prisma.savedArticle.delete({
+      where: {
+        userId_articleId: {
+          userId,
+          articleId,
+        },
+      },
+    });
+  }
+
+  async listSavedArticlesByUser(params: {
+    userId: string;
+    skip: number;
+    take: number;
+  }) {
+    return this.prisma.savedArticle.findMany({
+      where: {
+        userId: params.userId,
+        article: {
+          isPublished: true,
+        },
+      },
+      skip: params.skip,
+      take: params.take,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        article: {
+          include: savedArticleInclude,
+        },
+      },
+    });
+  }
+
+  async countSavedArticlesByUser(userId: string) {
+    return this.prisma.savedArticle.count({
+      where: {
+        userId,
+        article: {
+          isPublished: true,
+        },
+      },
+    });
+  }
+
+  async getSavedArticleIdsForUser(userId: string, articleIds?: string[]) {
+    const savedArticles = await this.prisma.savedArticle.findMany({
+      where: {
+        userId,
+        ...(articleIds && articleIds.length > 0
+          ? {
+              articleId: {
+                in: articleIds,
+              },
+            }
+          : {}),
+      },
+      select: {
+        articleId: true,
+      },
+    });
+
+    return savedArticles.map(savedArticle => savedArticle.articleId);
   }
 }

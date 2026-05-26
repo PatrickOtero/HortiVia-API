@@ -334,6 +334,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   articles?: Prisma.ArticleListRelationFilter
   productFavorites?: Prisma.ProductFavoriteListRelationFilter
+  savedArticles?: Prisma.SavedArticleListRelationFilter
   preferences?: Prisma.XOR<Prisma.UserPreferenceNullableScalarRelationFilter, Prisma.UserPreferenceWhereInput> | null
 }
 
@@ -359,6 +360,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   articles?: Prisma.ArticleOrderByRelationAggregateInput
   productFavorites?: Prisma.ProductFavoriteOrderByRelationAggregateInput
+  savedArticles?: Prisma.SavedArticleOrderByRelationAggregateInput
   preferences?: Prisma.UserPreferenceOrderByWithRelationInput
 }
 
@@ -387,6 +389,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   articles?: Prisma.ArticleListRelationFilter
   productFavorites?: Prisma.ProductFavoriteListRelationFilter
+  savedArticles?: Prisma.SavedArticleListRelationFilter
   preferences?: Prisma.XOR<Prisma.UserPreferenceNullableScalarRelationFilter, Prisma.UserPreferenceWhereInput> | null
 }, "id" | "email">
 
@@ -464,6 +467,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   productFavorites?: Prisma.ProductFavoriteCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleCreateNestedManyWithoutUserInput
   preferences?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
 }
 
@@ -489,6 +493,7 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   productFavorites?: Prisma.ProductFavoriteUncheckedCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -514,6 +519,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   productFavorites?: Prisma.ProductFavoriteUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUpdateManyWithoutUserNestedInput
   preferences?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
 }
 
@@ -539,6 +545,7 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   productFavorites?: Prisma.ProductFavoriteUncheckedUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -753,6 +760,20 @@ export type UserUpdateOneRequiredWithoutArticlesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutArticlesInput, Prisma.UserUpdateWithoutArticlesInput>, Prisma.UserUncheckedUpdateWithoutArticlesInput>
 }
 
+export type UserCreateNestedOneWithoutSavedArticlesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedArticlesInput, Prisma.UserUncheckedCreateWithoutSavedArticlesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedArticlesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSavedArticlesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedArticlesInput, Prisma.UserUncheckedCreateWithoutSavedArticlesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedArticlesInput
+  upsert?: Prisma.UserUpsertWithoutSavedArticlesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedArticlesInput, Prisma.UserUpdateWithoutSavedArticlesInput>, Prisma.UserUncheckedUpdateWithoutSavedArticlesInput>
+}
+
 export type UserCreateNestedOneWithoutPreferencesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutPreferencesInput, Prisma.UserUncheckedCreateWithoutPreferencesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreferencesInput
@@ -788,6 +809,7 @@ export type UserCreateWithoutProductFavoritesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  savedArticles?: Prisma.SavedArticleCreateNestedManyWithoutUserInput
   preferences?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
 }
 
@@ -812,6 +834,7 @@ export type UserUncheckedCreateWithoutProductFavoritesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  savedArticles?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -852,6 +875,7 @@ export type UserUpdateWithoutProductFavoritesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  savedArticles?: Prisma.SavedArticleUpdateManyWithoutUserNestedInput
   preferences?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
 }
 
@@ -876,6 +900,7 @@ export type UserUncheckedUpdateWithoutProductFavoritesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  savedArticles?: Prisma.SavedArticleUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -900,6 +925,7 @@ export type UserCreateWithoutArticlesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   productFavorites?: Prisma.ProductFavoriteCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleCreateNestedManyWithoutUserInput
   preferences?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
 }
 
@@ -924,6 +950,7 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   productFavorites?: Prisma.ProductFavoriteUncheckedCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutUserInput
   preferences?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -964,6 +991,7 @@ export type UserUpdateWithoutArticlesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productFavorites?: Prisma.ProductFavoriteUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUpdateManyWithoutUserNestedInput
   preferences?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
 }
 
@@ -987,6 +1015,123 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productFavorites?: Prisma.ProductFavoriteUncheckedUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSavedArticlesInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  avatarUrl?: string | null
+  gender?: $Enums.Gender | null
+  role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  productFavorites?: Prisma.ProductFavoriteCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSavedArticlesInput = {
+  id?: string
+  name: string
+  email: string
+  passwordHash: string
+  avatarUrl?: string | null
+  gender?: $Enums.Gender | null
+  role?: $Enums.UserRole
+  emailVerified?: boolean
+  emailVerifiedAt?: Date | string | null
+  emailConfirmationCodeHash?: string | null
+  emailConfirmationCodeExpiresAt?: Date | string | null
+  emailConfirmationCodeSentAt?: Date | string | null
+  emailConfirmationAttempts?: number
+  passwordResetCodeHash?: string | null
+  passwordResetCodeExpiresAt?: Date | string | null
+  passwordResetCodeSentAt?: Date | string | null
+  passwordResetAttempts?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  productFavorites?: Prisma.ProductFavoriteUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSavedArticlesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedArticlesInput, Prisma.UserUncheckedCreateWithoutSavedArticlesInput>
+}
+
+export type UserUpsertWithoutSavedArticlesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSavedArticlesInput, Prisma.UserUncheckedUpdateWithoutSavedArticlesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedArticlesInput, Prisma.UserUncheckedCreateWithoutSavedArticlesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSavedArticlesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSavedArticlesInput, Prisma.UserUncheckedUpdateWithoutSavedArticlesInput>
+}
+
+export type UserUpdateWithoutSavedArticlesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  productFavorites?: Prisma.ProductFavoriteUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSavedArticlesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailConfirmationCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  emailConfirmationAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  passwordResetCodeHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordResetCodeExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetCodeSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   productFavorites?: Prisma.ProductFavoriteUncheckedUpdateManyWithoutUserNestedInput
   preferences?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
 }
@@ -1013,6 +1158,7 @@ export type UserCreateWithoutPreferencesInput = {
   updatedAt?: Date | string
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   productFavorites?: Prisma.ProductFavoriteCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPreferencesInput = {
@@ -1037,6 +1183,7 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   updatedAt?: Date | string
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   productFavorites?: Prisma.ProductFavoriteUncheckedCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPreferencesInput = {
@@ -1077,6 +1224,7 @@ export type UserUpdateWithoutPreferencesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   productFavorites?: Prisma.ProductFavoriteUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPreferencesInput = {
@@ -1101,6 +1249,7 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   productFavorites?: Prisma.ProductFavoriteUncheckedUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1111,11 +1260,13 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
 export type UserCountOutputType = {
   articles: number
   productFavorites: number
+  savedArticles: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | UserCountOutputTypeCountArticlesArgs
   productFavorites?: boolean | UserCountOutputTypeCountProductFavoritesArgs
+  savedArticles?: boolean | UserCountOutputTypeCountSavedArticlesArgs
 }
 
 /**
@@ -1142,6 +1293,13 @@ export type UserCountOutputTypeCountProductFavoritesArgs<ExtArgs extends runtime
   where?: Prisma.ProductFavoriteWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSavedArticlesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedArticleWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1165,6 +1323,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   productFavorites?: boolean | Prisma.User$productFavoritesArgs<ExtArgs>
+  savedArticles?: boolean | Prisma.User$savedArticlesArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1239,6 +1398,7 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   productFavorites?: boolean | Prisma.User$productFavoritesArgs<ExtArgs>
+  savedArticles?: boolean | Prisma.User$savedArticlesArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1250,6 +1410,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     articles: Prisma.$ArticlePayload<ExtArgs>[]
     productFavorites: Prisma.$ProductFavoritePayload<ExtArgs>[]
+    savedArticles: Prisma.$SavedArticlePayload<ExtArgs>[]
     preferences: Prisma.$UserPreferencePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1668,6 +1829,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   articles<T extends Prisma.User$articlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   productFavorites<T extends Prisma.User$productFavoritesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$productFavoritesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductFavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedArticles<T extends Prisma.User$savedArticlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedArticlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   preferences<T extends Prisma.User$preferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferencesArgs<ExtArgs>>): Prisma.Prisma__UserPreferenceClient<runtime.Types.Result.GetResult<Prisma.$UserPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2155,6 +2317,30 @@ export type User$productFavoritesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ProductFavoriteScalarFieldEnum | Prisma.ProductFavoriteScalarFieldEnum[]
+}
+
+/**
+ * User.savedArticles
+ */
+export type User$savedArticlesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedArticle
+   */
+  select?: Prisma.SavedArticleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedArticle
+   */
+  omit?: Prisma.SavedArticleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedArticleInclude<ExtArgs> | null
+  where?: Prisma.SavedArticleWhereInput
+  orderBy?: Prisma.SavedArticleOrderByWithRelationInput | Prisma.SavedArticleOrderByWithRelationInput[]
+  cursor?: Prisma.SavedArticleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedArticleScalarFieldEnum | Prisma.SavedArticleScalarFieldEnum[]
 }
 
 /**

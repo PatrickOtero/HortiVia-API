@@ -614,48 +614,60 @@ async function main() {
   const author = await ensureSeedContentAuthor();
 
   for (const product of products) {
-    const savedProduct = await prisma.product.upsert({
+    const existingProduct = await prisma.product.findUnique({
       where: {
         slug: product.slug,
       },
-      create: {
-        name: product.name,
-        slug: product.slug,
-        category: product.category,
-        shortDescription: product.shortDescription,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        benefits: product.benefits,
-        howToChoose: product.howToChoose,
-        howToStore: product.howToStore,
-        usageTips: product.usageTips,
-        nutrients: product.nutrients,
-        isActive: true,
-      },
-      update: {
-        name: product.name,
-        category: product.category,
-        shortDescription: product.shortDescription,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        benefits: product.benefits,
-        howToChoose: product.howToChoose,
-        howToStore: product.howToStore,
-        usageTips: product.usageTips,
-        nutrients: product.nutrients,
-        isActive: true,
+      include: {
+        images: {
+          select: {
+            id: true,
+          },
+        },
+        guideSections: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
 
-    await prisma.productImage.deleteMany({
-      where: {
-        productId: savedProduct.id,
-      },
-    });
+    const savedProduct =
+      existingProduct ??
+      (await prisma.product.create({
+        data: {
+          name: product.name,
+          slug: product.slug,
+          category: product.category,
+          shortDescription: product.shortDescription,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          benefits: product.benefits,
+          howToChoose: product.howToChoose,
+          howToStore: product.howToStore,
+          usageTips: product.usageTips,
+          nutrients: product.nutrients,
+          isActive: true,
+        },
+        include: {
+          images: {
+            select: {
+              id: true,
+            },
+          },
+          guideSections: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      }));
 
-    if ((product.mainImages ?? []).length > 0) {
+    const mainImages = product.mainImages ?? [];
+
+    if (mainImages.length > 0 && savedProduct.images.length === 0) {
       await prisma.productImage.createMany({
-        data: product.mainImages.map((image, index) => ({
+        data: mainImages.map((image, index) => ({
           productId: savedProduct.id,
           url: image.url,
           alt: image.alt ?? null,
@@ -667,15 +679,11 @@ async function main() {
       });
     }
 
-    await prisma.productGuideSection.deleteMany({
-      where: {
-        productId: savedProduct.id,
-      },
-    });
+    const guideSections = product.guideSections ?? [];
 
-    if ((product.guideSections ?? []).length > 0) {
+    if (guideSections.length > 0 && savedProduct.guideSections.length === 0) {
       await prisma.productGuideSection.createMany({
-        data: product.guideSections.map((section, index) => ({
+        data: guideSections.map((section, index) => ({
           productId: savedProduct.id,
           kind: section.kind,
           title: section.title,
@@ -693,34 +701,27 @@ async function main() {
   }
 
   for (const article of articles) {
-    await prisma.article.upsert({
+    const existingArticle = await prisma.article.findUnique({
       where: {
         slug: article.slug,
       },
-      create: {
-        ...article,
-        author: {
-          connect: {
-            id: author.id,
-          },
-        },
-      },
-      update: {
-        title: article.title,
-        summary: article.summary,
-        content: article.content,
-        category: article.category,
-        imageUrl: article.imageUrl,
-        tags: article.tags,
-        isPublished: article.isPublished,
-        publishedAt: article.publishedAt,
-        author: {
-          connect: {
-            id: author.id,
-          },
-        },
+      select: {
+        id: true,
       },
     });
+
+    if (!existingArticle) {
+      await prisma.article.create({
+        data: {
+          ...article,
+          author: {
+            connect: {
+              id: author.id,
+            },
+          },
+        },
+      });
+    }
   }
 
   for (const relation of productArticleRelations) {

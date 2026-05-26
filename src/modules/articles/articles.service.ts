@@ -10,14 +10,17 @@ import { ArticlesRepository } from './articles.repository';
 import {
   toArticleDetailResponse,
   toArticleListItemResponse,
+  toSavedArticleItemResponse,
 } from './mappers/article-response.mapper';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import type { CreateArticleDto } from './dto/create-article.dto';
 import type { ListArticlesQueryDto } from './dto/list-articles-query.dto';
+import type { ListSavedArticlesQueryDto } from './dto/list-saved-articles-query.dto';
 import type { UpdateArticleDto } from './dto/update-article.dto';
 import type {
   ArticleDetailResponse,
   ArticlesListResponse,
+  SavedArticlesListResponse,
 } from './types/article-response';
 import { calculateReadingTimeMinutes } from './utils/reading-time.util';
 import { slugifyProductName } from '../products/utils/slug.util';
@@ -58,6 +61,9 @@ export class ArticlesService {
         toArticleListItemResponse(
           article,
           calculateReadingTimeMinutes(article.content),
+          {
+            isSaved: false,
+          },
         ),
       ),
       meta: {
@@ -79,7 +85,88 @@ export class ArticlesService {
     return toArticleDetailResponse(
       article,
       calculateReadingTimeMinutes(article.content),
+      {
+        isSaved: false,
+      },
     );
+  }
+
+  async saveArticle(userId: string, articleId: string) {
+    await this.requireArticle(articleId);
+
+    const existingSavedArticle =
+      await this.articlesRepository.findSavedArticleByUserAndArticle(
+        userId,
+        articleId,
+      );
+
+    if (!existingSavedArticle) {
+      try {
+        await this.articlesRepository.createSavedArticle(userId, articleId);
+      } catch (error) {
+        if (!this.isUniqueConstraintError(error)) {
+          throw error;
+        }
+      }
+    }
+
+    return {
+      message: 'Artigo salvo.',
+    };
+  }
+
+  async unsaveArticle(userId: string, articleId: string) {
+    await this.requireArticle(articleId, true);
+
+    const existingSavedArticle =
+      await this.articlesRepository.findSavedArticleByUserAndArticle(
+        userId,
+        articleId,
+      );
+
+    if (existingSavedArticle) {
+      try {
+        await this.articlesRepository.deleteSavedArticle(userId, articleId);
+      } catch (error) {
+        if (!this.isRecordNotFoundError(error)) {
+          throw error;
+        }
+      }
+    }
+
+    return {
+      message: 'Artigo removido das leituras salvas.',
+    };
+  }
+
+  async listSavedArticles(
+    userId: string,
+    query: ListSavedArticlesQueryDto,
+  ): Promise<SavedArticlesListResponse> {
+    const page = query.page ?? this.defaultPage;
+    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
+
+    const [savedArticles, total] = await Promise.all([
+      this.articlesRepository.listSavedArticlesByUser({
+        userId,
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.articlesRepository.countSavedArticlesByUser(userId),
+    ]);
+
+    return {
+      items: savedArticles.map(savedArticle =>
+        toSavedArticleItemResponse(
+          savedArticle.article,
+          calculateReadingTimeMinutes(savedArticle.article.content),
+        ),
+      ),
+      page,
+      limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+    };
   }
 
   async create(
@@ -110,6 +197,9 @@ export class ArticlesService {
       return toArticleDetailResponse(
         article,
         calculateReadingTimeMinutes(article.content),
+        {
+          isSaved: false,
+        },
       );
     } catch (error) {
       if (this.isUniqueConstraintError(error)) {
@@ -170,6 +260,9 @@ export class ArticlesService {
       return toArticleDetailResponse(
         existingArticle,
         calculateReadingTimeMinutes(existingArticle.content),
+        {
+          isSaved: false,
+        },
       );
     }
 
@@ -179,6 +272,9 @@ export class ArticlesService {
       return toArticleDetailResponse(
         article,
         calculateReadingTimeMinutes(article.content),
+        {
+          isSaved: false,
+        },
       );
     } catch (error) {
       if (this.isRecordNotFoundError(error)) {
@@ -225,6 +321,9 @@ export class ArticlesService {
       return toArticleDetailResponse(
         updatedArticle,
         calculateReadingTimeMinutes(updatedArticle.content),
+        {
+          isSaved: false,
+        },
       );
     } catch (error) {
       if (this.isRecordNotFoundError(error)) {
