@@ -70,6 +70,11 @@ export type ProductGuideSection = Prisma.ProductGuideSectionModel
  */
 export type Article = Prisma.ArticleModel
 /**
+ * Model ProductArticle
+ * 
+ */
+export type ProductArticle = Prisma.ProductArticleModel
+/**
  * Model UserPreference
  * 
  */

@@ -21,6 +21,24 @@ export const productDetailInclude = {
       },
     ],
   },
+  articleRelations: {
+    where: {
+      article: {
+        isPublished: true,
+      },
+    },
+    orderBy: [
+      {
+        sortOrder: 'asc',
+      },
+      {
+        createdAt: 'asc',
+      },
+    ],
+    include: {
+      article: true,
+    },
+  },
 } satisfies Prisma.ProductInclude;
 
 export type ProductDetailModel = Prisma.ProductGetPayload<{

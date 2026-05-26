@@ -161,6 +161,63 @@ export class ProductsRepository {
     return favorites.map(favorite => favorite.productId);
   }
 
+  async findProductArticleRelation(productId: string, articleId: string) {
+    return this.prisma.productArticle.findUnique({
+      where: {
+        productId_articleId: {
+          productId,
+          articleId,
+        },
+      },
+    });
+  }
+
+  async upsertProductArticleRelation(
+    productId: string,
+    articleId: string,
+    sortOrder = 0,
+  ) {
+    return this.prisma.productArticle.upsert({
+      where: {
+        productId_articleId: {
+          productId,
+          articleId,
+        },
+      },
+      create: {
+        productId,
+        articleId,
+        sortOrder,
+      },
+      update: {},
+    });
+  }
+
+  async updateProductArticleRelation(
+    productId: string,
+    articleId: string,
+    data: Prisma.ProductArticleUpdateInput,
+  ) {
+    return this.prisma.productArticle.update({
+      where: {
+        productId_articleId: {
+          productId,
+          articleId,
+        },
+      },
+      data,
+    });
+  }
+
+  async deleteProductArticleRelation(productId: string, articleId: string) {
+    return this.prisma.productArticle.deleteMany({
+      where: {
+        productId,
+        articleId,
+      },
+    });
+  }
+
   async findProductImageById(imageId: string) {
     return this.prisma.productImage.findUnique({
       where: {

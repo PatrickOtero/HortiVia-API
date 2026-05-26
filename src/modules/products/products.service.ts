@@ -8,6 +8,7 @@ import {
 import type {
   Prisma
 } from '../../generated/prisma/client';
+import { ArticlesRepository } from '../articles/articles.repository';
 import { StorageService } from '../storage/storage.service';
 import {
   ALLOWED_CONTENT_IMAGE_MIME_TYPES,
@@ -24,6 +25,7 @@ import type { ProductNutrientDto } from './dto/product-nutrient.dto';
 import type { UpdateProductGuideSectionDto } from './dto/update-product-guide-section.dto';
 import type { UpdateProductImageFileDto } from './dto/update-product-image-file.dto';
 import type { UpdateProductImageDto } from './dto/update-product-image.dto';
+import type { UpdateProductArticleRelationDto } from './dto/update-product-article-relation.dto';
 import type { UpdateProductDto } from './dto/update-product.dto';
 import {
   toFavoriteProductItemResponse,
@@ -50,6 +52,7 @@ export class ProductsService {
 
   constructor(
     private readonly productsRepository: ProductsRepository,
+    private readonly articlesRepository: ArticlesRepository,
     private readonly storageService: StorageService,
   ) {}
 
@@ -86,6 +89,66 @@ export class ProductsService {
     }
 
     return toProductDetailResponse(product);
+  }
+
+  async relateArticle(productId: string, articleId: string) {
+    await Promise.all([
+      this.requireActiveProduct(productId),
+      this.requireArticle(articleId),
+    ]);
+
+    await this.productsRepository.upsertProductArticleRelation(productId, articleId);
+
+    return {
+      message: 'Relação salva com sucesso.',
+    };
+  }
+
+  async updateArticleRelation(
+    productId: string,
+    articleId: string,
+    updateProductArticleRelationDto: UpdateProductArticleRelationDto,
+  ) {
+    await Promise.all([
+      this.requireActiveProduct(productId),
+      this.requireArticle(articleId),
+    ]);
+
+    const existingRelation = await this.productsRepository.findProductArticleRelation(
+      productId,
+      articleId,
+    );
+
+    if (!existingRelation) {
+      throw this.buildProductArticleRelationNotFoundException();
+    }
+
+    if (updateProductArticleRelationDto.sortOrder === undefined) {
+      return {
+        message: 'Relação atualizada com sucesso.',
+      };
+    }
+
+    await this.productsRepository.updateProductArticleRelation(productId, articleId, {
+      sortOrder: updateProductArticleRelationDto.sortOrder,
+    });
+
+    return {
+      message: 'Relação atualizada com sucesso.',
+    };
+  }
+
+  async removeArticleRelation(productId: string, articleId: string) {
+    await Promise.all([
+      this.requireActiveProduct(productId),
+      this.requireArticle(articleId),
+    ]);
+
+    await this.productsRepository.deleteProductArticleRelation(productId, articleId);
+
+    return {
+      message: 'Relação removida com sucesso.',
+    };
   }
 
   async favoriteProduct(userId: string, productId: string) {
@@ -683,6 +746,16 @@ export class ProductsService {
     return product;
   }
 
+  private async requireArticle(id: string) {
+    const article = await this.articlesRepository.findById(id, true);
+
+    if (!article) {
+      throw this.buildArticleNotFoundException();
+    }
+
+    return article;
+  }
+
   private async requireProductImage(productId: string, imageId: string) {
     const image = await this.productsRepository.findProductImageById(imageId);
 
@@ -800,6 +873,20 @@ export class ProductsService {
     return new ConflictException({
       message: 'Não foi possível salvar o produto com um slug único.',
       error: 'Conflict',
+    });
+  }
+
+  private buildArticleNotFoundException() {
+    return new NotFoundException({
+      message: 'Artigo não encontrado.',
+      error: 'Not Found',
+    });
+  }
+
+  private buildProductArticleRelationNotFoundException() {
+    return new NotFoundException({
+      message: 'Relação entre produto e artigo não encontrada.',
+      error: 'Not Found',
     });
   }
 

@@ -1,4 +1,5 @@
 import type {
+  ArticleCategory,
   ProductCategory,
   ProductGuideSectionKind,
   ProductImageKind,
@@ -17,6 +18,16 @@ export interface ProductListItemResponse {
   shortDescription: string;
   imageUrl: string | null;
   isFavorite?: boolean;
+}
+
+export interface RelatedArticleResponse {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  category: ArticleCategory;
+  imageUrl: string | null;
+  publishedAt: string;
 }
 
 export interface ProductImageResponse {
@@ -52,6 +63,7 @@ export interface ProductDetailResponse extends ProductListItemResponse {
   nutrients: ProductNutrientResponse[];
   mainImages: ProductImageResponse[];
   guideSections: ProductGuideSectionResponse[];
+  relatedArticles: RelatedArticleResponse[];
   createdAt: string;
   updatedAt: string;
 }

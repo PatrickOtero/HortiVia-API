@@ -1,12 +1,16 @@
-import type { ArticleWithAuthorRecord } from '../articles.repository';
+import type {
+  ArticleDetailRecord,
+  ArticleListRecord,
+} from '../articles.repository';
 import type {
   ArticleAuthorResponse,
   ArticleDetailResponse,
   ArticleListItemResponse,
+  RelatedProductResponse,
 } from '../types/article-response';
 
 function toArticleAuthorResponse(
-  article: ArticleWithAuthorRecord,
+  article: ArticleListRecord | ArticleDetailRecord,
 ): ArticleAuthorResponse {
   return {
     id: article.author.id,
@@ -15,12 +19,25 @@ function toArticleAuthorResponse(
   };
 }
 
-function resolvePublishedAt(article: ArticleWithAuthorRecord) {
+function resolvePublishedAt(article: ArticleListRecord | ArticleDetailRecord) {
   return (article.publishedAt ?? article.createdAt).toISOString();
 }
 
+function toRelatedProducts(
+  article: ArticleDetailRecord,
+): RelatedProductResponse[] {
+  return article.productRelations.map(relation => ({
+    id: relation.product.id,
+    name: relation.product.name,
+    slug: relation.product.slug,
+    category: relation.product.category,
+    shortDescription: relation.product.shortDescription,
+    imageUrl: relation.product.imageUrl,
+  }));
+}
+
 export function toArticleListItemResponse(
-  article: ArticleWithAuthorRecord,
+  article: ArticleListRecord | ArticleDetailRecord,
   readingTimeMinutes: number,
 ): ArticleListItemResponse {
   return {
@@ -38,12 +55,13 @@ export function toArticleListItemResponse(
 }
 
 export function toArticleDetailResponse(
-  article: ArticleWithAuthorRecord,
+  article: ArticleDetailRecord,
   readingTimeMinutes: number,
 ): ArticleDetailResponse {
   return {
     ...toArticleListItemResponse(article, readingTimeMinutes),
     content: article.content,
+    relatedProducts: toRelatedProducts(article),
     createdAt: article.createdAt.toISOString(),
     updatedAt: article.updatedAt.toISOString(),
   };

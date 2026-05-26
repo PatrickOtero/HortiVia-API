@@ -534,6 +534,49 @@ const articles = [
   },
 ];
 
+const productArticleRelations = [
+  {
+    productSlug: 'abacate',
+    articleSlug: 'como-escolher-um-abacate-no-ponto-certo',
+    sortOrder: 0,
+  },
+  {
+    productSlug: 'abacate',
+    articleSlug: 'como-reduzir-perdas-na-geladeira',
+    sortOrder: 1,
+  },
+  {
+    productSlug: 'banana',
+    articleSlug: 'como-reduzir-perdas-na-geladeira',
+    sortOrder: 0,
+  },
+  {
+    productSlug: 'tomate',
+    articleSlug: 'o-que-observar-antes-de-comprar-tomate',
+    sortOrder: 0,
+  },
+  {
+    productSlug: 'tomate',
+    articleSlug: 'como-reduzir-perdas-na-geladeira',
+    sortOrder: 1,
+  },
+  {
+    productSlug: 'alface',
+    articleSlug: 'como-conservar-folhas-por-mais-tempo',
+    sortOrder: 0,
+  },
+  {
+    productSlug: 'agriao',
+    articleSlug: 'como-conservar-folhas-por-mais-tempo',
+    sortOrder: 0,
+  },
+  {
+    productSlug: 'cenoura',
+    articleSlug: 'como-reduzir-perdas-na-geladeira',
+    sortOrder: 0,
+  },
+];
+
 async function ensureSeedContentAuthor() {
   const passwordHash = await hash(randomBytes(32).toString('hex'), 10);
 
@@ -676,6 +719,47 @@ async function main() {
             id: author.id,
           },
         },
+      },
+    });
+  }
+
+  for (const relation of productArticleRelations) {
+    const product = await prisma.product.findUnique({
+      where: {
+        slug: relation.productSlug,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const article = await prisma.article.findUnique({
+      where: {
+        slug: relation.articleSlug,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!product || !article) {
+      continue;
+    }
+
+    await prisma.productArticle.upsert({
+      where: {
+        productId_articleId: {
+          productId: product.id,
+          articleId: article.id,
+        },
+      },
+      create: {
+        productId: product.id,
+        articleId: article.id,
+        sortOrder: relation.sortOrder,
+      },
+      update: {
+        sortOrder: relation.sortOrder,
       },
     });
   }

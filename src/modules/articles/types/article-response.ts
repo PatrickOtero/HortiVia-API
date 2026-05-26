@@ -1,9 +1,20 @@
 import type { ArticleCategory } from '../../../generated/prisma/enums';
 
+import type { ProductCategory } from '../../../generated/prisma/enums';
+
 export interface ArticleAuthorResponse {
   id: string;
   name: string;
   avatarUrl: string | null;
+}
+
+export interface RelatedProductResponse {
+  id: string;
+  name: string;
+  slug: string;
+  category: ProductCategory;
+  shortDescription: string;
+  imageUrl: string | null;
 }
 
 export interface ArticleListItemResponse {
@@ -21,6 +32,7 @@ export interface ArticleListItemResponse {
 
 export interface ArticleDetailResponse extends ArticleListItemResponse {
   content: string;
+  relatedProducts: RelatedProductResponse[];
   createdAt: string;
   updatedAt: string;
 }

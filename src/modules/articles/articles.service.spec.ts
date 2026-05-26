@@ -1,4 +1,4 @@
-import { ArticleCategory } from '../../generated/prisma/enums';
+import { ArticleCategory, ProductCategory } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { StorageService } from '../storage/storage.service';
@@ -26,6 +26,29 @@ describe('ArticlesService', () => {
     isPublished: true,
     createdAt: new Date('2026-05-20T09:00:00.000Z'),
     updatedAt: new Date('2026-05-20T09:00:00.000Z'),
+    productRelations: [],
+  };
+
+  const baseRelatedProduct = {
+    id: 'product-1',
+    name: 'Abacate',
+    slug: 'abacate',
+    category: ProductCategory.FRUIT,
+    shortDescription: 'Vai bem em torradas, vitaminas e cremes.',
+    imageUrl: null,
+    description: null,
+    benefits: [],
+    howToChoose: [],
+    howToStore: [],
+    usageTips: [],
+    nutrients: [],
+    isActive: true,
+    createdAt: new Date('2026-05-20T00:00:00.000Z'),
+    updatedAt: new Date('2026-05-20T00:00:00.000Z'),
+    images: [],
+    guideSections: [],
+    articleRelations: [],
+    favorites: [],
   };
 
   const adminUser: AuthenticatedUser = {
@@ -115,6 +138,7 @@ describe('ArticlesService', () => {
       category: baseArticle.category,
       author: baseArticle.author,
     });
+    expect(result.data[0]).not.toHaveProperty('relatedProducts');
   });
 
   it('searches articles by title and summary', async () => {
@@ -167,7 +191,19 @@ describe('ArticlesService', () => {
   });
 
   it('returns article detail by id', async () => {
-    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findById.mockResolvedValue({
+      ...baseArticle,
+      productRelations: [
+        {
+          id: 'relation-1',
+          productId: baseRelatedProduct.id,
+          articleId: baseArticle.id,
+          sortOrder: 0,
+          createdAt: new Date('2026-05-20T11:00:00.000Z'),
+          product: baseRelatedProduct,
+        },
+      ],
+    });
 
     const result = await service.getById(baseArticle.id);
 
@@ -179,6 +215,16 @@ describe('ArticlesService', () => {
       author: baseArticle.author,
       readingTimeMinutes: 1,
     });
+    expect(result.relatedProducts).toEqual([
+      {
+        id: baseRelatedProduct.id,
+        name: baseRelatedProduct.name,
+        slug: baseRelatedProduct.slug,
+        category: baseRelatedProduct.category,
+        shortDescription: baseRelatedProduct.shortDescription,
+        imageUrl: baseRelatedProduct.imageUrl,
+      },
+    ]);
   });
 
   it('throws not found when the article does not exist', async () => {

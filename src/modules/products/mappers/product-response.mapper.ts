@@ -8,6 +8,7 @@ import type {
   ProductImageResponse,
   ProductListItemResponse,
   ProductNutrientResponse,
+  RelatedArticleResponse,
 } from '../types/product-response';
 
 function toProductNutrients(value: ProductModel['nutrients']): ProductNutrientResponse[] {
@@ -122,6 +123,20 @@ function toGuideSections(
   return product.guideSections.map(toProductGuideSectionResponse);
 }
 
+function toRelatedArticles(
+  product: ProductDetailModel,
+): RelatedArticleResponse[] {
+  return product.articleRelations.map(relation => ({
+    id: relation.article.id,
+    title: relation.article.title,
+    slug: relation.article.slug,
+    summary: relation.article.summary,
+    category: relation.article.category,
+    imageUrl: relation.article.imageUrl,
+    publishedAt: (relation.article.publishedAt ?? relation.article.createdAt).toISOString(),
+  }));
+}
+
 export function toProductListItemResponse(
   product: Pick<
     ProductModel,
@@ -155,6 +170,7 @@ export function toProductDetailResponse(
     nutrients: toProductNutrients(product.nutrients),
     mainImages: toMainImages(product),
     guideSections: toGuideSections(product),
+    relatedArticles: toRelatedArticles(product),
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
   };

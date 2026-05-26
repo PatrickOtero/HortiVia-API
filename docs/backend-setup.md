@@ -223,6 +223,58 @@ Regras:
 - a listagem retorna os itens paginados em ordem de favorito mais recente
 - o catálogo público continua público e não depende de autenticação para listar produtos
 
+## RelaÃ§Ã£o entre produtos e artigos
+
+O backend usa a relaÃ§Ã£o explÃ­cita `ProductArticle` para conectar guias de produto e conteÃºdos educativos.
+
+Campos principais:
+
+- `productId`
+- `articleId`
+- `sortOrder`
+
+Regras:
+
+- `productId + articleId` Ã© Ãºnico
+- `GET /products/:id` retorna apenas artigos publicados em `relatedArticles`
+- `GET /articles/:id` retorna apenas produtos ativos em `relatedProducts`
+- as listagens continuam leves e nÃ£o incluem os relacionados
+
+### Campos adicionados ao detalhe de produto
+
+- `relatedArticles`
+
+Cada item inclui:
+
+- `id`
+- `title`
+- `slug`
+- `summary`
+- `category`
+- `imageUrl`
+- `publishedAt`
+
+### Campos adicionados ao detalhe de artigo
+
+- `relatedProducts`
+
+Cada item inclui:
+
+- `id`
+- `name`
+- `slug`
+- `category`
+- `shortDescription`
+- `imageUrl`
+
+### Endpoints administrativos da relaÃ§Ã£o
+
+JWT obrigatÃ³rio e role `ADMIN`:
+
+- `POST /products/:productId/articles/:articleId`
+- `PATCH /products/:productId/articles/:articleId`
+- `DELETE /products/:productId/articles/:articleId`
+
 ## Docker
 
 Build:

@@ -27,6 +27,7 @@ import { CreateProductGuideSectionDto } from './dto/create-product-guide-section
 import { CreateProductImageDto } from './dto/create-product-image.dto';
 import { CreateProductImageUploadDto } from './dto/create-product-image-upload.dto';
 import { ListProductsQueryDto } from './dto/list-products-query.dto';
+import { UpdateProductArticleRelationDto } from './dto/update-product-article-relation.dto';
 import { UpdateProductGuideSectionDto } from './dto/update-product-guide-section.dto';
 import { UpdateProductImageFileDto } from './dto/update-product-image-file.dto';
 import { UpdateProductImageDto } from './dto/update-product-image.dto';
@@ -63,6 +64,41 @@ export class ProductsController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.productsService.unfavoriteProduct(user.userId, productId);
+  }
+
+  @Post(':productId/articles/:articleId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async relateArticle(
+    @Param('productId') productId: string,
+    @Param('articleId') articleId: string,
+  ) {
+    return this.productsService.relateArticle(productId, articleId);
+  }
+
+  @Patch(':productId/articles/:articleId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async updateArticleRelation(
+    @Param('productId') productId: string,
+    @Param('articleId') articleId: string,
+    @Body() updateProductArticleRelationDto: UpdateProductArticleRelationDto,
+  ) {
+    return this.productsService.updateArticleRelation(
+      productId,
+      articleId,
+      updateProductArticleRelationDto,
+    );
+  }
+
+  @Delete(':productId/articles/:articleId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async removeArticleRelation(
+    @Param('productId') productId: string,
+    @Param('articleId') articleId: string,
+  ) {
+    return this.productsService.removeArticleRelation(productId, articleId);
   }
 
   @Post()

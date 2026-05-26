@@ -1,9 +1,11 @@
 import {
+  ArticleCategory,
   ProductCategory,
   ProductGuideSectionKind,
   ProductImageKind,
 } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
+import { ArticlesRepository } from '../articles/articles.repository';
 import { StorageService } from '../storage/storage.service';
 import { ProductsRepository } from './products.repository';
 import { ProductsService } from './products.service';
@@ -27,6 +29,29 @@ describe('ProductsService', () => {
     updatedAt: new Date('2026-05-20T00:00:00.000Z'),
     images: [],
     guideSections: [],
+    articleRelations: [],
+  };
+
+  const baseArticle = {
+    id: 'article-1',
+    title: 'Como escolher um abacate no ponto certo',
+    slug: 'como-escolher-um-abacate-no-ponto-certo',
+    summary: 'Sinais simples para acertar na escolha.',
+    content: 'Observe a textura e a casca.',
+    category: ArticleCategory.TIPS,
+    imageUrl: null,
+    tags: ['abacate'],
+    authorId: 'user-1',
+    author: {
+      id: 'user-1',
+      name: 'Equipe HortiVia',
+      avatarUrl: null,
+    },
+    publishedAt: new Date('2026-05-20T10:00:00.000Z'),
+    isPublished: true,
+    createdAt: new Date('2026-05-20T09:00:00.000Z'),
+    updatedAt: new Date('2026-05-20T09:00:00.000Z'),
+    productRelations: [],
   };
 
   const baseImage = {
@@ -74,6 +99,10 @@ describe('ProductsService', () => {
     listFavoritesByUser: jest.fn(),
     countFavoritesByUser: jest.fn(),
     getFavoriteProductIdsForUser: jest.fn(),
+    findProductArticleRelation: jest.fn(),
+    upsertProductArticleRelation: jest.fn(),
+    updateProductArticleRelation: jest.fn(),
+    deleteProductArticleRelation: jest.fn(),
     findProductImageById: jest.fn(),
     createProductImage: jest.fn(),
     updateProductImage: jest.fn(),
@@ -85,6 +114,10 @@ describe('ProductsService', () => {
     deleteProductGuideSection: jest.fn(),
   } as unknown as jest.Mocked<ProductsRepository>;
 
+  const articlesRepository = {
+    findById: jest.fn(),
+  } as unknown as jest.Mocked<Pick<ArticlesRepository, 'findById'>>;
+
   const storageService = {
     uploadProductImage: jest.fn(),
   } as unknown as jest.Mocked<Pick<StorageService, 'uploadProductImage'>>;
@@ -95,6 +128,7 @@ describe('ProductsService', () => {
     jest.clearAllMocks();
     service = new ProductsService(
       productsRepository as unknown as ProductsRepository,
+      articlesRepository as unknown as ArticlesRepository,
       storageService as unknown as StorageService,
     );
   });
@@ -116,6 +150,7 @@ describe('ProductsService', () => {
         (data.nutrients as { label: string; value: string }[] | undefined) ?? [],
       images: [],
       guideSections: [],
+      articleRelations: [],
     };
   }
 
@@ -151,6 +186,7 @@ describe('ProductsService', () => {
         imageUrl: baseProduct.imageUrl,
       },
     ]);
+    expect(result.data[0]).not.toHaveProperty('relatedArticles');
   });
 
   it('searches products by name', async () => {
@@ -212,6 +248,7 @@ describe('ProductsService', () => {
       },
     ]);
     expect(result.guideSections).toEqual([]);
+    expect(result.relatedArticles).toEqual([]);
   });
 
   it('returns product detail with real mainImages and ordered guideSections', async () => {
@@ -301,6 +338,110 @@ describe('ProductsService', () => {
         sortOrder: 0,
       },
     ]);
+    expect(result.relatedArticles).toEqual([]);
+  });
+
+  it('returns only published related articles in product detail', async () => {
+    productsRepository.findById.mockResolvedValue({
+      ...baseProduct,
+      articleRelations: [
+        {
+          id: 'relation-1',
+          productId: baseProduct.id,
+          articleId: baseArticle.id,
+          sortOrder: 0,
+          createdAt: new Date('2026-05-20T11:00:00.000Z'),
+          article: baseArticle,
+        },
+      ],
+    });
+
+    const result = await service.getById(baseProduct.id);
+
+    expect(result.relatedArticles).toEqual([
+      {
+        id: baseArticle.id,
+        title: baseArticle.title,
+        slug: baseArticle.slug,
+        summary: baseArticle.summary,
+        category: baseArticle.category,
+        imageUrl: baseArticle.imageUrl,
+        publishedAt: baseArticle.publishedAt.toISOString(),
+      },
+    ]);
+  });
+
+  it('allows an admin flow to relate a product and an article idempotently', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+
+    const result = await service.relateArticle(baseProduct.id, baseArticle.id);
+
+    expect(productsRepository.upsertProductArticleRelation).toHaveBeenCalledWith(
+      baseProduct.id,
+      baseArticle.id,
+    );
+    expect(result).toEqual({
+      message: 'Relação salva com sucesso.',
+    });
+  });
+
+  it('allows updating the sort order of an existing product and article relation', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    productsRepository.findProductArticleRelation.mockResolvedValue({
+      id: 'relation-1',
+      productId: baseProduct.id,
+      articleId: baseArticle.id,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    const result = await service.updateArticleRelation(baseProduct.id, baseArticle.id, {
+      sortOrder: 2,
+    });
+
+    expect(productsRepository.updateProductArticleRelation).toHaveBeenCalledWith(
+      baseProduct.id,
+      baseArticle.id,
+      {
+        sortOrder: 2,
+      },
+    );
+    expect(result).toEqual({
+      message: 'Relação atualizada com sucesso.',
+    });
+  });
+
+  it('returns 404 when updating a missing product and article relation', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    productsRepository.findProductArticleRelation.mockResolvedValue(null);
+
+    await expect(
+      service.updateArticleRelation(baseProduct.id, baseArticle.id, {
+        sortOrder: 1,
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Relação entre produto e artigo não encontrada.',
+      },
+    });
+  });
+
+  it('allows removing a related article from a product', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+
+    const result = await service.removeArticleRelation(baseProduct.id, baseArticle.id);
+
+    expect(productsRepository.deleteProductArticleRelation).toHaveBeenCalledWith(
+      baseProduct.id,
+      baseArticle.id,
+    );
+    expect(result).toEqual({
+      message: 'Relação removida com sucesso.',
+    });
   });
 
   it('allows an authenticated user to favorite a product', async () => {

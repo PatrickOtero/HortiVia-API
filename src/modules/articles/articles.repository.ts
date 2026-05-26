@@ -8,14 +8,40 @@ export const articleAuthorSelect = {
   avatarUrl: true,
 } as const;
 
-export const articleWithAuthorInclude = {
+export const articleListInclude = {
   author: {
     select: articleAuthorSelect,
   },
-} as const;
+} satisfies Prisma.ArticleInclude;
 
-export type ArticleWithAuthorRecord = Prisma.ArticleGetPayload<{
-  include: typeof articleWithAuthorInclude;
+export const articleDetailInclude = {
+  ...articleListInclude,
+  productRelations: {
+    where: {
+      product: {
+        isActive: true,
+      },
+    },
+    orderBy: [
+      {
+        sortOrder: 'asc',
+      },
+      {
+        createdAt: 'asc',
+      },
+    ],
+    include: {
+      product: true,
+    },
+  },
+} satisfies Prisma.ArticleInclude;
+
+export type ArticleListRecord = Prisma.ArticleGetPayload<{
+  include: typeof articleListInclude;
+}>;
+
+export type ArticleDetailRecord = Prisma.ArticleGetPayload<{
+  include: typeof articleDetailInclude;
 }>;
 
 @Injectable()
@@ -31,7 +57,7 @@ export class ArticlesRepository {
       where: params.where,
       skip: params.skip,
       take: params.take,
-      include: articleWithAuthorInclude,
+      include: articleListInclude,
       orderBy: [
         {
           publishedAt: 'desc',
@@ -53,21 +79,20 @@ export class ArticlesRepository {
         id,
         ...(includeUnpublished ? {} : { isPublished: true }),
       },
-      include: articleWithAuthorInclude,
+      include: articleDetailInclude,
     });
   }
 
   async findBySlug(slug: string) {
     return this.prisma.article.findUnique({
       where: { slug },
-      include: articleWithAuthorInclude,
     });
   }
 
   async create(data: Prisma.ArticleCreateInput) {
     return this.prisma.article.create({
       data,
-      include: articleWithAuthorInclude,
+      include: articleDetailInclude,
     });
   }
 
@@ -75,7 +100,7 @@ export class ArticlesRepository {
     return this.prisma.article.update({
       where: { id },
       data,
-      include: articleWithAuthorInclude,
+      include: articleDetailInclude,
     });
   }
 
@@ -85,7 +110,7 @@ export class ArticlesRepository {
       data: {
         imageUrl,
       },
-      include: articleWithAuthorInclude,
+      include: articleDetailInclude,
     });
   }
 
@@ -95,7 +120,7 @@ export class ArticlesRepository {
       data: {
         isPublished: false,
       },
-      include: articleWithAuthorInclude,
+      include: articleDetailInclude,
     });
   }
 }
