@@ -16,6 +16,7 @@ export interface ProductListItemResponse {
   category: ProductCategory;
   shortDescription: string;
   imageUrl: string | null;
+  isFavorite?: boolean;
 }
 
 export interface ProductImageResponse {
@@ -65,4 +66,16 @@ export interface ProductsListMeta {
 export interface ProductsListResponse {
   data: ProductListItemResponse[];
   meta: ProductsListMeta;
+}
+
+export interface FavoriteProductItemResponse extends ProductListItemResponse {
+  isFavorite: true;
+}
+
+export interface FavoriteProductsListResponse {
+  items: FavoriteProductItemResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }

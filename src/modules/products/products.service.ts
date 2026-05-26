@@ -5,7 +5,9 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import type { Prisma } from '../../generated/prisma/client';
+import type {
+  Prisma
+} from '../../generated/prisma/client';
 import { StorageService } from '../storage/storage.service';
 import {
   ALLOWED_CONTENT_IMAGE_MIME_TYPES,
@@ -15,6 +17,7 @@ import type { UploadFile } from '../storage/types/upload-file';
 import type { CreateProductGuideSectionDto } from './dto/create-product-guide-section.dto';
 import type { CreateProductImageDto } from './dto/create-product-image.dto';
 import type { CreateProductImageUploadDto } from './dto/create-product-image-upload.dto';
+import type { ListFavoriteProductsQueryDto } from './dto/list-favorite-products-query.dto';
 import type { CreateProductDto } from './dto/create-product.dto';
 import type { ListProductsQueryDto } from './dto/list-products-query.dto';
 import type { ProductNutrientDto } from './dto/product-nutrient.dto';
@@ -23,6 +26,7 @@ import type { UpdateProductImageFileDto } from './dto/update-product-image-file.
 import type { UpdateProductImageDto } from './dto/update-product-image.dto';
 import type { UpdateProductDto } from './dto/update-product.dto';
 import {
+  toFavoriteProductItemResponse,
   toProductDetailResponse,
   toProductGuideSectionResponse,
   toProductImageResponse,
@@ -30,6 +34,7 @@ import {
 } from './mappers/product-response.mapper';
 import { ProductsRepository } from './products.repository';
 import type {
+  FavoriteProductsListResponse,
   ProductDetailResponse,
   ProductGuideSectionResponse,
   ProductImageResponse,
@@ -63,7 +68,7 @@ export class ProductsService {
     ]);
 
     return {
-      data: products.map(toProductListItemResponse),
+      data: products.map(product => toProductListItemResponse(product)),
       meta: {
         page,
         limit,
@@ -81,6 +86,75 @@ export class ProductsService {
     }
 
     return toProductDetailResponse(product);
+  }
+
+  async favoriteProduct(userId: string, productId: string) {
+    await this.requireActiveProduct(productId);
+
+    const existingFavorite =
+      await this.productsRepository.findFavoriteByUserAndProduct(userId, productId);
+
+    if (!existingFavorite) {
+      try {
+        await this.productsRepository.createFavorite(userId, productId);
+      } catch (error) {
+        if (!this.isUniqueConstraintError(error)) {
+          throw error;
+        }
+      }
+    }
+
+    return {
+      message: 'Produto adicionado aos favoritos.',
+    };
+  }
+
+  async unfavoriteProduct(userId: string, productId: string) {
+    await this.requireActiveProduct(productId);
+
+    const existingFavorite =
+      await this.productsRepository.findFavoriteByUserAndProduct(userId, productId);
+
+    if (existingFavorite) {
+      try {
+        await this.productsRepository.deleteFavorite(userId, productId);
+      } catch (error) {
+        if (!this.isRecordNotFoundError(error)) {
+          throw error;
+        }
+      }
+    }
+
+    return {
+      message: 'Produto removido dos favoritos.',
+    };
+  }
+
+  async listFavoriteProducts(
+    userId: string,
+    query: ListFavoriteProductsQueryDto,
+  ): Promise<FavoriteProductsListResponse> {
+    const page = query.page ?? this.defaultPage;
+    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
+
+    const [favorites, total] = await Promise.all([
+      this.productsRepository.listFavoritesByUser({
+        userId,
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.productsRepository.countFavoritesByUser(userId),
+    ]);
+
+    return {
+      items: favorites.map(favorite =>
+        toFavoriteProductItemResponse(favorite.product),
+      ),
+      page,
+      limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+    };
   }
 
   async create(createProductDto: CreateProductDto): Promise<ProductDetailResponse> {

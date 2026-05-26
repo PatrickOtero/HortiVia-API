@@ -209,6 +209,20 @@ JWT obrigatório e role `ADMIN`:
 - `PATCH /products/:productId/guide-sections/:sectionId`
 - `DELETE /products/:productId/guide-sections/:sectionId`
 
+## Favoritos de produto
+
+JWT obrigatório:
+
+- `POST /products/:productId/favorite`
+- `DELETE /products/:productId/favorite`
+- `GET /favorites/products`
+
+Regras:
+
+- o favorito é idempotente por usuário e produto
+- a listagem retorna os itens paginados em ordem de favorito mais recente
+- o catálogo público continua público e não depende de autenticação para listar produtos
+
 ## Docker
 
 Build:

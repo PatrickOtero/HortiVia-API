@@ -28,6 +28,11 @@ export type User = Prisma.UserModel
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model ProductFavorite
+ * 
+ */
+export type ProductFavorite = Prisma.ProductFavoriteModel
+/**
  * Model ProductImage
  * 
  */

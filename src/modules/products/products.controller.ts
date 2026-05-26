@@ -15,9 +15,11 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UserRole } from '../../generated/prisma/enums';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
 import { ImageUploadExceptionFilter } from '../storage/image-upload.exception-filter';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -43,6 +45,24 @@ export class ProductsController {
   @Get(':id')
   async getById(@Param('id') id: string) {
     return this.productsService.getById(id);
+  }
+
+  @Post(':productId/favorite')
+  @UseGuards(JwtAuthGuard)
+  async favoriteProduct(
+    @Param('productId') productId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.productsService.favoriteProduct(user.userId, productId);
+  }
+
+  @Delete(':productId/favorite')
+  @UseGuards(JwtAuthGuard)
+  async unfavoriteProduct(
+    @Param('productId') productId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.productsService.unfavoriteProduct(user.userId, productId);
   }
 
   @Post()

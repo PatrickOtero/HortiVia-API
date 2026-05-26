@@ -2,6 +2,7 @@ import { ProductImageKind } from '../../../generated/prisma/enums';
 import type { ProductModel } from '../../../generated/prisma/models/Product';
 import type { ProductDetailModel } from '../types/product-model';
 import type {
+  FavoriteProductItemResponse,
   ProductDetailResponse,
   ProductGuideSectionResponse,
   ProductImageResponse,
@@ -126,6 +127,9 @@ export function toProductListItemResponse(
     ProductModel,
     'id' | 'name' | 'slug' | 'category' | 'shortDescription' | 'imageUrl'
   >,
+  options?: {
+    isFavorite?: boolean;
+  },
 ): ProductListItemResponse {
   return {
     id: product.id,
@@ -134,6 +138,7 @@ export function toProductListItemResponse(
     category: product.category,
     shortDescription: product.shortDescription,
     imageUrl: product.imageUrl,
+    isFavorite: options?.isFavorite,
   };
 }
 
@@ -152,5 +157,19 @@ export function toProductDetailResponse(
     guideSections: toGuideSections(product),
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
+  };
+}
+
+export function toFavoriteProductItemResponse(
+  product: Pick<
+    ProductModel,
+    'id' | 'name' | 'slug' | 'category' | 'shortDescription' | 'imageUrl'
+  >,
+): FavoriteProductItemResponse {
+  return {
+    ...toProductListItemResponse(product, {
+      isFavorite: true,
+    }),
+    isFavorite: true,
   };
 }

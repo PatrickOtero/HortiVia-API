@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Product: 'Product',
+  ProductFavorite: 'ProductFavorite',
   ProductImage: 'ProductImage',
   ProductGuideSection: 'ProductGuideSection',
   Article: 'Article',
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "productImage" | "productGuideSection" | "article" | "userPreference"
+    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "userPreference"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -554,6 +555,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProductFavorite: {
+      payload: Prisma.$ProductFavoritePayload<ExtArgs>
+      fields: Prisma.ProductFavoriteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductFavoriteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductFavoriteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>
+        }
+        findFirst: {
+          args: Prisma.ProductFavoriteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductFavoriteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>
+        }
+        findMany: {
+          args: Prisma.ProductFavoriteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>[]
+        }
+        create: {
+          args: Prisma.ProductFavoriteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>
+        }
+        createMany: {
+          args: Prisma.ProductFavoriteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductFavoriteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>[]
+        }
+        delete: {
+          args: Prisma.ProductFavoriteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>
+        }
+        update: {
+          args: Prisma.ProductFavoriteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductFavoriteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductFavoriteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductFavoriteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductFavoriteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductFavoritePayload>
+        }
+        aggregate: {
+          args: Prisma.ProductFavoriteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProductFavorite>
+        }
+        groupBy: {
+          args: Prisma.ProductFavoriteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductFavoriteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductFavoriteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductFavoriteCountAggregateOutputType> | number
         }
       }
     }
@@ -936,6 +1011,16 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const ProductFavoriteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  productId: 'productId',
+  createdAt: 'createdAt'
+} as const
+
+export type ProductFavoriteScalarFieldEnum = (typeof ProductFavoriteScalarFieldEnum)[keyof typeof ProductFavoriteScalarFieldEnum]
 
 
 export const ProductImageScalarFieldEnum = {
@@ -1324,6 +1409,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   product?: Prisma.ProductOmit
+  productFavorite?: Prisma.ProductFavoriteOmit
   productImage?: Prisma.ProductImageOmit
   productGuideSection?: Prisma.ProductGuideSectionOmit
   article?: Prisma.ArticleOmit

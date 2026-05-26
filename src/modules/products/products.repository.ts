@@ -26,6 +26,17 @@ export class ProductsRepository {
     return this.prisma.product.count({ where });
   }
 
+  async findFavoriteByUserAndProduct(userId: string, productId: string) {
+    return this.prisma.productFavorite.findUnique({
+      where: {
+        userId_productId: {
+          userId,
+          productId,
+        },
+      },
+    });
+  }
+
   async findById(id: string, includeInactive = false) {
     return this.prisma.product.findFirst({
       where: {
@@ -74,6 +85,80 @@ export class ProductsRepository {
         isActive: false,
       },
     });
+  }
+
+  async createFavorite(userId: string, productId: string) {
+    return this.prisma.productFavorite.create({
+      data: {
+        userId,
+        productId,
+      },
+    });
+  }
+
+  async deleteFavorite(userId: string, productId: string) {
+    return this.prisma.productFavorite.delete({
+      where: {
+        userId_productId: {
+          userId,
+          productId,
+        },
+      },
+    });
+  }
+
+  async listFavoritesByUser(params: {
+    userId: string;
+    skip: number;
+    take: number;
+  }) {
+    return this.prisma.productFavorite.findMany({
+      where: {
+        userId: params.userId,
+        product: {
+          isActive: true,
+        },
+      },
+      skip: params.skip,
+      take: params.take,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        product: true,
+      },
+    });
+  }
+
+  async countFavoritesByUser(userId: string) {
+    return this.prisma.productFavorite.count({
+      where: {
+        userId,
+        product: {
+          isActive: true,
+        },
+      },
+    });
+  }
+
+  async getFavoriteProductIdsForUser(userId: string, productIds: string[]) {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    const favorites = await this.prisma.productFavorite.findMany({
+      where: {
+        userId,
+        productId: {
+          in: productIds,
+        },
+      },
+      select: {
+        productId: true,
+      },
+    });
+
+    return favorites.map(favorite => favorite.productId);
   }
 
   async findProductImageById(imageId: string) {

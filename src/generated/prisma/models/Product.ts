@@ -244,6 +244,7 @@ export type ProductWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   images?: Prisma.ProductImageListRelationFilter
   guideSections?: Prisma.ProductGuideSectionListRelationFilter
+  favorites?: Prisma.ProductFavoriteListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -264,6 +265,7 @@ export type ProductOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   images?: Prisma.ProductImageOrderByRelationAggregateInput
   guideSections?: Prisma.ProductGuideSectionOrderByRelationAggregateInput
+  favorites?: Prisma.ProductFavoriteOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -287,6 +289,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   images?: Prisma.ProductImageListRelationFilter
   guideSections?: Prisma.ProductGuideSectionListRelationFilter
+  favorites?: Prisma.ProductFavoriteListRelationFilter
 }, "id" | "slug">
 
 export type ProductOrderByWithAggregationInput = {
@@ -349,6 +352,7 @@ export type ProductCreateInput = {
   updatedAt?: Date | string
   images?: Prisma.ProductImageCreateNestedManyWithoutProductInput
   guideSections?: Prisma.ProductGuideSectionCreateNestedManyWithoutProductInput
+  favorites?: Prisma.ProductFavoriteCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -369,6 +373,7 @@ export type ProductUncheckedCreateInput = {
   updatedAt?: Date | string
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutProductInput
   guideSections?: Prisma.ProductGuideSectionUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.ProductFavoriteUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -389,6 +394,7 @@ export type ProductUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.ProductImageUpdateManyWithoutProductNestedInput
   guideSections?: Prisma.ProductGuideSectionUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.ProductFavoriteUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -409,6 +415,7 @@ export type ProductUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutProductNestedInput
   guideSections?: Prisma.ProductGuideSectionUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.ProductFavoriteUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -562,6 +569,20 @@ export type ProductUpdateusageTipsInput = {
   push?: string | string[]
 }
 
+export type ProductCreateNestedOneWithoutFavoritesInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutFavoritesInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutFavoritesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutFavoritesInput
+  upsert?: Prisma.ProductUpsertWithoutFavoritesInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutFavoritesInput, Prisma.ProductUpdateWithoutFavoritesInput>, Prisma.ProductUncheckedUpdateWithoutFavoritesInput>
+}
+
 export type ProductCreateNestedOneWithoutImagesInput = {
   create?: Prisma.XOR<Prisma.ProductCreateWithoutImagesInput, Prisma.ProductUncheckedCreateWithoutImagesInput>
   connectOrCreate?: Prisma.ProductCreateOrConnectWithoutImagesInput
@@ -590,6 +611,102 @@ export type ProductUpdateOneRequiredWithoutGuideSectionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutGuideSectionsInput, Prisma.ProductUpdateWithoutGuideSectionsInput>, Prisma.ProductUncheckedUpdateWithoutGuideSectionsInput>
 }
 
+export type ProductCreateWithoutFavoritesInput = {
+  id?: string
+  name: string
+  slug: string
+  category: $Enums.ProductCategory
+  shortDescription: string
+  description?: string | null
+  imageUrl?: string | null
+  benefits?: Prisma.ProductCreatebenefitsInput | string[]
+  howToChoose?: Prisma.ProductCreatehowToChooseInput | string[]
+  howToStore?: Prisma.ProductCreatehowToStoreInput | string[]
+  usageTips?: Prisma.ProductCreateusageTipsInput | string[]
+  nutrients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  images?: Prisma.ProductImageCreateNestedManyWithoutProductInput
+  guideSections?: Prisma.ProductGuideSectionCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutFavoritesInput = {
+  id?: string
+  name: string
+  slug: string
+  category: $Enums.ProductCategory
+  shortDescription: string
+  description?: string | null
+  imageUrl?: string | null
+  benefits?: Prisma.ProductCreatebenefitsInput | string[]
+  howToChoose?: Prisma.ProductCreatehowToChooseInput | string[]
+  howToStore?: Prisma.ProductCreatehowToStoreInput | string[]
+  usageTips?: Prisma.ProductCreateusageTipsInput | string[]
+  nutrients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutProductInput
+  guideSections?: Prisma.ProductGuideSectionUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutFavoritesInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+}
+
+export type ProductUpsertWithoutFavoritesInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutFavoritesInput, Prisma.ProductUncheckedUpdateWithoutFavoritesInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutFavoritesInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutFavoritesInput, Prisma.ProductUncheckedUpdateWithoutFavoritesInput>
+}
+
+export type ProductUpdateWithoutFavoritesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProductCategoryFieldUpdateOperationsInput | $Enums.ProductCategory
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  benefits?: Prisma.ProductUpdatebenefitsInput | string[]
+  howToChoose?: Prisma.ProductUpdatehowToChooseInput | string[]
+  howToStore?: Prisma.ProductUpdatehowToStoreInput | string[]
+  usageTips?: Prisma.ProductUpdateusageTipsInput | string[]
+  nutrients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  images?: Prisma.ProductImageUpdateManyWithoutProductNestedInput
+  guideSections?: Prisma.ProductGuideSectionUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutFavoritesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumProductCategoryFieldUpdateOperationsInput | $Enums.ProductCategory
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  benefits?: Prisma.ProductUpdatebenefitsInput | string[]
+  howToChoose?: Prisma.ProductUpdatehowToChooseInput | string[]
+  howToStore?: Prisma.ProductUpdatehowToStoreInput | string[]
+  usageTips?: Prisma.ProductUpdateusageTipsInput | string[]
+  nutrients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  images?: Prisma.ProductImageUncheckedUpdateManyWithoutProductNestedInput
+  guideSections?: Prisma.ProductGuideSectionUncheckedUpdateManyWithoutProductNestedInput
+}
+
 export type ProductCreateWithoutImagesInput = {
   id?: string
   name: string
@@ -607,6 +724,7 @@ export type ProductCreateWithoutImagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   guideSections?: Prisma.ProductGuideSectionCreateNestedManyWithoutProductInput
+  favorites?: Prisma.ProductFavoriteCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutImagesInput = {
@@ -626,6 +744,7 @@ export type ProductUncheckedCreateWithoutImagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   guideSections?: Prisma.ProductGuideSectionUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.ProductFavoriteUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutImagesInput = {
@@ -661,6 +780,7 @@ export type ProductUpdateWithoutImagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   guideSections?: Prisma.ProductGuideSectionUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.ProductFavoriteUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutImagesInput = {
@@ -680,6 +800,7 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   guideSections?: Prisma.ProductGuideSectionUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.ProductFavoriteUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutGuideSectionsInput = {
@@ -699,6 +820,7 @@ export type ProductCreateWithoutGuideSectionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.ProductImageCreateNestedManyWithoutProductInput
+  favorites?: Prisma.ProductFavoriteCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutGuideSectionsInput = {
@@ -718,6 +840,7 @@ export type ProductUncheckedCreateWithoutGuideSectionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.ProductImageUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.ProductFavoriteUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutGuideSectionsInput = {
@@ -753,6 +876,7 @@ export type ProductUpdateWithoutGuideSectionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.ProductImageUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.ProductFavoriteUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutGuideSectionsInput = {
@@ -772,6 +896,7 @@ export type ProductUncheckedUpdateWithoutGuideSectionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.ProductImageUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.ProductFavoriteUncheckedUpdateManyWithoutProductNestedInput
 }
 
 
@@ -782,11 +907,13 @@ export type ProductUncheckedUpdateWithoutGuideSectionsInput = {
 export type ProductCountOutputType = {
   images: number
   guideSections: number
+  favorites: number
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | ProductCountOutputTypeCountImagesArgs
   guideSections?: boolean | ProductCountOutputTypeCountGuideSectionsArgs
+  favorites?: boolean | ProductCountOutputTypeCountFavoritesArgs
 }
 
 /**
@@ -813,6 +940,13 @@ export type ProductCountOutputTypeCountGuideSectionsArgs<ExtArgs extends runtime
   where?: Prisma.ProductGuideSectionWhereInput
 }
 
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountFavoritesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProductFavoriteWhereInput
+}
+
 
 export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -832,6 +966,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   images?: boolean | Prisma.Product$imagesArgs<ExtArgs>
   guideSections?: boolean | Prisma.Product$guideSectionsArgs<ExtArgs>
+  favorites?: boolean | Prisma.Product$favoritesArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -893,6 +1028,7 @@ export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.Product$imagesArgs<ExtArgs>
   guideSections?: boolean | Prisma.Product$guideSectionsArgs<ExtArgs>
+  favorites?: boolean | Prisma.Product$favoritesArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -903,6 +1039,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     images: Prisma.$ProductImagePayload<ExtArgs>[]
     guideSections: Prisma.$ProductGuideSectionPayload<ExtArgs>[]
+    favorites: Prisma.$ProductFavoritePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1316,6 +1453,7 @@ export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   images<T extends Prisma.Product$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   guideSections<T extends Prisma.Product$guideSectionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$guideSectionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductGuideSectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  favorites<T extends Prisma.Product$favoritesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductFavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1798,6 +1936,30 @@ export type Product$guideSectionsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ProductGuideSectionScalarFieldEnum | Prisma.ProductGuideSectionScalarFieldEnum[]
+}
+
+/**
+ * Product.favorites
+ */
+export type Product$favoritesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProductFavorite
+   */
+  select?: Prisma.ProductFavoriteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProductFavorite
+   */
+  omit?: Prisma.ProductFavoriteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductFavoriteInclude<ExtArgs> | null
+  where?: Prisma.ProductFavoriteWhereInput
+  orderBy?: Prisma.ProductFavoriteOrderByWithRelationInput | Prisma.ProductFavoriteOrderByWithRelationInput[]
+  cursor?: Prisma.ProductFavoriteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProductFavoriteScalarFieldEnum | Prisma.ProductFavoriteScalarFieldEnum[]
 }
 
 /**

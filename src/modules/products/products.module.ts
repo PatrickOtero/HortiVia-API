@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { StorageModule } from '../storage/storage.module';
+import { FavoritesController } from './favorites.controller';
 import { ProductsController } from './products.controller';
 import { ProductsRepository } from './products.repository';
 import { ProductsService } from './products.service';
 
 @Module({
   imports: [AuthModule, StorageModule],
-  controllers: [ProductsController],
+  controllers: [ProductsController, FavoritesController],
   providers: [ProductsRepository, ProductsService],
   exports: [ProductsRepository, ProductsService],
 })

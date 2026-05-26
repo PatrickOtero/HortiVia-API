@@ -62,12 +62,18 @@ describe('ProductsService', () => {
   const productsRepository = {
     findManyWithPagination: jest.fn(),
     count: jest.fn(),
+    findFavoriteByUserAndProduct: jest.fn(),
     findById: jest.fn(),
     findBySlug: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     updateImageUrl: jest.fn(),
     deactivate: jest.fn(),
+    createFavorite: jest.fn(),
+    deleteFavorite: jest.fn(),
+    listFavoritesByUser: jest.fn(),
+    countFavoritesByUser: jest.fn(),
+    getFavoriteProductIdsForUser: jest.fn(),
     findProductImageById: jest.fn(),
     createProductImage: jest.fn(),
     updateProductImage: jest.fn(),
@@ -295,6 +301,126 @@ describe('ProductsService', () => {
         sortOrder: 0,
       },
     ]);
+  });
+
+  it('allows an authenticated user to favorite a product', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    productsRepository.findFavoriteByUserAndProduct.mockResolvedValue(null);
+
+    const result = await service.favoriteProduct('user-1', baseProduct.id);
+
+    expect(productsRepository.createFavorite).toHaveBeenCalledWith(
+      'user-1',
+      baseProduct.id,
+    );
+    expect(result).toEqual({
+      message: 'Produto adicionado aos favoritos.',
+    });
+  });
+
+  it('favoriting the same product twice is safe and idempotent', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    productsRepository.findFavoriteByUserAndProduct.mockResolvedValue({
+      id: 'favorite-1',
+      userId: 'user-1',
+      productId: baseProduct.id,
+      createdAt: new Date('2026-05-25T00:00:00.000Z'),
+    });
+
+    const result = await service.favoriteProduct('user-1', baseProduct.id);
+
+    expect(productsRepository.createFavorite).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      message: 'Produto adicionado aos favoritos.',
+    });
+  });
+
+  it('allows an authenticated user to unfavorite a product', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    productsRepository.findFavoriteByUserAndProduct.mockResolvedValue({
+      id: 'favorite-1',
+      userId: 'user-1',
+      productId: baseProduct.id,
+      createdAt: new Date('2026-05-25T00:00:00.000Z'),
+    });
+
+    const result = await service.unfavoriteProduct('user-1', baseProduct.id);
+
+    expect(productsRepository.deleteFavorite).toHaveBeenCalledWith(
+      'user-1',
+      baseProduct.id,
+    );
+    expect(result).toEqual({
+      message: 'Produto removido dos favoritos.',
+    });
+  });
+
+  it('unfavoriting a non-favorited product is safe and idempotent', async () => {
+    productsRepository.findById.mockResolvedValue(baseProduct);
+    productsRepository.findFavoriteByUserAndProduct.mockResolvedValue(null);
+
+    const result = await service.unfavoriteProduct('user-1', baseProduct.id);
+
+    expect(productsRepository.deleteFavorite).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      message: 'Produto removido dos favoritos.',
+    });
+  });
+
+  it('returns 404 when favoriting an unknown product', async () => {
+    productsRepository.findById.mockResolvedValue(null);
+
+    await expect(service.favoriteProduct('user-1', 'missing')).rejects.toMatchObject({
+      response: {
+        message: 'Produto não encontrado.',
+      },
+    });
+  });
+
+  it('lists favorite products with pagination ordered by favorite creation date', async () => {
+    productsRepository.listFavoritesByUser.mockResolvedValue([
+      {
+        id: 'favorite-2',
+        userId: 'user-1',
+        productId: 'product-2',
+        createdAt: new Date('2026-05-25T12:00:00.000Z'),
+        product: {
+          ...baseProduct,
+          id: 'product-2',
+          name: 'Banana',
+          slug: 'banana',
+        },
+      },
+    ]);
+    productsRepository.countFavoritesByUser.mockResolvedValue(1);
+
+    const result = await service.listFavoriteProducts('user-1', {
+      page: 1,
+      limit: 20,
+    });
+
+    expect(productsRepository.listFavoritesByUser).toHaveBeenCalledWith({
+      userId: 'user-1',
+      skip: 0,
+      take: 20,
+    });
+    expect(result).toEqual({
+      items: [
+        {
+          id: 'product-2',
+          name: 'Banana',
+          slug: 'banana',
+          category: baseProduct.category,
+          shortDescription: baseProduct.shortDescription,
+          imageUrl: baseProduct.imageUrl,
+          isFavorite: true,
+        },
+      ],
+      page: 1,
+      limit: 20,
+      total: 1,
+      totalPages: 1,
+    });
   });
 
   it('throws not found when the product does not exist', async () => {

@@ -76,6 +76,7 @@ model User {
   createdAt                       DateTime        @default(now())
   updatedAt                       DateTime        @updatedAt
   articles                        Article[]
+  productFavorites                ProductFavorite[]
   preferences                     UserPreference?
 }
 
@@ -97,6 +98,20 @@ model Product {
   updatedAt        DateTime         @updatedAt
   images           ProductImage[]
   guideSections    ProductGuideSection[]
+  favorites        ProductFavorite[]
+}
+
+model ProductFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId, createdAt])
+  @@index([productId])
 }
 
 model ProductImage {

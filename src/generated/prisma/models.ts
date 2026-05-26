@@ -10,6 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/Product'
+export type * from './models/ProductFavorite'
 export type * from './models/ProductImage'
 export type * from './models/ProductGuideSection'
 export type * from './models/Article'
