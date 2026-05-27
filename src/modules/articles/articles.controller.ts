@@ -24,9 +24,11 @@ import { CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
 import { ImageUploadExceptionFilter } from '../storage/image-upload.exception-filter';
 import { ArticlesService } from './articles.service';
 import { CreateArticleBlockDto } from './dto/create-article-block.dto';
+import { CreateArticleBlockImageUploadDto } from './dto/create-article-block-image-upload.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
 import { UpdateArticleBlockDto } from './dto/update-article-block.dto';
+import { UpdateArticleBlockImageDto } from './dto/update-article-block-image.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Controller('articles')
@@ -95,6 +97,21 @@ export class ArticlesController {
     return this.articlesService.createBlock(articleId, createArticleBlockDto);
   }
 
+  @Post(':articleId/blocks/:blockId/image-upload')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async createBlockImageUploadUrl(
+    @Param('articleId') articleId: string,
+    @Param('blockId') blockId: string,
+    @Body() createArticleBlockImageUploadDto: CreateArticleBlockImageUploadDto,
+  ) {
+    return this.articlesService.createBlockImageUploadUrl(
+      articleId,
+      blockId,
+      createArticleBlockImageUploadDto,
+    );
+  }
+
   @Patch(':articleId/blocks/:blockId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -110,6 +127,21 @@ export class ArticlesController {
     );
   }
 
+  @Patch(':articleId/blocks/:blockId/image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async updateBlockImage(
+    @Param('articleId') articleId: string,
+    @Param('blockId') blockId: string,
+    @Body() updateArticleBlockImageDto: UpdateArticleBlockImageDto,
+  ) {
+    return this.articlesService.updateBlockImage(
+      articleId,
+      blockId,
+      updateArticleBlockImageDto,
+    );
+  }
+
   @Delete(':articleId/blocks/:blockId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -118,6 +150,16 @@ export class ArticlesController {
     @Param('blockId') blockId: string,
   ) {
     return this.articlesService.deleteBlock(articleId, blockId);
+  }
+
+  @Delete(':articleId/blocks/:blockId/image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async removeBlockImage(
+    @Param('articleId') articleId: string,
+    @Param('blockId') blockId: string,
+  ) {
+    return this.articlesService.removeBlockImage(articleId, blockId);
   }
 
   @Post(':id/image')

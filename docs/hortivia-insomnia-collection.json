@@ -1,7 +1,7 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-05-27T15:20:37.883Z",
+  "__export_date": "2026-05-27T17:47:40.280Z",
   "__export_source": "codex.updated-export",
   "resources": [
     {
@@ -48,7 +48,11 @@
         "limit": "10",
         "password_reset_code": "",
         "reset_password_new": "NovaSenhaForte!123",
-        "article_block_id": ""
+        "article_block_id": "",
+        "article_block_image_file_name": "bloco-artigo.webp",
+        "article_block_image_content_type": "image/webp",
+        "article_block_image_file_size": "245760",
+        "article_block_image_url": ""
       }
     },
     {
@@ -1149,6 +1153,28 @@
       ]
     },
     {
+      "_id": "req_articles_create_block_image_upload_url",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "POST Create Article Block Image Upload URL",
+      "method": "POST",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}/image-upload",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fileName\": \"{{ _.article_block_image_file_name }}\",\n  \"contentType\": \"{{ _.article_block_image_content_type }}\",\n  \"fileSize\": {{ _.article_block_image_file_size }}\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
       "_id": "req_articles_update_block",
       "_type": "request",
       "parentId": "fld_articles_admin",
@@ -1171,12 +1197,49 @@
       ]
     },
     {
+      "_id": "req_articles_update_block_image",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "PATCH Update Article Block Image",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}/image",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"imageUrl\": \"{{ _.article_block_image_url }}\",\n  \"imageAlt\": \"Folhas verdes em uma centrifuga de salada apos a lavagem\",\n  \"imageCaption\": \"Secar bem as folhas antes de guardar ajuda a evitar excesso de umidade.\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
       "_id": "req_articles_delete_block",
       "_type": "request",
       "parentId": "fld_articles_admin",
       "name": "DELETE Article Block",
       "method": "DELETE",
       "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_delete_block_image",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "DELETE Article Block Image",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}/image",
       "body": {},
       "headers": [
         {

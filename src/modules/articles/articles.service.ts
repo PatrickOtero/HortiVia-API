@@ -16,10 +16,12 @@ import {
 } from './mappers/article-response.mapper';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import type { CreateArticleBlockDto } from './dto/create-article-block.dto';
+import type { CreateArticleBlockImageUploadDto } from './dto/create-article-block-image-upload.dto';
 import type { CreateArticleDto } from './dto/create-article.dto';
 import type { ListArticlesQueryDto } from './dto/list-articles-query.dto';
 import type { ListSavedArticlesQueryDto } from './dto/list-saved-articles-query.dto';
 import type { UpdateArticleBlockDto } from './dto/update-article-block.dto';
+import type { UpdateArticleBlockImageDto } from './dto/update-article-block-image.dto';
 import type { UpdateArticleDto } from './dto/update-article.dto';
 import type {
   ArticleBlockResponse,
@@ -34,6 +36,7 @@ import {
   ALLOWED_CONTENT_IMAGE_MIME_TYPES,
   CONTENT_IMAGE_MAX_FILE_SIZE,
 } from '../storage/image-upload.constants';
+import type { PresignedUploadResult } from '../storage/types/presigned-upload-result';
 import type { UploadFile } from '../storage/types/upload-file';
 
 @Injectable()
@@ -362,6 +365,30 @@ export class ArticlesService {
     return toArticleBlockItemResponse(block);
   }
 
+  async createBlockImageUploadUrl(
+    articleId: string,
+    blockId: string,
+    createArticleBlockImageUploadDto: CreateArticleBlockImageUploadDto,
+  ): Promise<PresignedUploadResult> {
+    await this.requireArticle(articleId, true);
+    await this.requireArticleBlock(articleId, blockId);
+    this.validateImageUploadRequest(createArticleBlockImageUploadDto);
+
+    try {
+      return await this.storageService.createArticleBlockImageUploadUrl(
+        articleId,
+        blockId,
+        createArticleBlockImageUploadDto.fileName,
+        createArticleBlockImageUploadDto.contentType,
+      );
+    } catch {
+      throw new InternalServerErrorException({
+        message: 'Nao foi possivel preparar o upload da imagem.',
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
   async updateBlock(
     articleId: string,
     blockId: string,
@@ -419,6 +446,38 @@ export class ArticlesService {
     }
   }
 
+  async updateBlockImage(
+    articleId: string,
+    blockId: string,
+    updateArticleBlockImageDto: UpdateArticleBlockImageDto,
+  ): Promise<ArticleBlockResponse> {
+    await this.requireArticle(articleId, true);
+    await this.requireArticleBlock(articleId, blockId);
+    this.validateManagedBlockImageUrl(
+      articleId,
+      blockId,
+      updateArticleBlockImageDto.imageUrl,
+    );
+
+    try {
+      const block = await this.articlesRepository.updateBlock(blockId, {
+        imageUrl: this.normalizeText(updateArticleBlockImageDto.imageUrl),
+        imageAlt: this.normalizeOptionalText(updateArticleBlockImageDto.imageAlt),
+        imageCaption: this.normalizeOptionalText(
+          updateArticleBlockImageDto.imageCaption,
+        ),
+      });
+
+      return toArticleBlockItemResponse(block);
+    } catch (error) {
+      if (this.isRecordNotFoundError(error)) {
+        throw this.buildArticleBlockNotFoundException();
+      }
+
+      throw error;
+    }
+  }
+
   async deleteBlock(articleId: string, blockId: string) {
     await this.requireArticle(articleId, true);
     await this.requireArticleBlock(articleId, blockId);
@@ -436,6 +495,30 @@ export class ArticlesService {
     return {
       message: 'Bloco do artigo removido.',
     };
+  }
+
+  async removeBlockImage(
+    articleId: string,
+    blockId: string,
+  ): Promise<ArticleBlockResponse> {
+    await this.requireArticle(articleId, true);
+    await this.requireArticleBlock(articleId, blockId);
+
+    try {
+      const block = await this.articlesRepository.updateBlock(blockId, {
+        imageUrl: null,
+        imageAlt: null,
+        imageCaption: null,
+      });
+
+      return toArticleBlockItemResponse(block);
+    } catch (error) {
+      if (this.isRecordNotFoundError(error)) {
+        throw this.buildArticleBlockNotFoundException();
+      }
+
+      throw error;
+    }
   }
 
   async uploadImage(id: string, file?: UploadFile): Promise<ArticleDetailResponse> {
@@ -670,6 +753,50 @@ export class ArticlesService {
     }
 
     return file;
+  }
+
+  private validateImageUploadRequest(uploadRequest: {
+    fileName: string;
+    contentType: string;
+    fileSize: number;
+  }) {
+    const normalizedFileName = uploadRequest.fileName.trim();
+
+    if (!normalizedFileName || normalizedFileName.includes('..') || /[\\/]/.test(normalizedFileName)) {
+      throw new BadRequestException({
+        message: 'Informe um nome de arquivo valido.',
+        error: 'Bad Request',
+      });
+    }
+
+    if (uploadRequest.fileSize > CONTENT_IMAGE_MAX_FILE_SIZE) {
+      throw new BadRequestException({
+        message: 'A imagem deve ter no maximo 5 MB.',
+        error: 'Bad Request',
+      });
+    }
+
+    if (!ALLOWED_CONTENT_IMAGE_MIME_TYPES.has(uploadRequest.contentType)) {
+      throw new BadRequestException({
+        message: 'Formato de imagem nao permitido.',
+        error: 'Bad Request',
+      });
+    }
+  }
+
+  private validateManagedBlockImageUrl(
+    articleId: string,
+    blockId: string,
+    imageUrl: string,
+  ) {
+    const expectedPrefix = `articles/${articleId}/blocks/${blockId}`;
+
+    if (!this.storageService.isManagedPublicUrl(imageUrl, expectedPrefix)) {
+      throw new BadRequestException({
+        message: 'Informe uma URL de imagem valida.',
+        error: 'Bad Request',
+      });
+    }
   }
 
   private buildArticleNotFoundException() {

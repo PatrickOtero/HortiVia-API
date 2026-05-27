@@ -108,7 +108,14 @@ describe('ArticlesService', () => {
 
   const storageService = {
     uploadArticleImage: jest.fn(),
-  } as unknown as jest.Mocked<Pick<StorageService, 'uploadArticleImage'>>;
+    createArticleBlockImageUploadUrl: jest.fn(),
+    isManagedPublicUrl: jest.fn(),
+  } as unknown as jest.Mocked<
+    Pick<
+      StorageService,
+      'uploadArticleImage' | 'createArticleBlockImageUploadUrl' | 'isManagedPublicUrl'
+    >
+  >;
 
   let service: ArticlesService;
 
@@ -234,9 +241,9 @@ describe('ArticlesService', () => {
           kind: 'PARAGRAPH',
           title: null,
           body: 'Primeiro bloco.',
-          imageUrl: null,
-          imageAlt: null,
-          imageCaption: null,
+          imageUrl: 'https://cdn.hortivia.com/articles/article-1/blocks/block-1/intro.webp',
+          imageAlt: 'Folhas verdes secando sobre pano limpo',
+          imageCaption: 'A secagem correta ajuda a conservar melhor.',
           items: null,
           sortOrder: 0,
           createdAt: new Date('2026-05-20T11:00:00.000Z'),
@@ -279,9 +286,16 @@ describe('ArticlesService', () => {
     expect(result.blocks).toEqual([
       expect.objectContaining({
         id: 'block-1',
+        articleId: baseArticle.id,
         kind: 'PARAGRAPH',
         body: 'Primeiro bloco.',
+        imageUrl:
+          'https://cdn.hortivia.com/articles/article-1/blocks/block-1/intro.webp',
+        imageAlt: 'Folhas verdes secando sobre pano limpo',
+        imageCaption: 'A secagem correta ajuda a conservar melhor.',
         sortOrder: 0,
+        createdAt: '2026-05-20T11:00:00.000Z',
+        updatedAt: '2026-05-20T11:00:00.000Z',
       }),
     ]);
   });
@@ -501,10 +515,175 @@ describe('ArticlesService', () => {
     expect(result).toEqual(
       expect.objectContaining({
         id: 'block-1',
+        articleId: baseArticle.id,
         kind: 'TIP',
         sortOrder: 2,
       }),
     );
+  });
+
+  it('creates a presigned upload URL for an article block image', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+    storageService.createArticleBlockImageUploadUrl.mockResolvedValue({
+      key: 'articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+      uploadUrl: 'https://upload.example.com',
+      url: 'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+    });
+
+    const result = await service.createBlockImageUploadUrl(baseArticle.id, 'block-1', {
+      fileName: 'folhas.webp',
+      contentType: 'image/webp',
+      fileSize: 1024,
+    });
+
+    expect(storageService.createArticleBlockImageUploadUrl).toHaveBeenCalledWith(
+      baseArticle.id,
+      'block-1',
+      'folhas.webp',
+      'image/webp',
+    );
+    expect(result).toEqual({
+      key: 'articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+      uploadUrl: 'https://upload.example.com',
+      url: 'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+    });
+  });
+
+  it('rejects article block image upload URL generation with an invalid content type', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    await expect(
+      service.createBlockImageUploadUrl(baseArticle.id, 'block-1', {
+        fileName: 'folhas.svg',
+        contentType: 'image/svg+xml',
+        fileSize: 1024,
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Formato de imagem nao permitido.',
+      },
+    });
+  });
+
+  it('rejects article block image upload URL generation when the article does not exist', async () => {
+    articlesRepository.findById.mockResolvedValue(null);
+
+    await expect(
+      service.createBlockImageUploadUrl(baseArticle.id, 'block-1', {
+        fileName: 'folhas.webp',
+        contentType: 'image/webp',
+        fileSize: 1024,
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Artigo não encontrado.',
+      },
+    });
+  });
+
+  it('rejects article block image upload URL generation with a file above the limit', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    await expect(
+      service.createBlockImageUploadUrl(baseArticle.id, 'block-1', {
+        fileName: 'folhas.webp',
+        contentType: 'image/webp',
+        fileSize: 6 * 1024 * 1024,
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'A imagem deve ter no maximo 5 MB.',
+      },
+    });
+  });
+
+  it('rejects block image upload URL generation when the block belongs to another article', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: 'other-article',
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    await expect(
+      service.createBlockImageUploadUrl(baseArticle.id, 'block-1', {
+        fileName: 'folhas.webp',
+        contentType: 'image/webp',
+        fileSize: 1024,
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Bloco do artigo não encontrado.',
+      },
+    });
+  });
+
+  it('rejects article block image upload URL generation when the block does not exist', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue(null);
+
+    await expect(
+      service.createBlockImageUploadUrl(baseArticle.id, 'block-1', {
+        fileName: 'folhas.webp',
+        contentType: 'image/webp',
+        fileSize: 1024,
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Bloco do artigo não encontrado.',
+      },
+    });
   });
 
   it('updates an existing article block that belongs to the article', async () => {
@@ -604,6 +783,149 @@ describe('ArticlesService', () => {
     expect(result).toEqual({
       message: 'Bloco do artigo removido.',
     });
+  });
+
+  it('updates article block image metadata with a managed storage URL', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: 'Secagem correta',
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+    storageService.isManagedPublicUrl.mockReturnValue(true);
+    articlesRepository.updateBlock.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: 'Secagem correta',
+      body: null,
+      imageUrl:
+        'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+      imageAlt: 'Folhas verdes em uma centrifuga de salada',
+      imageCaption: 'Secar bem ajuda a evitar umidade excessiva.',
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T12:00:00.000Z'),
+    });
+
+    const result = await service.updateBlockImage(baseArticle.id, 'block-1', {
+      imageUrl:
+        'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+      imageAlt: 'Folhas verdes em uma centrifuga de salada',
+      imageCaption: 'Secar bem ajuda a evitar umidade excessiva.',
+    });
+
+    expect(storageService.isManagedPublicUrl).toHaveBeenCalledWith(
+      'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+      'articles/article-1/blocks/block-1',
+    );
+    expect(articlesRepository.updateBlock).toHaveBeenCalledWith(
+      'block-1',
+      expect.objectContaining({
+        imageUrl:
+          'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+        imageAlt: 'Folhas verdes em uma centrifuga de salada',
+        imageCaption: 'Secar bem ajuda a evitar umidade excessiva.',
+      }),
+    );
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: 'block-1',
+        articleId: baseArticle.id,
+        imageUrl:
+          'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+        imageAlt: 'Folhas verdes em uma centrifuga de salada',
+        imageCaption: 'Secar bem ajuda a evitar umidade excessiva.',
+      }),
+    );
+  });
+
+  it('rejects article block image persistence with a URL outside managed storage', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+    storageService.isManagedPublicUrl.mockReturnValue(false);
+
+    await expect(
+      service.updateBlockImage(baseArticle.id, 'block-1', {
+        imageUrl: 'https://example.com/outside.webp',
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Informe uma URL de imagem valida.',
+      },
+    });
+  });
+
+  it('clears article block image metadata', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: 'https://cdn.hortivia.com/articles/article-1/blocks/block-1/existing.webp',
+      imageAlt: 'Descricao antiga',
+      imageCaption: 'Legenda antiga',
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+    articlesRepository.updateBlock.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T12:00:00.000Z'),
+    });
+
+    const result = await service.removeBlockImage(baseArticle.id, 'block-1');
+
+    expect(articlesRepository.updateBlock).toHaveBeenCalledWith('block-1', {
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+    });
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: 'block-1',
+        articleId: baseArticle.id,
+        imageUrl: null,
+        imageAlt: null,
+        imageCaption: null,
+      }),
+    );
   });
 
   it('appends a numeric suffix when the slug already exists', async () => {

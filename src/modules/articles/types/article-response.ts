@@ -40,6 +40,7 @@ export interface ArticleListItemResponse {
 
 export interface ArticleBlockResponse {
   id: string;
+  articleId: string;
   kind: ArticleBlockKind;
   title: string | null;
   body: string | null;
@@ -48,6 +49,8 @@ export interface ArticleBlockResponse {
   imageCaption: string | null;
   items: unknown[] | null;
   sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ArticleDetailResponse extends ArticleListItemResponse {

@@ -1,8 +1,10 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { getStorageConfig } from './storage.config';
 import type { UploadFile } from './types/upload-file';
+import type { PresignedUploadResult } from './types/presigned-upload-result';
 import type { UploadResult } from './types/upload-result';
 
 type StorageClientContext = {
@@ -32,6 +34,35 @@ export class CloudflareR2StorageService {
     return {
       url: `${publicBaseUrl}/${objectKey}`,
     };
+  }
+
+  async createPresignedUploadUrl(
+    objectKey: string,
+    contentType: string,
+  ): Promise<PresignedUploadResult> {
+    const { client, bucketName, publicBaseUrl } = this.getContext();
+
+    const uploadUrl = await getSignedUrl(
+      client,
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: objectKey,
+        ContentType: contentType,
+      }),
+      {
+        expiresIn: 900,
+      },
+    );
+
+    return {
+      key: objectKey,
+      uploadUrl,
+      url: `${publicBaseUrl}/${objectKey}`,
+    };
+  }
+
+  getPublicBaseUrl() {
+    return this.getContext().publicBaseUrl;
   }
 
   private getContext(): StorageClientContext {

@@ -46,6 +46,7 @@ function toRelatedProducts(
 function toArticleBlockResponse(block: ArticleBlockRecord): ArticleBlockResponse {
   return {
     id: block.id,
+    articleId: block.articleId,
     kind: block.kind,
     title: block.title,
     body: block.body,
@@ -54,6 +55,8 @@ function toArticleBlockResponse(block: ArticleBlockRecord): ArticleBlockResponse
     imageCaption: block.imageCaption,
     items: Array.isArray(block.items) ? (block.items as unknown[]) : null,
     sortOrder: block.sortOrder,
+    createdAt: block.createdAt.toISOString(),
+    updatedAt: block.updatedAt.toISOString(),
   };
 }
 
