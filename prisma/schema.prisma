@@ -48,6 +48,20 @@ enum ArticleCategory {
   WASTE_REDUCTION
 }
 
+enum ArticleBlockKind {
+  PARAGRAPH
+  HEADING
+  IMAGE
+  TIP
+  WARNING
+  CHECKLIST
+  STEPS
+  QUOTE
+  PRODUCT_REFERENCE
+  SECTION
+  OTHER
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -156,10 +170,15 @@ model Article {
   id               String           @id @default(uuid())
   title            String
   slug             String           @unique
+  subtitle         String?
   summary          String
   content          String
   category         ArticleCategory
   imageUrl         String?
+  coverImageUrl    String?
+  coverImageAlt    String?
+  readingTimeMinutes Int?
+  featured         Boolean          @default(false)
   tags             String[]
   authorId         String
   author           User             @relation(fields: [authorId], references: [id], onDelete: Restrict)
@@ -167,8 +186,27 @@ model Article {
   isPublished      Boolean          @default(false)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
+  blocks           ArticleBlock[]
   productRelations ProductArticle[]
   savedBy          SavedArticle[]
+}
+
+model ArticleBlock {
+  id           String           @id @default(cuid())
+  articleId    String
+  article      Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  kind         ArticleBlockKind
+  title        String?
+  body         String?
+  imageUrl     String?
+  imageAlt     String?
+  imageCaption String?
+  items        Json?
+  sortOrder    Int              @default(0)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([articleId, sortOrder])
 }
 
 model SavedArticle {

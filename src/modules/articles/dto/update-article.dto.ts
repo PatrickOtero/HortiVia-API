@@ -1,10 +1,24 @@
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+} from 'class-validator';
 import { ArticleCategory } from '../../../generated/prisma/enums';
 
 export class UpdateArticleDto {
   @IsOptional()
   @IsString()
   title?: string;
+
+  @IsOptional()
+  @IsString()
+  subtitle?: string;
 
   @IsOptional()
   @IsString()
@@ -21,6 +35,23 @@ export class UpdateArticleDto {
   @IsOptional()
   @IsUrl()
   imageUrl?: string;
+
+  @IsOptional()
+  @IsUrl()
+  coverImageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  coverImageAlt?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  readingTimeMinutes?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  featured?: boolean;
 
   @IsOptional()
   @IsArray()

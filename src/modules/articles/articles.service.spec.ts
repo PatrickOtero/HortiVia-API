@@ -10,11 +10,16 @@ describe('ArticlesService', () => {
     id: 'article-1',
     title: 'Como escolher um abacate no ponto certo',
     slug: 'como-escolher-um-abacate-no-ponto-certo',
+    subtitle: 'Sinais diretos para acertar na compra.',
     summary: 'Aprenda sinais simples para identificar maturacao.',
     content:
       'Aprenda a observar a casca, a textura e o aroma antes de levar o abacate para casa.',
     category: ArticleCategory.TIPS,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: null,
+    featured: false,
     tags: ['abacate', 'compra'],
     authorId: 'user-1',
     author: {
@@ -26,6 +31,7 @@ describe('ArticlesService', () => {
     isPublished: true,
     createdAt: new Date('2026-05-20T09:00:00.000Z'),
     updatedAt: new Date('2026-05-20T09:00:00.000Z'),
+    blocks: [],
     productRelations: [],
   };
 
@@ -66,6 +72,10 @@ describe('ArticlesService', () => {
     update: jest.fn(),
     updateImageUrl: jest.fn(),
     unpublish: jest.fn(),
+    createBlock: jest.fn(),
+    findBlockById: jest.fn(),
+    updateBlock: jest.fn(),
+    deleteBlock: jest.fn(),
     findSavedArticleByUserAndArticle: jest.fn(),
     createSavedArticle: jest.fn(),
     deleteSavedArticle: jest.fn(),
@@ -83,6 +93,10 @@ describe('ArticlesService', () => {
       | 'update'
       | 'updateImageUrl'
       | 'unpublish'
+      | 'createBlock'
+      | 'findBlockById'
+      | 'updateBlock'
+      | 'deleteBlock'
       | 'findSavedArticleByUserAndArticle'
       | 'createSavedArticle'
       | 'deleteSavedArticle'
@@ -111,13 +125,20 @@ describe('ArticlesService', () => {
       ...baseArticle,
       title: data.title as string,
       slug: data.slug as string,
+      subtitle: (data.subtitle as string | null | undefined) ?? null,
       summary: data.summary as string,
       content: data.content as string,
       category: data.category as ArticleCategory,
       imageUrl: (data.imageUrl as string | null) ?? null,
+      coverImageUrl: (data.coverImageUrl as string | null | undefined) ?? null,
+      coverImageAlt: (data.coverImageAlt as string | null | undefined) ?? null,
+      readingTimeMinutes:
+        (data.readingTimeMinutes as number | null | undefined) ?? null,
+      featured: (data.featured as boolean | undefined) ?? false,
       tags: (data.tags as string[]) ?? [],
       isPublished: (data.isPublished as boolean | undefined) ?? false,
       publishedAt: (data.publishedAt as Date | null | undefined) ?? null,
+      blocks: [],
     };
   }
 
@@ -206,6 +227,22 @@ describe('ArticlesService', () => {
   it('returns article detail by id', async () => {
     articlesRepository.findById.mockResolvedValue({
       ...baseArticle,
+      blocks: [
+        {
+          id: 'block-1',
+          articleId: baseArticle.id,
+          kind: 'PARAGRAPH',
+          title: null,
+          body: 'Primeiro bloco.',
+          imageUrl: null,
+          imageAlt: null,
+          imageCaption: null,
+          items: null,
+          sortOrder: 0,
+          createdAt: new Date('2026-05-20T11:00:00.000Z'),
+          updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+        },
+      ],
       productRelations: [
         {
           id: 'relation-1',
@@ -239,6 +276,61 @@ describe('ArticlesService', () => {
         imageUrl: baseRelatedProduct.imageUrl,
       },
     ]);
+    expect(result.blocks).toEqual([
+      expect.objectContaining({
+        id: 'block-1',
+        kind: 'PARAGRAPH',
+        body: 'Primeiro bloco.',
+        sortOrder: 0,
+      }),
+    ]);
+  });
+
+  it('returns blocks ordered by sortOrder in article detail', async () => {
+    articlesRepository.findById.mockResolvedValue({
+      ...baseArticle,
+      blocks: [
+        {
+          id: 'block-2',
+          articleId: baseArticle.id,
+          kind: 'CHECKLIST',
+          title: 'Checklist',
+          body: null,
+          imageUrl: null,
+          imageAlt: null,
+          imageCaption: null,
+          items: ['item 1'],
+          sortOrder: 1,
+          createdAt: new Date('2026-05-20T12:00:00.000Z'),
+          updatedAt: new Date('2026-05-20T12:00:00.000Z'),
+        },
+        {
+          id: 'block-1',
+          articleId: baseArticle.id,
+          kind: 'PARAGRAPH',
+          title: null,
+          body: 'Introdução.',
+          imageUrl: null,
+          imageAlt: null,
+          imageCaption: null,
+          items: null,
+          sortOrder: 0,
+          createdAt: new Date('2026-05-20T11:00:00.000Z'),
+          updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+        },
+      ],
+      productRelations: [],
+    });
+
+    const result = await service.getById(baseArticle.id);
+
+    expect(result.blocks.map(block => block.sortOrder)).toEqual([0, 1]);
+    expect(result.blocks[0]).toEqual(
+      expect.objectContaining({
+        id: 'block-1',
+        kind: 'PARAGRAPH',
+      }),
+    );
   });
 
   it('throws not found when the article does not exist', async () => {
@@ -373,6 +465,145 @@ describe('ArticlesService', () => {
     );
     expect(result.slug).toBe('como-conservar-folhas-por-mais-tempo');
     expect(result.readingTimeMinutes).toBe(1);
+  });
+
+  it('creates an article block for an existing article', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.createBlock.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'TIP',
+      title: 'Dica',
+      body: 'Seque bem as folhas.',
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: ['Use papel toalha.'],
+      sortOrder: 2,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    const result = await service.createBlock(baseArticle.id, {
+      kind: 'TIP' as never,
+      title: 'Dica',
+      body: 'Seque bem as folhas.',
+      items: ['Use papel toalha.'],
+      sortOrder: 2,
+    });
+
+    expect(articlesRepository.createBlock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'TIP',
+        sortOrder: 2,
+      }),
+    );
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: 'block-1',
+        kind: 'TIP',
+        sortOrder: 2,
+      }),
+    );
+  });
+
+  it('updates an existing article block that belongs to the article', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'PARAGRAPH',
+      title: null,
+      body: 'Texto antigo.',
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+    articlesRepository.updateBlock.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'PARAGRAPH',
+      title: null,
+      body: 'Texto novo.',
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T12:00:00.000Z'),
+    });
+
+    const result = await service.updateBlock(baseArticle.id, 'block-1', {
+      body: 'Texto novo.',
+      sortOrder: 1,
+    });
+
+    expect(articlesRepository.updateBlock).toHaveBeenCalledWith(
+      'block-1',
+      expect.objectContaining({
+        body: 'Texto novo.',
+        sortOrder: 1,
+      }),
+    );
+    expect(result.body).toBe('Texto novo.');
+  });
+
+  it('rejects block update when the block belongs to another article', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: 'other-article',
+      kind: 'PARAGRAPH',
+      title: null,
+      body: 'Texto antigo.',
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    await expect(
+      service.updateBlock(baseArticle.id, 'block-1', {
+        body: 'Texto novo.',
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Bloco do artigo não encontrado.',
+      },
+    });
+  });
+
+  it('deletes an article block that belongs to the article', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'PARAGRAPH',
+      title: null,
+      body: 'Texto antigo.',
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 0,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    const result = await service.deleteBlock(baseArticle.id, 'block-1');
+
+    expect(articlesRepository.deleteBlock).toHaveBeenCalledWith('block-1');
+    expect(result).toEqual({
+      message: 'Bloco do artigo removido.',
+    });
   });
 
   it('appends a numeric suffix when the slug already exists', async () => {

@@ -318,6 +318,17 @@ export type EnumArticleCategoryFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumArticleCategoryFilter<$PrismaModel> | $Enums.ArticleCategory
 }
 
+export type IntNullableFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
+}
+
 export type EnumArticleCategoryWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.ArticleCategory | Prisma.EnumArticleCategoryFieldRefInput<$PrismaModel>
   in?: $Enums.ArticleCategory[] | Prisma.ListEnumArticleCategoryFieldRefInput<$PrismaModel>
@@ -326,6 +337,39 @@ export type EnumArticleCategoryWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumArticleCategoryFilter<$PrismaModel>
   _max?: Prisma.NestedEnumArticleCategoryFilter<$PrismaModel>
+}
+
+export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
+}
+
+export type EnumArticleBlockKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleBlockKind | Prisma.EnumArticleBlockKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel> | $Enums.ArticleBlockKind
+}
+
+export type EnumArticleBlockKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleBlockKind | Prisma.EnumArticleBlockKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleBlockKindWithAggregatesFilter<$PrismaModel> | $Enums.ArticleBlockKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -626,6 +670,50 @@ export type NestedEnumArticleCategoryWithAggregatesFilter<$PrismaModel = never> 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumArticleCategoryFilter<$PrismaModel>
   _max?: Prisma.NestedEnumArticleCategoryFilter<$PrismaModel>
+}
+
+export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
+}
+
+export type NestedFloatNullableFilter<$PrismaModel = never> = {
+  equals?: number | Prisma.FloatFieldRefInput<$PrismaModel> | null
+  in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  notIn?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel> | null
+  lt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  lte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumArticleBlockKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleBlockKind | Prisma.EnumArticleBlockKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel> | $Enums.ArticleBlockKind
+}
+
+export type NestedEnumArticleBlockKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleBlockKind | Prisma.EnumArticleBlockKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleBlockKind[] | Prisma.ListEnumArticleBlockKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleBlockKindWithAggregatesFilter<$PrismaModel> | $Enums.ArticleBlockKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
 }
 
 

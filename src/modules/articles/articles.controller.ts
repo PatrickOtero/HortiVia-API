@@ -23,8 +23,10 @@ import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
 import { ImageUploadExceptionFilter } from '../storage/image-upload.exception-filter';
 import { ArticlesService } from './articles.service';
+import { CreateArticleBlockDto } from './dto/create-article-block.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
+import { UpdateArticleBlockDto } from './dto/update-article-block.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Controller('articles')
@@ -81,6 +83,41 @@ export class ArticlesController {
   @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
     return this.articlesService.remove(id);
+  }
+
+  @Post(':articleId/blocks')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async createBlock(
+    @Param('articleId') articleId: string,
+    @Body() createArticleBlockDto: CreateArticleBlockDto,
+  ) {
+    return this.articlesService.createBlock(articleId, createArticleBlockDto);
+  }
+
+  @Patch(':articleId/blocks/:blockId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async updateBlock(
+    @Param('articleId') articleId: string,
+    @Param('blockId') blockId: string,
+    @Body() updateArticleBlockDto: UpdateArticleBlockDto,
+  ) {
+    return this.articlesService.updateBlock(
+      articleId,
+      blockId,
+      updateArticleBlockDto,
+    );
+  }
+
+  @Delete(':articleId/blocks/:blockId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async deleteBlock(
+    @Param('articleId') articleId: string,
+    @Param('blockId') blockId: string,
+  ) {
+    return this.articlesService.deleteBlock(articleId, blockId);
   }
 
   @Post(':id/image')

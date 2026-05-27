@@ -1,4 +1,7 @@
-import type { ArticleCategory } from '../../../generated/prisma/enums';
+import type {
+  ArticleBlockKind,
+  ArticleCategory,
+} from '../../../generated/prisma/enums';
 
 import type { ProductCategory } from '../../../generated/prisma/enums';
 
@@ -21,18 +24,35 @@ export interface ArticleListItemResponse {
   id: string;
   title: string;
   slug: string;
+  subtitle: string | null;
   summary: string;
   category: ArticleCategory;
   imageUrl: string | null;
+  coverImageUrl: string | null;
+  coverImageAlt: string | null;
   tags: string[];
   publishedAt: string;
   readingTimeMinutes: number;
+  featured: boolean;
   author: ArticleAuthorResponse;
   isSaved?: boolean;
 }
 
+export interface ArticleBlockResponse {
+  id: string;
+  kind: ArticleBlockKind;
+  title: string | null;
+  body: string | null;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  imageCaption: string | null;
+  items: unknown[] | null;
+  sortOrder: number;
+}
+
 export interface ArticleDetailResponse extends ArticleListItemResponse {
   content: string;
+  blocks: ArticleBlockResponse[];
   relatedProducts: RelatedProductResponse[];
   createdAt: string;
   updatedAt: string;

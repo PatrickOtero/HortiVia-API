@@ -3,13 +3,14 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { hash } from 'bcryptjs';
 import { randomBytes } from 'crypto';
 import {
+  ArticleBlockKind,
   ArticleCategory,
   ProductCategory,
   ProductGuideSectionKind,
   ProductImageKind,
   UserRole,
 } from '../src/generated/prisma/enums';
-import { PrismaClient } from '../src/generated/prisma/client';
+import { Prisma, PrismaClient } from '../src/generated/prisma/client';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -46,6 +47,30 @@ function createGuideSection(
     bullets: options?.bullets ?? [],
     idealPoints: options?.idealPoints ?? [],
     avoidPoints: options?.avoidPoints ?? [],
+    sortOrder: options?.sortOrder ?? 0,
+  };
+}
+
+function createArticleBlock(
+  kind: ArticleBlockKind,
+  options?: {
+    title?: string;
+    body?: string;
+    imageUrl?: string | null;
+    imageAlt?: string | null;
+    imageCaption?: string | null;
+    items?: unknown[];
+    sortOrder?: number;
+  },
+) {
+  return {
+    kind,
+    title: options?.title ?? null,
+    body: options?.body ?? null,
+    imageUrl: options?.imageUrl ?? null,
+    imageAlt: options?.imageAlt ?? null,
+    imageCaption: options?.imageCaption ?? null,
+    items: options?.items as Prisma.InputJsonValue | undefined,
     sortOrder: options?.sortOrder ?? 0,
   };
 }
@@ -463,74 +488,182 @@ const articles = [
   {
     title: 'Abacate: como saber se está no ponto',
     slug: 'como-escolher-um-abacate-no-ponto-certo',
+    subtitle: 'Firmeza, cor e aroma ajudam a evitar erro na compra.',
     summary: 'Sinais simples para acertar na escolha.',
     content:
       'Observe se a casca está íntegra e aperte de leve: o abacate deve ceder um pouco, sem afundar.\n\nSe ainda estiver muito firme, deixe amadurecer em temperatura ambiente por alguns dias antes de consumir.',
     category: ArticleCategory.TIPS,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: 2,
+    featured: false,
     tags: ['abacate', 'compra'],
     isPublished: true,
     publishedAt: new Date('2026-05-20T10:00:00.000Z'),
+    blocks: [],
   },
   {
-    title: 'Folhas frescas por mais tempo na geladeira',
+    title: 'Como conservar folhas por mais tempo',
     slug: 'como-conservar-folhas-por-mais-tempo',
+    subtitle: 'Lavagem, secagem e armazenamento fazem diferença no dia a dia.',
     summary: 'Cuidados simples para manter as folhas em bom estado por mais tempo.',
     content:
       'Seque bem as folhas antes de guardar e use pote fechado ou saco bem vedado.\n\nPara ajudar na conservação, coloque papel toalha no recipiente e troque quando perceber excesso de umidade.',
     category: ArticleCategory.STORAGE,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: 4,
+    featured: true,
     tags: ['folhas', 'conservação'],
     isPublished: true,
     publishedAt: new Date('2026-05-21T10:00:00.000Z'),
+    blocks: [
+      createArticleBlock(ArticleBlockKind.PARAGRAPH, {
+        body: 'Folhas delicadas costumam perder textura rápido quando ficam úmidas ou abafadas. Um cuidado simples antes de guardar já ajuda bastante na rotina.',
+        sortOrder: 0,
+      }),
+      createArticleBlock(ArticleBlockKind.SECTION, {
+        title: 'Lavagem e secagem',
+        body: 'Lave somente quando for necessário e seque muito bem antes de levar para a geladeira. Centrífuga de salada, pano limpo ou papel toalha ajudam a retirar o excesso de água.',
+        sortOrder: 1,
+      }),
+      createArticleBlock(ArticleBlockKind.CHECKLIST, {
+        title: 'Checklist rápido antes de guardar',
+        items: [
+          'Retire folhas muito danificadas',
+          'Seque bem antes de fechar o recipiente',
+          'Use pote ou saco bem vedado',
+          'Troque o papel quando houver excesso de umidade',
+        ],
+        sortOrder: 2,
+      }),
+      createArticleBlock(ArticleBlockKind.TIP, {
+        title: 'Dica prática',
+        body: 'Guarde as folhas já separadas por tipo quando a rotina estiver corrida. Isso facilita usar primeiro o que está mais delicado.',
+        sortOrder: 3,
+      }),
+    ],
   },
   {
     title: 'Por que vale a pena observar a safra das frutas',
     slug: 'frutas-da-estacao-por-que-vale-a-pena-observar',
+    subtitle: 'Frutas da estação costumam chegar mais saborosas e acessíveis.',
     summary: 'A época certa costuma trazer frutas mais saborosas e fáceis de encontrar.',
     content:
       'Quando uma fruta está na época, ela costuma chegar mais fresca e com melhor sabor.\n\nObservar a safra também ajuda a variar a rotina e, muitas vezes, torna a compra mais vantajosa.',
     category: ArticleCategory.SEASONALITY,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: 2,
+    featured: false,
     tags: ['safra', 'economia'],
     isPublished: true,
     publishedAt: new Date('2026-05-22T10:00:00.000Z'),
+    blocks: [],
   },
   {
     title: 'Talos e cascas: ideias simples para aproveitar melhor',
     slug: 'como-aproveitar-talos-e-cascas-no-dia-a-dia',
+    subtitle: 'Pequenos reaproveitamentos ajudam a reduzir desperdício sem complicar.',
     summary: 'Ideias simples para reduzir desperdício na cozinha.',
     content:
       'Talos podem entrar em refogados, caldos e recheios sem complicar o preparo.\n\nCascas bem higienizadas também podem ser aproveitadas em chips, farofas e sucos, dependendo do alimento.',
     category: ArticleCategory.WASTE_REDUCTION,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: 2,
+    featured: false,
     tags: ['aproveitamento', 'desperdício'],
     isPublished: true,
     publishedAt: new Date('2026-05-23T10:00:00.000Z'),
+    blocks: [],
   },
   {
     title: 'Tomate: sinais para escolher melhor na compra',
     slug: 'o-que-observar-antes-de-comprar-tomate',
+    subtitle: 'Cor, firmeza e casca ajudam a escolher com mais segurança.',
     summary: 'Cor, firmeza e casca ajudam a escolher melhor.',
     content:
       'Tomates com casca lisa, cor uniforme e sem rachaduras tendem a render melhor no uso do dia a dia.\n\nSe a ideia for consumir logo, escolha os mais maduros. Para guardar por mais tempo, prefira os ainda firmes.',
     category: ArticleCategory.TIPS,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: 2,
+    featured: false,
     tags: ['tomate', 'compra'],
     isPublished: true,
     publishedAt: new Date('2026-05-24T10:00:00.000Z'),
+    blocks: [],
   },
   {
     title: 'Como organizar a geladeira para perder menos alimentos',
     slug: 'como-reduzir-perdas-na-geladeira',
+    subtitle: 'Uma organização simples já ajuda a lembrar o que precisa ser usado antes.',
     summary: 'Uma organização simples já ajuda a evitar desperdício em casa.',
     content:
       'Deixe os itens mais maduros em locais visíveis para lembrar de usá-los primeiro.\n\nSeparar os alimentos por tipo e revisar a geladeira antes de comprar de novo já ajuda a reduzir perdas.',
     category: ArticleCategory.STORAGE,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: 2,
+    featured: false,
     tags: ['geladeira', 'organização'],
     isPublished: true,
     publishedAt: new Date('2026-05-25T10:00:00.000Z'),
+    blocks: [],
+  },
+  {
+    title: 'Como escolher frutas maduras sem errar no toque',
+    slug: 'como-escolher-frutas-maduras-sem-errar-no-toque',
+    subtitle: 'Textura, aroma e pequenos sinais evitam compras frustradas.',
+    summary: 'Um guia direto para perceber o ponto ideal de frutas mais delicadas.',
+    content:
+      'Nem toda fruta madura fica mole demais. Entender o que muda no toque e no aroma ajuda a comprar melhor para consumo imediato ou para alguns dias depois.',
+    category: ArticleCategory.TIPS,
+    imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: 4,
+    featured: true,
+    tags: ['frutas', 'maturação', 'compra'],
+    isPublished: true,
+    publishedAt: new Date('2026-05-26T10:00:00.000Z'),
+    blocks: [
+      createArticleBlock(ArticleBlockKind.PARAGRAPH, {
+        body: 'O toque ajuda muito, mas ele funciona melhor quando combinado com aroma, cor e aspecto da casca. Assim você evita levar fruta passada ou ainda verde demais.',
+        sortOrder: 0,
+      }),
+      createArticleBlock(ArticleBlockKind.SECTION, {
+        title: 'Observe a firmeza',
+        body: 'Pressione com cuidado. A fruta madura costuma ceder levemente, sem afundar demais. Frutas muito rígidas ainda precisam amadurecer; as muito moles pedem consumo rápido.',
+        sortOrder: 1,
+      }),
+      createArticleBlock(ArticleBlockKind.SECTION, {
+        title: 'Perceba o aroma',
+        body: 'Um cheiro adocicado perto do cabo costuma indicar maturação. Se o aroma estiver forte demais ou fermentado, vale redobrar a atenção.',
+        sortOrder: 2,
+      }),
+      createArticleBlock(ArticleBlockKind.WARNING, {
+        title: 'Sinais de excesso de maturação',
+        body: 'Áreas afundadas, casca rompida, vazamento e cheiro fermentado são sinais de que a fruta pode estar passada.',
+        sortOrder: 3,
+      }),
+      createArticleBlock(ArticleBlockKind.CHECKLIST, {
+        title: 'Antes de colocar na sacola',
+        items: [
+          'Compare o ponto com o dia em que pretende consumir',
+          'Evite frutas rachadas ou com líquido na casca',
+          'Misture frutas mais prontas com algumas ainda firmes',
+        ],
+        sortOrder: 4,
+      }),
+    ],
   },
 ];
 
@@ -568,12 +701,32 @@ const productArticleRelations = [
   {
     productSlug: 'agriao',
     articleSlug: 'como-conservar-folhas-por-mais-tempo',
-    sortOrder: 0,
+    sortOrder: 1,
+  },
+  {
+    productSlug: 'couve',
+    articleSlug: 'como-conservar-folhas-por-mais-tempo',
+    sortOrder: 2,
   },
   {
     productSlug: 'cenoura',
     articleSlug: 'como-reduzir-perdas-na-geladeira',
     sortOrder: 0,
+  },
+  {
+    productSlug: 'abacate',
+    articleSlug: 'como-escolher-frutas-maduras-sem-errar-no-toque',
+    sortOrder: 2,
+  },
+  {
+    productSlug: 'banana',
+    articleSlug: 'como-escolher-frutas-maduras-sem-errar-no-toque',
+    sortOrder: 1,
+  },
+  {
+    productSlug: 'manga',
+    articleSlug: 'como-escolher-frutas-maduras-sem-errar-no-toque',
+    sortOrder: 2,
   },
 ];
 
@@ -701,24 +854,76 @@ async function main() {
   }
 
   for (const article of articles) {
-    const existingArticle = await prisma.article.findUnique({
+    const savedArticle = await prisma.article.upsert({
       where: {
         slug: article.slug,
+      },
+      create: {
+        title: article.title,
+        slug: article.slug,
+        subtitle: article.subtitle,
+        summary: article.summary,
+        content: article.content,
+        category: article.category,
+        imageUrl: article.imageUrl,
+        coverImageUrl: article.coverImageUrl,
+        coverImageAlt: article.coverImageAlt,
+        readingTimeMinutes: article.readingTimeMinutes,
+        featured: article.featured,
+        tags: article.tags,
+        isPublished: article.isPublished,
+        publishedAt: article.publishedAt,
+        author: {
+          connect: {
+            id: author.id,
+          },
+        },
+      },
+      update: {
+        title: article.title,
+        subtitle: article.subtitle,
+        summary: article.summary,
+        content: article.content,
+        category: article.category,
+        imageUrl: article.imageUrl,
+        coverImageUrl: article.coverImageUrl,
+        coverImageAlt: article.coverImageAlt,
+        readingTimeMinutes: article.readingTimeMinutes,
+        featured: article.featured,
+        tags: article.tags,
+        isPublished: article.isPublished,
+        publishedAt: article.publishedAt,
+        authorId: author.id,
       },
       select: {
         id: true,
       },
     });
 
-    if (!existingArticle) {
-      await prisma.article.create({
-        data: {
-          ...article,
-          author: {
-            connect: {
-              id: author.id,
-            },
-          },
+    if (article.blocks.length > 0) {
+      await prisma.articleBlock.deleteMany({
+        where: {
+          articleId: savedArticle.id,
+        },
+      });
+
+      await prisma.articleBlock.createMany({
+        data: article.blocks.map((block, index) => ({
+          articleId: savedArticle.id,
+          kind: block.kind,
+          title: block.title,
+          body: block.body,
+          imageUrl: block.imageUrl,
+          imageAlt: block.imageAlt,
+          imageCaption: block.imageCaption,
+          items: block.items,
+          sortOrder: block.sortOrder ?? index,
+        })),
+      });
+    } else {
+      await prisma.articleBlock.deleteMany({
+        where: {
+          articleId: savedArticle.id,
         },
       });
     }

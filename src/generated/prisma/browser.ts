@@ -48,6 +48,11 @@ export type ProductGuideSection = Prisma.ProductGuideSectionModel
  */
 export type Article = Prisma.ArticleModel
 /**
+ * Model ArticleBlock
+ * 
+ */
+export type ArticleBlock = Prisma.ArticleBlockModel
+/**
  * Model SavedArticle
  * 
  */

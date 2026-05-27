@@ -5,19 +5,24 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import type { Prisma } from '../../generated/prisma/client';
+import { Prisma } from '../../generated/prisma/client';
+import { ArticleBlockKind } from '../../generated/prisma/enums';
 import { ArticlesRepository } from './articles.repository';
 import {
+  toArticleBlockItemResponse,
   toArticleDetailResponse,
   toArticleListItemResponse,
   toSavedArticleItemResponse,
 } from './mappers/article-response.mapper';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
+import type { CreateArticleBlockDto } from './dto/create-article-block.dto';
 import type { CreateArticleDto } from './dto/create-article.dto';
 import type { ListArticlesQueryDto } from './dto/list-articles-query.dto';
 import type { ListSavedArticlesQueryDto } from './dto/list-saved-articles-query.dto';
+import type { UpdateArticleBlockDto } from './dto/update-article-block.dto';
 import type { UpdateArticleDto } from './dto/update-article.dto';
 import type {
+  ArticleBlockResponse,
   ArticleDetailResponse,
   ArticlesListResponse,
   SavedArticlesListResponse,
@@ -60,7 +65,7 @@ export class ArticlesService {
       data: articles.map(article =>
         toArticleListItemResponse(
           article,
-          calculateReadingTimeMinutes(article.content),
+          this.resolveReadingTimeMinutes(article),
           {
             isSaved: false,
           },
@@ -84,7 +89,7 @@ export class ArticlesService {
 
     return toArticleDetailResponse(
       article,
-      calculateReadingTimeMinutes(article.content),
+      this.resolveReadingTimeMinutes(article),
       {
         isSaved: false,
       },
@@ -159,7 +164,7 @@ export class ArticlesService {
       items: savedArticles.map(savedArticle =>
         toSavedArticleItemResponse(
           savedArticle.article,
-          calculateReadingTimeMinutes(savedArticle.article.content),
+          this.resolveReadingTimeMinutes(savedArticle.article),
         ),
       ),
       page,
@@ -179,11 +184,16 @@ export class ArticlesService {
     try {
       const article = await this.articlesRepository.create({
         title: this.normalizeText(createArticleDto.title),
+        subtitle: this.normalizeOptionalText(createArticleDto.subtitle),
         slug,
         summary: this.normalizeText(createArticleDto.summary),
         content: this.normalizeText(createArticleDto.content),
         category: createArticleDto.category,
         imageUrl: this.normalizeOptionalText(createArticleDto.imageUrl),
+        coverImageUrl: this.normalizeOptionalText(createArticleDto.coverImageUrl),
+        coverImageAlt: this.normalizeOptionalText(createArticleDto.coverImageAlt),
+        readingTimeMinutes: createArticleDto.readingTimeMinutes ?? null,
+        featured: createArticleDto.featured ?? false,
         tags: this.normalizeTags(createArticleDto.tags),
         isPublished: publication.isPublished,
         publishedAt: publication.publishedAt,
@@ -196,7 +206,7 @@ export class ArticlesService {
 
       return toArticleDetailResponse(
         article,
-        calculateReadingTimeMinutes(article.content),
+        this.resolveReadingTimeMinutes(article),
         {
           isSaved: false,
         },
@@ -230,6 +240,10 @@ export class ArticlesService {
       data.summary = this.normalizeText(updateArticleDto.summary);
     }
 
+    if (updateArticleDto.subtitle !== undefined) {
+      data.subtitle = this.normalizeOptionalText(updateArticleDto.subtitle);
+    }
+
     if (updateArticleDto.content !== undefined) {
       data.content = this.normalizeText(updateArticleDto.content);
     }
@@ -240,6 +254,22 @@ export class ArticlesService {
 
     if (updateArticleDto.imageUrl !== undefined) {
       data.imageUrl = this.normalizeOptionalText(updateArticleDto.imageUrl);
+    }
+
+    if (updateArticleDto.coverImageUrl !== undefined) {
+      data.coverImageUrl = this.normalizeOptionalText(updateArticleDto.coverImageUrl);
+    }
+
+    if (updateArticleDto.coverImageAlt !== undefined) {
+      data.coverImageAlt = this.normalizeOptionalText(updateArticleDto.coverImageAlt);
+    }
+
+    if (updateArticleDto.readingTimeMinutes !== undefined) {
+      data.readingTimeMinutes = updateArticleDto.readingTimeMinutes;
+    }
+
+    if (updateArticleDto.featured !== undefined) {
+      data.featured = updateArticleDto.featured;
     }
 
     if (updateArticleDto.tags !== undefined) {
@@ -259,7 +289,7 @@ export class ArticlesService {
     if (Object.keys(data).length === 0) {
       return toArticleDetailResponse(
         existingArticle,
-        calculateReadingTimeMinutes(existingArticle.content),
+        this.resolveReadingTimeMinutes(existingArticle),
         {
           isSaved: false,
         },
@@ -271,7 +301,7 @@ export class ArticlesService {
 
       return toArticleDetailResponse(
         article,
-        calculateReadingTimeMinutes(article.content),
+        this.resolveReadingTimeMinutes(article),
         {
           isSaved: false,
         },
@@ -307,6 +337,107 @@ export class ArticlesService {
     };
   }
 
+  async createBlock(
+    articleId: string,
+    createArticleBlockDto: CreateArticleBlockDto,
+  ): Promise<ArticleBlockResponse> {
+    await this.requireArticle(articleId, true);
+
+    const block = await this.articlesRepository.createBlock({
+      article: {
+        connect: {
+          id: articleId,
+        },
+      },
+      kind: createArticleBlockDto.kind,
+      title: this.normalizeOptionalText(createArticleBlockDto.title),
+      body: this.normalizeOptionalText(createArticleBlockDto.body),
+      imageUrl: this.normalizeOptionalText(createArticleBlockDto.imageUrl),
+      imageAlt: this.normalizeOptionalText(createArticleBlockDto.imageAlt),
+      imageCaption: this.normalizeOptionalText(createArticleBlockDto.imageCaption),
+      items: this.normalizeBlockItems(createArticleBlockDto.items),
+      sortOrder: createArticleBlockDto.sortOrder ?? 0,
+    });
+
+    return toArticleBlockItemResponse(block);
+  }
+
+  async updateBlock(
+    articleId: string,
+    blockId: string,
+    updateArticleBlockDto: UpdateArticleBlockDto,
+  ): Promise<ArticleBlockResponse> {
+    await this.requireArticle(articleId, true);
+    const existingBlock = await this.requireArticleBlock(articleId, blockId);
+    const data: Prisma.ArticleBlockUpdateInput = {};
+
+    if (updateArticleBlockDto.kind !== undefined) {
+      data.kind = updateArticleBlockDto.kind;
+    }
+
+    if (updateArticleBlockDto.title !== undefined) {
+      data.title = this.normalizeOptionalText(updateArticleBlockDto.title);
+    }
+
+    if (updateArticleBlockDto.body !== undefined) {
+      data.body = this.normalizeOptionalText(updateArticleBlockDto.body);
+    }
+
+    if (updateArticleBlockDto.imageUrl !== undefined) {
+      data.imageUrl = this.normalizeOptionalText(updateArticleBlockDto.imageUrl);
+    }
+
+    if (updateArticleBlockDto.imageAlt !== undefined) {
+      data.imageAlt = this.normalizeOptionalText(updateArticleBlockDto.imageAlt);
+    }
+
+    if (updateArticleBlockDto.imageCaption !== undefined) {
+      data.imageCaption = this.normalizeOptionalText(updateArticleBlockDto.imageCaption);
+    }
+
+    if (updateArticleBlockDto.items !== undefined) {
+      data.items = this.normalizeBlockItems(updateArticleBlockDto.items);
+    }
+
+    if (updateArticleBlockDto.sortOrder !== undefined) {
+      data.sortOrder = updateArticleBlockDto.sortOrder;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return toArticleBlockItemResponse(existingBlock);
+    }
+
+    try {
+      const block = await this.articlesRepository.updateBlock(blockId, data);
+      return toArticleBlockItemResponse(block);
+    } catch (error) {
+      if (this.isRecordNotFoundError(error)) {
+        throw this.buildArticleBlockNotFoundException();
+      }
+
+      throw error;
+    }
+  }
+
+  async deleteBlock(articleId: string, blockId: string) {
+    await this.requireArticle(articleId, true);
+    await this.requireArticleBlock(articleId, blockId);
+
+    try {
+      await this.articlesRepository.deleteBlock(blockId);
+    } catch (error) {
+      if (this.isRecordNotFoundError(error)) {
+        throw this.buildArticleBlockNotFoundException();
+      }
+
+      throw error;
+    }
+
+    return {
+      message: 'Bloco do artigo removido.',
+    };
+  }
+
   async uploadImage(id: string, file?: UploadFile): Promise<ArticleDetailResponse> {
     await this.requireArticle(id, true);
     const imageFile = this.validateImageFile(file);
@@ -320,7 +451,7 @@ export class ArticlesService {
 
       return toArticleDetailResponse(
         updatedArticle,
-        calculateReadingTimeMinutes(updatedArticle.content),
+        this.resolveReadingTimeMinutes(updatedArticle),
         {
           isSaved: false,
         },
@@ -331,7 +462,7 @@ export class ArticlesService {
       }
 
       throw new InternalServerErrorException({
-        message: 'Não foi possível enviar a imagem.',
+        message: 'NÃƒÂ£o foi possÃƒÂ­vel enviar a imagem.',
         error: 'Internal Server Error',
       });
     }
@@ -372,6 +503,16 @@ export class ArticlesService {
     }
 
     return article;
+  }
+
+  private async requireArticleBlock(articleId: string, blockId: string) {
+    const block = await this.articlesRepository.findBlockById(blockId);
+
+    if (!block || block.articleId !== articleId) {
+      throw this.buildArticleBlockNotFoundException();
+    }
+
+    return block;
   }
 
   private async generateUniqueSlug(title: string, currentArticleId?: string) {
@@ -465,24 +606,65 @@ export class ArticlesService {
     return (tags ?? []).map(tag => tag.trim()).filter(Boolean);
   }
 
+  private normalizeBlockItems(
+    items?: unknown[],
+  ): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+    if (items === undefined) {
+      return Prisma.JsonNull;
+    }
+
+    return [...items] as Prisma.InputJsonValue;
+  }
+
+  private resolveReadingTimeMinutes(article: {
+    content: string;
+    readingTimeMinutes?: number | null;
+    blocks?: Array<{
+      kind: ArticleBlockKind;
+      title: string | null;
+      body: string | null;
+      items: Prisma.JsonValue | null;
+    }>;
+  }) {
+    if (article.readingTimeMinutes && article.readingTimeMinutes > 0) {
+      return article.readingTimeMinutes;
+    }
+
+    const blockText = (article.blocks ?? [])
+      .flatMap(block => {
+        const itemsText = Array.isArray(block.items)
+          ? block.items
+              .map(item => (typeof item === 'string' ? item : JSON.stringify(item)))
+              .join(' ')
+          : '';
+
+        return [block.title ?? '', block.body ?? '', itemsText];
+      })
+      .join(' ');
+
+    return calculateReadingTimeMinutes(
+      [article.content, blockText].filter(Boolean).join(' '),
+    );
+  }
+
   private validateImageFile(file?: UploadFile): UploadFile {
     if (!file) {
       throw new BadRequestException({
-        message: 'Envie uma imagem válida.',
+        message: 'Envie uma imagem v\u00e1lida.',
         error: 'Bad Request',
       });
     }
 
     if (file.size > CONTENT_IMAGE_MAX_FILE_SIZE) {
       throw new BadRequestException({
-        message: 'A imagem deve ter no máximo 5 MB.',
+        message: 'A imagem deve ter no m\u00e1ximo 5 MB.',
         error: 'Bad Request',
       });
     }
 
     if (!ALLOWED_CONTENT_IMAGE_MIME_TYPES.has(file.mimeType)) {
       throw new BadRequestException({
-        message: 'Formato de imagem não permitido.',
+        message: 'Formato de imagem n\u00e3o permitido.',
         error: 'Bad Request',
       });
     }
@@ -492,14 +674,21 @@ export class ArticlesService {
 
   private buildArticleNotFoundException() {
     return new NotFoundException({
-      message: 'Artigo não encontrado.',
+      message: 'Artigo n\u00e3o encontrado.',
+      error: 'Not Found',
+    });
+  }
+
+  private buildArticleBlockNotFoundException() {
+    return new NotFoundException({
+      message: 'Bloco do artigo n\u00e3o encontrado.',
       error: 'Not Found',
     });
   }
 
   private buildSlugConflictException() {
     return new ConflictException({
-      message: 'Não foi possível salvar o artigo com um slug único.',
+      message: 'N\u00e3o foi poss\u00edvel salvar o artigo com um slug \u00fanico.',
       error: 'Conflict',
     });
   }

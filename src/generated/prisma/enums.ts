@@ -64,6 +64,23 @@ export const ArticleCategory = {
 export type ArticleCategory = (typeof ArticleCategory)[keyof typeof ArticleCategory]
 
 
+export const ArticleBlockKind = {
+  PARAGRAPH: 'PARAGRAPH',
+  HEADING: 'HEADING',
+  IMAGE: 'IMAGE',
+  TIP: 'TIP',
+  WARNING: 'WARNING',
+  CHECKLIST: 'CHECKLIST',
+  STEPS: 'STEPS',
+  QUOTE: 'QUOTE',
+  PRODUCT_REFERENCE: 'PRODUCT_REFERENCE',
+  SECTION: 'SECTION',
+  OTHER: 'OTHER'
+} as const
+
+export type ArticleBlockKind = (typeof ArticleBlockKind)[keyof typeof ArticleBlockKind]
+
+
 export const Gender = {
   MALE: 'MALE',
   FEMALE: 'FEMALE',

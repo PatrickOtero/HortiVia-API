@@ -390,6 +390,7 @@ export const ModelName = {
   ProductImage: 'ProductImage',
   ProductGuideSection: 'ProductGuideSection',
   Article: 'Article',
+  ArticleBlock: 'ArticleBlock',
   SavedArticle: 'SavedArticle',
   ProductArticle: 'ProductArticle',
   UserPreference: 'UserPreference'
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "savedArticle" | "productArticle" | "userPreference"
+    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "productArticle" | "userPreference"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -856,6 +857,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ArticleBlock: {
+      payload: Prisma.$ArticleBlockPayload<ExtArgs>
+      fields: Prisma.ArticleBlockFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ArticleBlockFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ArticleBlockFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>
+        }
+        findFirst: {
+          args: Prisma.ArticleBlockFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ArticleBlockFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>
+        }
+        findMany: {
+          args: Prisma.ArticleBlockFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>[]
+        }
+        create: {
+          args: Prisma.ArticleBlockCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>
+        }
+        createMany: {
+          args: Prisma.ArticleBlockCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ArticleBlockCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>[]
+        }
+        delete: {
+          args: Prisma.ArticleBlockDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>
+        }
+        update: {
+          args: Prisma.ArticleBlockUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>
+        }
+        deleteMany: {
+          args: Prisma.ArticleBlockDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ArticleBlockUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ArticleBlockUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>[]
+        }
+        upsert: {
+          args: Prisma.ArticleBlockUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleBlockPayload>
+        }
+        aggregate: {
+          args: Prisma.ArticleBlockAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateArticleBlock>
+        }
+        groupBy: {
+          args: Prisma.ArticleBlockGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ArticleBlockGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ArticleBlockCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ArticleBlockCountAggregateOutputType> | number
+        }
+      }
+    }
     SavedArticle: {
       payload: Prisma.$SavedArticlePayload<ExtArgs>
       fields: Prisma.SavedArticleFieldRefs
@@ -1213,10 +1288,15 @@ export const ArticleScalarFieldEnum = {
   id: 'id',
   title: 'title',
   slug: 'slug',
+  subtitle: 'subtitle',
   summary: 'summary',
   content: 'content',
   category: 'category',
   imageUrl: 'imageUrl',
+  coverImageUrl: 'coverImageUrl',
+  coverImageAlt: 'coverImageAlt',
+  readingTimeMinutes: 'readingTimeMinutes',
+  featured: 'featured',
   tags: 'tags',
   authorId: 'authorId',
   publishedAt: 'publishedAt',
@@ -1226,6 +1306,24 @@ export const ArticleScalarFieldEnum = {
 } as const
 
 export type ArticleScalarFieldEnum = (typeof ArticleScalarFieldEnum)[keyof typeof ArticleScalarFieldEnum]
+
+
+export const ArticleBlockScalarFieldEnum = {
+  id: 'id',
+  articleId: 'articleId',
+  kind: 'kind',
+  title: 'title',
+  body: 'body',
+  imageUrl: 'imageUrl',
+  imageAlt: 'imageAlt',
+  imageCaption: 'imageCaption',
+  items: 'items',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ArticleBlockScalarFieldEnum = (typeof ArticleBlockScalarFieldEnum)[keyof typeof ArticleBlockScalarFieldEnum]
 
 
 export const SavedArticleScalarFieldEnum = {
@@ -1456,6 +1554,20 @@ export type ListEnumArticleCategoryFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+ * Reference to a field of type 'ArticleBlockKind'
+ */
+export type EnumArticleBlockKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleBlockKind'>
+    
+
+
+/**
+ * Reference to a field of type 'ArticleBlockKind[]'
+ */
+export type ListEnumArticleBlockKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleBlockKind[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1584,6 +1696,7 @@ export type GlobalOmitConfig = {
   productImage?: Prisma.ProductImageOmit
   productGuideSection?: Prisma.ProductGuideSectionOmit
   article?: Prisma.ArticleOmit
+  articleBlock?: Prisma.ArticleBlockOmit
   savedArticle?: Prisma.SavedArticleOmit
   productArticle?: Prisma.ProductArticleOmit
   userPreference?: Prisma.UserPreferenceOmit

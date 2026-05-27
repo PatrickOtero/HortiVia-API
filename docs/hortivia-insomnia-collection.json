@@ -1,8 +1,8 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-05-24T21:20:00.000Z",
-  "__export_source": "codex.manual-export",
+  "__export_date": "2026-05-27T15:20:37.883Z",
+  "__export_source": "codex.updated-export",
   "resources": [
     {
       "_id": "wrk_hortivia_api",
@@ -45,7 +45,10 @@
         "article_search": "",
         "article_category": "",
         "page": "1",
-        "limit": "10"
+        "limit": "10",
+        "password_reset_code": "",
+        "reset_password_new": "NovaSenhaForte!123",
+        "article_block_id": ""
       }
     },
     {
@@ -307,6 +310,60 @@
       ]
     },
     {
+      "_id": "req_auth_forgot_password",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Forgot Password",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/forgot-password",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.user_email }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_auth_resend_password_reset_code",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Resend Password Reset Code",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/resend-password-reset-code",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.user_email }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_auth_reset_password",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST Reset Password",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/reset-password",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.user_email }}\",\n  \"code\": \"{{ _.password_reset_code }}\",\n  \"password\": \"{{ _.reset_password_new }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
       "_id": "req_auth_me",
       "_type": "request",
       "parentId": "fld_auth",
@@ -459,6 +516,61 @@
       "headers": []
     },
     {
+      "_id": "req_products_list_favorites",
+      "_type": "request",
+      "parentId": "fld_products_public",
+      "name": "GET Favorite Products",
+      "method": "GET",
+      "url": "{{ _.base_url }}/favorites/products",
+      "body": {},
+      "parameters": [
+        {
+          "name": "page",
+          "value": "{{ _.page }}"
+        },
+        {
+          "name": "limit",
+          "value": "{{ _.limit }}"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_favorite",
+      "_type": "request",
+      "parentId": "fld_products_public",
+      "name": "POST Favorite Product",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/favorite",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_unfavorite",
+      "_type": "request",
+      "parentId": "fld_products_public",
+      "name": "DELETE Favorite Product",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/favorite",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
       "_id": "req_products_create",
       "_type": "request",
       "parentId": "fld_products_admin",
@@ -518,6 +630,58 @@
       ]
     },
     {
+      "_id": "req_products_relate_article",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Relate Product Article",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/articles/{{ _.article_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_update_article_relation",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "PATCH Update Product Article Relation",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/articles/{{ _.article_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"sortOrder\": 0\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_remove_article_relation",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "DELETE Remove Product Article Relation",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/articles/{{ _.article_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
       "_id": "req_products_upload_image",
       "_type": "request",
       "parentId": "fld_products_admin",
@@ -539,6 +703,28 @@
         {
           "name": "Authorization",
           "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_products_create_gallery_image_url",
+      "_type": "request",
+      "parentId": "fld_products_admin",
+      "name": "POST Create Product Gallery Image URL",
+      "method": "POST",
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"url\": \"https://example.com/images/manga-palmer-hero.jpg\",\n  \"kind\": \"HERO\",\n  \"alt\": \"Produto em destaque\",\n  \"caption\": \"Imagem principal do produto\",\n  \"sortOrder\": 0,\n  \"isPrimary\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
         }
       ]
     },
@@ -827,6 +1013,61 @@
       "headers": []
     },
     {
+      "_id": "req_articles_save",
+      "_type": "request",
+      "parentId": "fld_articles_public",
+      "name": "POST Save Article",
+      "method": "POST",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/save",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_unsave",
+      "_type": "request",
+      "parentId": "fld_articles_public",
+      "name": "DELETE Save Article",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/save",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_list_saved",
+      "_type": "request",
+      "parentId": "fld_articles_public",
+      "name": "GET Saved Articles",
+      "method": "GET",
+      "url": "{{ _.base_url }}/saved/articles",
+      "body": {},
+      "parameters": [
+        {
+          "name": "page",
+          "value": "{{ _.page }}"
+        },
+        {
+          "name": "limit",
+          "value": "{{ _.limit }}"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.access_token }}"
+        }
+      ]
+    },
+    {
       "_id": "req_articles_create",
       "_type": "request",
       "parentId": "fld_articles_admin",
@@ -835,7 +1076,7 @@
       "url": "{{ _.base_url }}/articles",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"title\": \"Como armazenar folhas por mais tempo\",\n  \"summary\": \"Dicas praticas para conservar folhas e manter textura e sabor.\",\n  \"content\": \"Lave apenas no momento do consumo, seque bem e use recipientes ventilados ou forrados com papel-toalha.\",\n  \"category\": \"STORAGE\",\n  \"tags\": [\"folhas\", \"conservacao\", \"geladeira\"],\n  \"isPublished\": true,\n  \"publishedAt\": \"2026-05-22T12:00:00.000Z\"\n}"
+        "text": "{\n  \"title\": \"Como armazenar folhas por mais tempo\",\n  \"subtitle\": \"Cuidados simples para preservar textura e sabor\",\n  \"summary\": \"Dicas praticas para conservar folhas e manter textura e sabor.\",\n  \"content\": \"Lave apenas no momento do consumo, seque bem e use recipientes ventilados ou forrados com papel-toalha.\",\n  \"category\": \"STORAGE\",\n  \"coverImageUrl\": \"https://example.com/images/folhas-capa.jpg\",\n  \"coverImageAlt\": \"Folhas verdes armazenadas na geladeira\",\n  \"readingTimeMinutes\": 4,\n  \"featured\": true,\n  \"tags\": [\n    \"folhas\",\n    \"conservacao\",\n    \"geladeira\"\n  ],\n  \"isPublished\": true,\n  \"publishedAt\": \"2026-05-22T12:00:00.000Z\"\n}"
       },
       "headers": [
         {
@@ -857,7 +1098,7 @@
       "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"summary\": \"Dicas praticas para conservar folhas e reduzir desperdicio.\",\n  \"tags\": [\"folhas\", \"conservacao\", \"desperdicio\"],\n  \"isPublished\": true\n}"
+        "text": "{\n  \"subtitle\": \"Versao revisada com foco em reducao de desperdicio\",\n  \"summary\": \"Dicas praticas para conservar folhas e reduzir desperdicio.\",\n  \"readingTimeMinutes\": 5,\n  \"tags\": [\n    \"folhas\",\n    \"conservacao\",\n    \"desperdicio\"\n  ],\n  \"isPublished\": true\n}"
       },
       "headers": [
         {
@@ -877,6 +1118,65 @@
       "name": "DELETE Article",
       "method": "DELETE",
       "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_create_block",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "POST Create Article Block",
+      "method": "POST",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"kind\": \"PARAGRAPH\",\n  \"title\": \"Secagem correta\",\n  \"body\": \"Depois de higienizar, seque bem as folhas para evitar umidade excessiva.\",\n  \"sortOrder\": 0\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_update_block",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "PATCH Update Article Block",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"kind\": \"CHECKLIST\",\n  \"title\": \"Checklist de armazenamento\",\n  \"items\": [\n    \"Secar bem\",\n    \"Usar pote limpo\",\n    \"Trocar papel-toalha quando necessario\"\n  ],\n  \"sortOrder\": 1\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_articles_delete_block",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "DELETE Article Block",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}",
       "body": {},
       "headers": [
         {

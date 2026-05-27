@@ -16,6 +16,16 @@ export const articleListInclude = {
 
 export const articleDetailInclude = {
   ...articleListInclude,
+  blocks: {
+    orderBy: [
+      {
+        sortOrder: 'asc',
+      },
+      {
+        createdAt: 'asc',
+      },
+    ],
+  },
   productRelations: {
     where: {
       product: {
@@ -53,6 +63,9 @@ export type SavedArticleRecord = Prisma.SavedArticleGetPayload<{
     };
   };
 }>;
+
+export type ArticleBlockRecord =
+  Prisma.ArticleBlockGetPayload<Prisma.ArticleBlockDefaultArgs>;
 
 @Injectable()
 export class ArticlesRepository {
@@ -227,5 +240,30 @@ export class ArticlesRepository {
     });
 
     return savedArticles.map(savedArticle => savedArticle.articleId);
+  }
+
+  async createBlock(data: Prisma.ArticleBlockCreateInput) {
+    return this.prisma.articleBlock.create({
+      data,
+    });
+  }
+
+  async findBlockById(id: string) {
+    return this.prisma.articleBlock.findUnique({
+      where: { id },
+    });
+  }
+
+  async updateBlock(id: string, data: Prisma.ArticleBlockUpdateInput) {
+    return this.prisma.articleBlock.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async deleteBlock(id: string) {
+    return this.prisma.articleBlock.delete({
+      where: { id },
+    });
   }
 }

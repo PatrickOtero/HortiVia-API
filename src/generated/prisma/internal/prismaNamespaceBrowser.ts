@@ -57,6 +57,7 @@ export const ModelName = {
   ProductImage: 'ProductImage',
   ProductGuideSection: 'ProductGuideSection',
   Article: 'Article',
+  ArticleBlock: 'ArticleBlock',
   SavedArticle: 'SavedArticle',
   ProductArticle: 'ProductArticle',
   UserPreference: 'UserPreference'
@@ -174,10 +175,15 @@ export const ArticleScalarFieldEnum = {
   id: 'id',
   title: 'title',
   slug: 'slug',
+  subtitle: 'subtitle',
   summary: 'summary',
   content: 'content',
   category: 'category',
   imageUrl: 'imageUrl',
+  coverImageUrl: 'coverImageUrl',
+  coverImageAlt: 'coverImageAlt',
+  readingTimeMinutes: 'readingTimeMinutes',
+  featured: 'featured',
   tags: 'tags',
   authorId: 'authorId',
   publishedAt: 'publishedAt',
@@ -187,6 +193,24 @@ export const ArticleScalarFieldEnum = {
 } as const
 
 export type ArticleScalarFieldEnum = (typeof ArticleScalarFieldEnum)[keyof typeof ArticleScalarFieldEnum]
+
+
+export const ArticleBlockScalarFieldEnum = {
+  id: 'id',
+  articleId: 'articleId',
+  kind: 'kind',
+  title: 'title',
+  body: 'body',
+  imageUrl: 'imageUrl',
+  imageAlt: 'imageAlt',
+  imageCaption: 'imageCaption',
+  items: 'items',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ArticleBlockScalarFieldEnum = (typeof ArticleBlockScalarFieldEnum)[keyof typeof ArticleBlockScalarFieldEnum]
 
 
 export const SavedArticleScalarFieldEnum = {

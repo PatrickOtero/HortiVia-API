@@ -1,17 +1,17 @@
 # Backend setup
 
-## Instalação
+## InstalaÃ§Ã£o
 
 ```bash
 npm install
 cp .env.example .env
 ```
 
-Preencha o `.env` com valores reais antes de subir a aplicação.
+Preencha o `.env` com valores reais antes de subir a aplicaÃ§Ã£o.
 
-## Variáveis de ambiente
+## VariÃ¡veis de ambiente
 
-Obrigatórias:
+ObrigatÃ³rias:
 
 - `DATABASE_URL`
 - `JWT_SECRET`
@@ -41,10 +41,10 @@ Opcionais:
 
 Notas:
 
-- a configuração atual usa `DATABASE_URL`
-- `DIRECT_URL` não é necessário neste projeto
-- no Northflank, os valores numéricos devem ser informados como inteiros simples
-- uploads dependem da configuração completa das variáveis de armazenamento
+- a configuraÃ§Ã£o atual usa `DATABASE_URL`
+- `DIRECT_URL` nÃ£o Ã© necessÃ¡rio neste projeto
+- no Northflank, os valores numÃ©ricos devem ser informados como inteiros simples
+- uploads dependem da configuraÃ§Ã£o completa das variÃ¡veis de armazenamento
 
 ## Prisma
 
@@ -72,9 +72,9 @@ Seed:
 npm run prisma:seed
 ```
 
-O seed é idempotente, popula conteúdos iniciais e não cria um ADMIN com credenciais fixas.
+O seed Ã© idempotente, popula conteÃºdos iniciais e nÃ£o cria um ADMIN com credenciais fixas.
 
-## Execução local
+## ExecuÃ§Ã£o local
 
 Desenvolvimento:
 
@@ -99,21 +99,21 @@ GET /health
 
 Fluxo recomendado:
 
-1. registrar um usuário normalmente
-2. promover esse usuário para ADMIN
+1. registrar um usuÃ¡rio normalmente
+2. promover esse usuÃ¡rio para ADMIN
 
 ```bash
 npm run admin:promote -- --email pessoa@exemplo.com
 ```
 
-Também é possível promover manualmente no banco, com cuidado no ambiente alvo.
+TambÃ©m Ã© possÃ­vel promover manualmente no banco, com cuidado no ambiente alvo.
 
 ## Uploads
 
 Avatar:
 
 - endpoint: `POST /profile/avatar`
-- auth: JWT obrigatório
+- auth: JWT obrigatÃ³rio
 - campo: `avatar`
 - tipos: `image/jpeg`, `image/png`, `image/webp`
 - limite: `2 MB`
@@ -121,7 +121,7 @@ Avatar:
 Produto e artigo:
 
 - endpoints: `POST /products/:id/image` e `POST /articles/:id/image`
-- auth: JWT obrigatório
+- auth: JWT obrigatÃ³rio
 - role: `ADMIN`
 - campo: `image`
 - tipos: `image/jpeg`, `image/png`, `image/webp`
@@ -129,7 +129,7 @@ Produto e artigo:
 
 ## Guias visuais de produto
 
-O módulo de produtos agora aceita dois blocos estruturados para enriquecer o detalhe:
+O mÃ³dulo de produtos agora aceita dois blocos estruturados para enriquecer o detalhe:
 
 - `ProductImage`
 - `ProductGuideSection`
@@ -145,7 +145,7 @@ Campos principais:
 - `sortOrder`
 - `isPrimary`
 
-Enums disponíveis em `ProductImageKind`:
+Enums disponÃ­veis em `ProductImageKind`:
 
 - `HERO`
 - `WHOLE`
@@ -159,7 +159,7 @@ Enums disponíveis em `ProductImageKind`:
 
 Regra:
 
-- quando uma imagem é salva com `isPrimary=true`, as outras imagens do mesmo produto passam a `false`
+- quando uma imagem Ã© salva com `isPrimary=true`, as outras imagens do mesmo produto passam a `false`
 
 ### ProductGuideSection
 
@@ -176,7 +176,7 @@ Campos principais:
 - `avoidPoints`
 - `sortOrder`
 
-Enums disponíveis em `ProductGuideSectionKind`:
+Enums disponÃ­veis em `ProductGuideSectionKind`:
 
 - `CHOOSE`
 - `OBSERVE`
@@ -187,7 +187,7 @@ Enums disponíveis em `ProductGuideSectionKind`:
 
 ### Resposta do detalhe de produto
 
-Além dos campos já existentes, `GET /products/:id` agora retorna:
+AlÃ©m dos campos jÃ¡ existentes, `GET /products/:id` agora retorna:
 
 - `mainImages`
 - `guideSections`
@@ -195,12 +195,12 @@ Além dos campos já existentes, `GET /products/:id` agora retorna:
 Compatibilidade:
 
 - `imageUrl` permanece no payload
-- quando não houver registros em `ProductImage`, `mainImages` faz fallback para `imageUrl`
-- a listagem `GET /products` continua leve e não carrega seções completas
+- quando nÃ£o houver registros em `ProductImage`, `mainImages` faz fallback para `imageUrl`
+- a listagem `GET /products` continua leve e nÃ£o carrega seÃ§Ãµes completas
 
 ### Endpoints administrativos
 
-JWT obrigatório e role `ADMIN`:
+JWT obrigatÃ³rio e role `ADMIN`:
 
 - `POST /products/:productId/images`
 - `PATCH /products/:productId/images/:imageId`
@@ -211,7 +211,7 @@ JWT obrigatório e role `ADMIN`:
 
 ## Favoritos de produto
 
-JWT obrigatório:
+JWT obrigatÃ³rio:
 
 - `POST /products/:productId/favorite`
 - `DELETE /products/:productId/favorite`
@@ -219,13 +219,13 @@ JWT obrigatório:
 
 Regras:
 
-- o favorito é idempotente por usuário e produto
+- o favorito Ã© idempotente por usuÃ¡rio e produto
 - a listagem retorna os itens paginados em ordem de favorito mais recente
-- o catálogo público continua público e não depende de autenticação para listar produtos
+- o catÃ¡logo pÃºblico continua pÃºblico e nÃ£o depende de autenticaÃ§Ã£o para listar produtos
 
 ## Leituras salvas
 
-JWT obrigatório:
+JWT obrigatÃ³rio:
 
 - `POST /articles/:articleId/save`
 - `DELETE /articles/:articleId/save`
@@ -233,15 +233,83 @@ JWT obrigatório:
 
 Regras:
 
-- salvar e remover são operações idempotentes por usuário e artigo
+- salvar e remover sÃ£o operaÃ§Ãµes idempotentes por usuÃ¡rio e artigo
 - a listagem retorna os itens paginados em ordem de salvamento mais recente
 - apenas artigos publicados entram na listagem
-- `GET /articles` e `GET /articles/:id` continuam públicos
+- `GET /articles` e `GET /articles/:id` continuam pÃºblicos
 - o campo `isSaved` pode vir como `false` fora do contexto autenticado e como `true` na listagem de leituras salvas
 
-## RelaÃ§Ã£o entre produtos e artigos
+## Conteúdo editorial de artigos
 
-O backend usa a relaÃ§Ã£o explÃ­cita `ProductArticle` para conectar guias de produto e conteÃºdos educativos.
+O modelo de artigos agora suporta campos editoriais mais ricos sem quebrar a compatibilidade do feed atual.
+
+Campos adicionais em `Article`:
+
+- `subtitle`
+- `coverImageUrl`
+- `coverImageAlt`
+- `readingTimeMinutes`
+- `featured`
+
+### ArticleBlock
+
+O detalhe de artigo agora pode carregar blocos estruturados por meio de `ArticleBlock`.
+
+Campos principais:
+
+- `kind`
+- `title`
+- `body`
+- `imageUrl`
+- `imageAlt`
+- `imageCaption`
+- `items`
+- `sortOrder`
+
+Enums disponíveis em `ArticleBlockKind`:
+
+- `PARAGRAPH`
+- `HEADING`
+- `IMAGE`
+- `TIP`
+- `WARNING`
+- `CHECKLIST`
+- `STEPS`
+- `QUOTE`
+- `PRODUCT_REFERENCE`
+- `SECTION`
+- `OTHER`
+
+### Resposta pública
+
+- `GET /articles` continua leve e não retorna `blocks`
+- `GET /articles/:id` retorna `blocks` ordenados por `sortOrder`
+- o campo `content` continua no payload para compatibilidade
+- `relatedProducts` continua sendo retornado no detalhe do artigo
+
+Cada bloco inclui:
+
+- `id`
+- `kind`
+- `title`
+- `body`
+- `imageUrl`
+- `imageAlt`
+- `imageCaption`
+- `items`
+- `sortOrder`
+
+### Endpoints administrativos de blocos
+
+JWT obrigatório e role `ADMIN`:
+
+- `POST /articles/:articleId/blocks`
+- `PATCH /articles/:articleId/blocks/:blockId`
+- `DELETE /articles/:articleId/blocks/:blockId`
+
+## RelaÃƒÂ§ÃƒÂ£o entre produtos e artigos
+
+O backend usa a relaÃƒÂ§ÃƒÂ£o explÃƒÂ­cita `ProductArticle` para conectar guias de produto e conteÃƒÂºdos educativos.
 
 Campos principais:
 
@@ -251,10 +319,10 @@ Campos principais:
 
 Regras:
 
-- `productId + articleId` Ã© Ãºnico
+- `productId + articleId` ÃƒÂ© ÃƒÂºnico
 - `GET /products/:id` retorna apenas artigos publicados em `relatedArticles`
 - `GET /articles/:id` retorna apenas produtos ativos em `relatedProducts`
-- as listagens continuam leves e nÃ£o incluem os relacionados
+- as listagens continuam leves e nÃƒÂ£o incluem os relacionados
 
 ### Campos adicionados ao detalhe de produto
 
@@ -283,9 +351,9 @@ Cada item inclui:
 - `shortDescription`
 - `imageUrl`
 
-### Endpoints administrativos da relaÃ§Ã£o
+### Endpoints administrativos da relaÃƒÂ§ÃƒÂ£o
 
-JWT obrigatÃ³rio e role `ADMIN`:
+JWT obrigatÃƒÂ³rio e role `ADMIN`:
 
 - `POST /products/:productId/articles/:articleId`
 - `PATCH /products/:productId/articles/:articleId`
@@ -307,15 +375,15 @@ docker run --env-file .env -p 3000:3000 hortivia-api
 
 ## Northflank
 
-Checklist mínimo:
+Checklist mÃ­nimo:
 
-- configurar todas as variáveis obrigatórias do `.env.example`
+- configurar todas as variÃ¡veis obrigatÃ³rias do `.env.example`
 - garantir `DATABASE_URL` apontando para o banco correto
 - preencher `JWT_SECRET`
-- revisar as variáveis numéricas de confirmação e redefinição
-- configurar o bloco de upload quando avatar e imagens administrativas forem necessários
+- revisar as variÃ¡veis numÃ©ricas de confirmaÃ§Ã£o e redefiniÃ§Ã£o
+- configurar o bloco de upload quando avatar e imagens administrativas forem necessÃ¡rios
 
-## Comandos úteis
+## Comandos Ãºteis
 
 ```bash
 npm run lint

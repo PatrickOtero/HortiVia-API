@@ -36,10 +36,15 @@ describe('ProductsService', () => {
     id: 'article-1',
     title: 'Como escolher um abacate no ponto certo',
     slug: 'como-escolher-um-abacate-no-ponto-certo',
+    subtitle: null,
     summary: 'Sinais simples para acertar na escolha.',
     content: 'Observe a textura e a casca.',
     category: ArticleCategory.TIPS,
     imageUrl: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    readingTimeMinutes: null,
+    featured: false,
     tags: ['abacate'],
     authorId: 'user-1',
     author: {
@@ -51,6 +56,7 @@ describe('ProductsService', () => {
     isPublished: true,
     createdAt: new Date('2026-05-20T09:00:00.000Z'),
     updatedAt: new Date('2026-05-20T09:00:00.000Z'),
+    blocks: [],
     productRelations: [],
   };
 
