@@ -70,6 +70,21 @@ export class StorageService {
     return this.cloudflareR2StorageService.uploadFile(objectKey, file);
   }
 
+  async uploadArticleBlockImage(
+    articleId: string,
+    blockId: string,
+    file: UploadFile,
+  ): Promise<UploadResult> {
+    const objectKey = this.buildArticleBlockImageObjectKey(
+      articleId,
+      blockId,
+      file.originalName ?? 'image',
+      file.mimeType,
+    );
+
+    return this.cloudflareR2StorageService.uploadFile(objectKey, file);
+  }
+
   async createArticleBlockImageUploadUrl(
     articleId: string,
     blockId: string,

@@ -49,10 +49,8 @@
         "password_reset_code": "",
         "reset_password_new": "NovaSenhaForte!123",
         "article_block_id": "",
-        "article_block_image_file_name": "bloco-artigo.webp",
-        "article_block_image_content_type": "image/webp",
-        "article_block_image_file_size": "245760",
-        "article_block_image_url": ""
+        "article_block_image_url": "",
+        "article_block_image_file_path": "C:/caminho/para/bloco-artigo.webp"
       }
     },
     {
@@ -1017,6 +1015,21 @@
       "headers": []
     },
     {
+      "_id": "req_articles_get_admin_by_id",
+      "_type": "request",
+      "parentId": "fld_articles_admin",
+      "name": "GET Admin Article By Id",
+      "method": "GET",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/admin",
+      "body": {},
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.admin_access_token }}"
+        }
+      ]
+    },
+    {
       "_id": "req_articles_save",
       "_type": "request",
       "parentId": "fld_articles_public",
@@ -1156,21 +1169,36 @@
       "_id": "req_articles_create_block_image_upload_url",
       "_type": "request",
       "parentId": "fld_articles_admin",
-      "name": "POST Create Article Block Image Upload URL",
+      "name": "POST Upload Article Block Image",
       "method": "POST",
-      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}/image-upload",
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.article_block_id }}/image",
       "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"fileName\": \"{{ _.article_block_image_file_name }}\",\n  \"contentType\": \"{{ _.article_block_image_content_type }}\",\n  \"fileSize\": {{ _.article_block_image_file_size }}\n}"
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "id": "pair_article_block_image_file",
+            "name": "image",
+            "type": "file",
+            "fileName": "{{ _.article_block_image_file_path }}"
+          },
+          {
+            "id": "pair_article_block_image_alt",
+            "name": "imageAlt",
+            "value": "Folhas verdes em uma centrifuga de salada apos a lavagem",
+            "type": "text"
+          },
+          {
+            "id": "pair_article_block_image_caption",
+            "name": "imageCaption",
+            "value": "Secar bem as folhas antes de guardar ajuda a evitar excesso de umidade.",
+            "type": "text"
+          }
+        ]
       },
       "headers": [
         {
           "name": "Authorization",
           "value": "Bearer {{ _.admin_access_token }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
         }
       ]
     },

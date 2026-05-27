@@ -38,10 +38,8 @@ Preencha no environment conforme o seu contexto:
 - `product_guide_section_id`
 - `article_id`
 - `article_block_id`
-- `article_block_image_file_name`
-- `article_block_image_content_type`
-- `article_block_image_file_size`
 - `article_block_image_url`
+- `article_block_image_file_path`
 - `avatar_file_path`
 - `product_image_file_path`
 - `product_gallery_image_file_path`
@@ -217,9 +215,10 @@ Categorias aceitas:
 - `POST Create Article`
 - `PATCH Update Article`
 - `DELETE Article`
+- `GET Admin Article By Id`
 - `POST Upload Article Image`
 - `POST Create Article Block`
-- `POST Create Article Block Image Upload URL`
+- `POST Upload Article Block Image`
 - `PATCH Update Article Block`
 - `PATCH Update Article Block Image`
 - `DELETE Article Block`
@@ -231,14 +230,12 @@ Para blocos de artigo:
 
 1. Rode `POST Create Article Block`.
 2. Copie o `id` retornado para `article_block_id`.
-3. Se o bloco precisar de imagem, ajuste `article_block_image_file_name`, `article_block_image_content_type` e `article_block_image_file_size`.
-4. Rode `POST Create Article Block Image Upload URL`.
-5. Use o `uploadUrl` retornado para enviar o arquivo direto ao storage.
-6. Copie o `imageUrl` retornado para `article_block_image_url`.
-7. Rode `PATCH Update Article Block Image` para persistir `imageUrl`, `imageAlt` e `imageCaption`.
-8. Use `PATCH Update Article Block` para revisar o restante do conteudo.
-9. Use `DELETE Article Block Image` para limpar a imagem do bloco sem remover o bloco.
-10. Use `DELETE Article Block` para remover o bloco inteiro.
+3. Se o bloco precisar de imagem, ajuste `article_block_image_file_path`.
+4. Rode `POST Upload Article Block Image` usando `multipart/form-data`.
+5. Use `PATCH Update Article Block Image` apenas quando quiser revisar `imageAlt` e `imageCaption` de uma imagem ja enviada.
+6. Use `PATCH Update Article Block` para revisar o restante do conteudo.
+7. Use `DELETE Article Block Image` para limpar a imagem do bloco sem remover o bloco.
+8. Use `DELETE Article Block` para remover o bloco inteiro.
 
 Tipos aceitos para `kind` de bloco:
 

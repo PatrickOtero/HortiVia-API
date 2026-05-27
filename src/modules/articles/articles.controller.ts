@@ -27,6 +27,7 @@ import { CreateArticleBlockDto } from './dto/create-article-block.dto';
 import { CreateArticleBlockImageUploadDto } from './dto/create-article-block-image-upload.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
+import { UploadArticleBlockImageDto } from './dto/upload-article-block-image.dto';
 import { UpdateArticleBlockDto } from './dto/update-article-block.dto';
 import { UpdateArticleBlockImageDto } from './dto/update-article-block-image.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
@@ -38,6 +39,13 @@ export class ArticlesController {
   @Get()
   async list(@Query() query: ListArticlesQueryDto) {
     return this.articlesService.list(query);
+  }
+
+  @Get(':id/admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async getByIdForAdmin(@Param('id') id: string) {
+    return this.articlesService.getByIdForAdmin(id);
   }
 
   @Get(':id')
@@ -139,6 +147,47 @@ export class ArticlesController {
       articleId,
       blockId,
       updateArticleBlockImageDto,
+    );
+  }
+
+  @Post(':articleId/blocks/:blockId/image')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @UseFilters(new ImageUploadExceptionFilter('5 MB'))
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: CONTENT_IMAGE_MAX_FILE_SIZE,
+      },
+    }),
+  )
+  async uploadBlockImage(
+    @Param('articleId') articleId: string,
+    @Param('blockId') blockId: string,
+    @Body() uploadArticleBlockImageDto: UploadArticleBlockImageDto,
+    @UploadedFile()
+    file?:
+      | {
+          buffer: Buffer;
+          mimetype: string;
+          size: number;
+          originalname?: string;
+        }
+      | undefined,
+  ) {
+    return this.articlesService.uploadBlockImage(
+      articleId,
+      blockId,
+      uploadArticleBlockImageDto,
+      file
+        ? {
+            buffer: file.buffer,
+            mimeType: file.mimetype,
+            size: file.size,
+            originalName: file.originalname,
+          }
+        : undefined,
     );
   }
 

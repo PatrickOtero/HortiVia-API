@@ -108,12 +108,16 @@ describe('ArticlesService', () => {
 
   const storageService = {
     uploadArticleImage: jest.fn(),
+    uploadArticleBlockImage: jest.fn(),
     createArticleBlockImageUploadUrl: jest.fn(),
     isManagedPublicUrl: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
       StorageService,
-      'uploadArticleImage' | 'createArticleBlockImageUploadUrl' | 'isManagedPublicUrl'
+      | 'uploadArticleImage'
+      | 'uploadArticleBlockImage'
+      | 'createArticleBlockImageUploadUrl'
+      | 'isManagedPublicUrl'
     >
   >;
 
@@ -264,7 +268,7 @@ describe('ArticlesService', () => {
 
     const result = await service.getById(baseArticle.id);
 
-    expect(articlesRepository.findById).toHaveBeenCalledWith(baseArticle.id);
+    expect(articlesRepository.findById).toHaveBeenCalledWith(baseArticle.id, false);
     expect(result).toMatchObject({
       id: baseArticle.id,
       title: baseArticle.title,
@@ -298,6 +302,25 @@ describe('ArticlesService', () => {
         updatedAt: '2026-05-20T11:00:00.000Z',
       }),
     ]);
+  });
+
+  it('returns unpublished article detail for admins', async () => {
+    articlesRepository.findById.mockResolvedValue({
+      ...baseArticle,
+      isPublished: false,
+      publishedAt: null,
+      blocks: [],
+      productRelations: [],
+    });
+
+    const result = await service.getByIdForAdmin(baseArticle.id);
+
+    expect(articlesRepository.findById).toHaveBeenCalledWith(baseArticle.id, true);
+    expect(result).toMatchObject({
+      id: baseArticle.id,
+      title: baseArticle.title,
+      isSaved: false,
+    });
   });
 
   it('returns blocks ordered by sortOrder in article detail', async () => {
@@ -848,6 +871,105 @@ describe('ArticlesService', () => {
         imageCaption: 'Secar bem ajuda a evitar umidade excessiva.',
       }),
     );
+  });
+
+  it('uploads article block image with multipart and persists metadata', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: 'Secagem correta',
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+    storageService.uploadArticleBlockImage.mockResolvedValue({
+      url: 'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+    });
+    articlesRepository.updateBlock.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: 'Secagem correta',
+      body: null,
+      imageUrl:
+        'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+      imageAlt: 'Folhas verdes na secagem',
+      imageCaption: 'Secar bem evita excesso de umidade.',
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T12:00:00.000Z'),
+    });
+
+    const file = {
+      buffer: Buffer.from('fake-image'),
+      mimeType: 'image/webp',
+      size: 512,
+      originalName: 'folhas.webp',
+    };
+
+    const result = await service.uploadBlockImage(baseArticle.id, 'block-1', {
+      imageAlt: 'Folhas verdes na secagem',
+      imageCaption: 'Secar bem evita excesso de umidade.',
+    }, file);
+
+    expect(storageService.uploadArticleBlockImage).toHaveBeenCalledWith(
+      baseArticle.id,
+      'block-1',
+      file,
+    );
+    expect(articlesRepository.updateBlock).toHaveBeenCalledWith(
+      'block-1',
+      expect.objectContaining({
+        imageUrl:
+          'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+        imageAlt: 'Folhas verdes na secagem',
+        imageCaption: 'Secar bem evita excesso de umidade.',
+      }),
+    );
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: 'block-1',
+        articleId: baseArticle.id,
+        imageUrl:
+          'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+        imageAlt: 'Folhas verdes na secagem',
+        imageCaption: 'Secar bem evita excesso de umidade.',
+      }),
+    );
+  });
+
+  it('rejects multipart article block image upload without a file', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findBlockById.mockResolvedValue({
+      id: 'block-1',
+      articleId: baseArticle.id,
+      kind: 'IMAGE',
+      title: null,
+      body: null,
+      imageUrl: null,
+      imageAlt: null,
+      imageCaption: null,
+      items: null,
+      sortOrder: 1,
+      createdAt: new Date('2026-05-20T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-20T11:00:00.000Z'),
+    });
+
+    await expect(
+      service.uploadBlockImage(baseArticle.id, 'block-1', {}),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Envie uma imagem v\u00e1lida.',
+      },
+    });
   });
 
   it('rejects article block image persistence with a URL outside managed storage', async () => {

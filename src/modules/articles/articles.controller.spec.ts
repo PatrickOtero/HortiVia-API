@@ -6,13 +6,19 @@ import { ArticlesService } from './articles.service';
 
 describe('ArticlesController', () => {
   const articlesService = {
+    getByIdForAdmin: jest.fn(),
     createBlockImageUploadUrl: jest.fn(),
+    uploadBlockImage: jest.fn(),
     updateBlockImage: jest.fn(),
     removeBlockImage: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
       ArticlesService,
-      'createBlockImageUploadUrl' | 'updateBlockImage' | 'removeBlockImage'
+      | 'getByIdForAdmin'
+      | 'createBlockImageUploadUrl'
+      | 'uploadBlockImage'
+      | 'updateBlockImage'
+      | 'removeBlockImage'
     >
   >;
 
@@ -32,6 +38,24 @@ describe('ArticlesController', () => {
     expect(
       Reflect.getMetadata(ROLES_KEY, controller.createBlockImageUploadUrl),
     ).toEqual([UserRole.ADMIN]);
+  });
+
+  it('protects admin article detail for admins', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.getByIdForAdmin),
+    ).toEqual(expect.arrayContaining([expect.anything(), expect.anything()]));
+    expect(Reflect.getMetadata(ROLES_KEY, controller.getByIdForAdmin)).toEqual([
+      UserRole.ADMIN,
+    ]);
+  });
+
+  it('protects multipart block image upload for admins', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.uploadBlockImage),
+    ).toEqual(expect.arrayContaining([expect.anything(), expect.anything()]));
+    expect(Reflect.getMetadata(ROLES_KEY, controller.uploadBlockImage)).toEqual([
+      UserRole.ADMIN,
+    ]);
   });
 
   it('protects block image persistence for admins', () => {
@@ -78,5 +102,19 @@ describe('ArticlesController', () => {
         fileSize: 1234,
       },
     );
+  });
+
+  it('delegates admin article detail loading to the service', async () => {
+    const response = {
+      id: 'article-1',
+      title: 'Artigo admin',
+    };
+
+    articlesService.getByIdForAdmin.mockResolvedValue(response as never);
+
+    await expect(controller.getByIdForAdmin('article-1')).resolves.toEqual(
+      response,
+    );
+    expect(articlesService.getByIdForAdmin).toHaveBeenCalledWith('article-1');
   });
 });

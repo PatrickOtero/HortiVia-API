@@ -20,6 +20,7 @@ import type { CreateArticleBlockImageUploadDto } from './dto/create-article-bloc
 import type { CreateArticleDto } from './dto/create-article.dto';
 import type { ListArticlesQueryDto } from './dto/list-articles-query.dto';
 import type { ListSavedArticlesQueryDto } from './dto/list-saved-articles-query.dto';
+import type { UploadArticleBlockImageDto } from './dto/upload-article-block-image.dto';
 import type { UpdateArticleBlockDto } from './dto/update-article-block.dto';
 import type { UpdateArticleBlockImageDto } from './dto/update-article-block-image.dto';
 import type { UpdateArticleDto } from './dto/update-article.dto';
@@ -84,7 +85,63 @@ export class ArticlesService {
   }
 
   async getById(id: string): Promise<ArticleDetailResponse> {
-    const article = await this.articlesRepository.findById(id);
+    return this.getDetailById(id, false);
+  }
+
+  async getByIdForAdmin(id: string): Promise<ArticleDetailResponse> {
+    return this.getDetailById(id, true);
+  }
+
+  async uploadBlockImage(
+    articleId: string,
+    blockId: string,
+    uploadArticleBlockImageDto: UploadArticleBlockImageDto,
+    file?: UploadFile,
+  ): Promise<ArticleBlockResponse> {
+    await this.requireArticle(articleId, true);
+    const existingBlock = await this.requireArticleBlock(articleId, blockId);
+    const imageFile = this.validateImageFile(file);
+
+    try {
+      const uploadResult = await this.storageService.uploadArticleBlockImage(
+        articleId,
+        blockId,
+        imageFile,
+      );
+
+      const updatedBlock = await this.articlesRepository.updateBlock(blockId, {
+        imageUrl: uploadResult.url,
+        imageAlt: this.resolveUploadedBlockImageText(
+          uploadArticleBlockImageDto.imageAlt,
+          existingBlock.imageAlt,
+        ),
+        imageCaption: this.resolveUploadedBlockImageText(
+          uploadArticleBlockImageDto.imageCaption,
+          existingBlock.imageCaption,
+        ),
+      });
+
+      return toArticleBlockItemResponse(updatedBlock);
+    } catch (error) {
+      if (this.isRecordNotFoundError(error)) {
+        throw this.buildArticleBlockNotFoundException();
+      }
+
+      throw new InternalServerErrorException({
+        message: 'Nao foi possivel enviar a imagem do bloco.',
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  private async getDetailById(
+    id: string,
+    includeUnpublished: boolean,
+  ): Promise<ArticleDetailResponse> {
+    const article = await this.articlesRepository.findById(
+      id,
+      includeUnpublished,
+    );
 
     if (!article) {
       throw this.buildArticleNotFoundException();
@@ -683,6 +740,19 @@ export class ArticlesService {
     const normalizedValue = value.trim();
 
     return normalizedValue.length > 0 ? normalizedValue : null;
+  }
+
+  private resolveUploadedBlockImageText(
+    submittedValue: string | undefined,
+    currentValue: string | null,
+  ) {
+    const normalizedSubmittedValue = this.normalizeOptionalText(submittedValue);
+
+    if (normalizedSubmittedValue !== null) {
+      return normalizedSubmittedValue;
+    }
+
+    return currentValue;
   }
 
   private normalizeTags(tags?: string[]) {
