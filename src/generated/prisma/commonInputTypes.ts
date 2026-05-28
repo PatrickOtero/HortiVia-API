@@ -372,6 +372,23 @@ export type EnumArticleBlockKindWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
 }
 
+export type EnumArticleReactionTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleReactionType | Prisma.EnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleReactionTypeFilter<$PrismaModel> | $Enums.ArticleReactionType
+}
+
+export type EnumArticleReactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleReactionType | Prisma.EnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleReactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.ArticleReactionType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleReactionTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleReactionTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -714,6 +731,23 @@ export type NestedEnumArticleBlockKindWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
   _max?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
+}
+
+export type NestedEnumArticleReactionTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleReactionType | Prisma.EnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleReactionTypeFilter<$PrismaModel> | $Enums.ArticleReactionType
+}
+
+export type NestedEnumArticleReactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ArticleReactionType | Prisma.EnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumArticleReactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.ArticleReactionType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumArticleReactionTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumArticleReactionTypeFilter<$PrismaModel>
 }
 
 

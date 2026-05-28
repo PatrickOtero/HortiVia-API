@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client';
-import { ArticleBlockKind } from '../../generated/prisma/enums';
+import { ArticleBlockKind, ArticleReactionType } from '../../generated/prisma/enums';
 import { ArticlesRepository } from './articles.repository';
 import {
   toArticleBlockItemResponse,
@@ -27,6 +27,7 @@ import type { UpdateArticleDto } from './dto/update-article.dto';
 import type {
   ArticleBlockResponse,
   ArticleDetailResponse,
+  ArticleReactionResponse,
   ArticlesListResponse,
   SavedArticlesListResponse,
 } from './types/article-response';
@@ -51,7 +52,10 @@ export class ArticlesService {
     private readonly storageService: StorageService,
   ) {}
 
-  async list(query: ListArticlesQueryDto): Promise<ArticlesListResponse> {
+  async list(
+    query: ListArticlesQueryDto,
+    user?: AuthenticatedUser,
+  ): Promise<ArticlesListResponse> {
     const page = query.page ?? this.defaultPage;
     const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
     const where = this.buildListWhereInput(query);
@@ -64,6 +68,10 @@ export class ArticlesService {
       }),
       this.articlesRepository.count(where),
     ]);
+    const reactedArticleIds = await this.getReactedArticleIds(
+      user?.userId,
+      articles.map(article => article.id),
+    );
 
     return {
       data: articles.map(article =>
@@ -72,6 +80,8 @@ export class ArticlesService {
           this.resolveReadingTimeMinutes(article),
           {
             isSaved: false,
+            isReacted: reactedArticleIds.has(article.id),
+            reactionsCount: article._count.reactions,
           },
         ),
       ),
@@ -84,8 +94,11 @@ export class ArticlesService {
     };
   }
 
-  async getById(id: string): Promise<ArticleDetailResponse> {
-    return this.getDetailById(id, false);
+  async getById(
+    id: string,
+    user?: AuthenticatedUser,
+  ): Promise<ArticleDetailResponse> {
+    return this.getDetailById(id, false, user);
   }
 
   async getByIdForAdmin(id: string): Promise<ArticleDetailResponse> {
@@ -137,6 +150,7 @@ export class ArticlesService {
   private async getDetailById(
     id: string,
     includeUnpublished: boolean,
+    user?: AuthenticatedUser,
   ): Promise<ArticleDetailResponse> {
     const article = await this.articlesRepository.findById(
       id,
@@ -147,13 +161,101 @@ export class ArticlesService {
       throw this.buildArticleNotFoundException();
     }
 
+    const isReacted = user?.userId
+      ? Boolean(
+          await this.articlesRepository.findReaction(
+            user.userId,
+            article.id,
+            ArticleReactionType.HELPFUL,
+          ),
+        )
+      : false;
+
     return toArticleDetailResponse(
       article,
       this.resolveReadingTimeMinutes(article),
       {
         isSaved: false,
+        isReacted,
+        reactionsCount: article._count.reactions,
       },
     );
+  }
+
+  async reactToArticle(
+    articleId: string,
+    user: AuthenticatedUser,
+  ): Promise<ArticleReactionResponse> {
+    await this.requireArticle(articleId, user.role === 'ADMIN');
+
+    const existingReaction = await this.articlesRepository.findReaction(
+      user.userId,
+      articleId,
+      ArticleReactionType.HELPFUL,
+    );
+
+    if (!existingReaction) {
+      try {
+        await this.articlesRepository.createReaction(
+          user.userId,
+          articleId,
+          ArticleReactionType.HELPFUL,
+        );
+      } catch (error) {
+        if (!this.isUniqueConstraintError(error)) {
+          throw error;
+        }
+      }
+    }
+
+    const reactionsCount = await this.articlesRepository.countReactions(
+      articleId,
+      ArticleReactionType.HELPFUL,
+    );
+
+    return {
+      message: 'Marcado como útil.',
+      isReacted: true,
+      reactionsCount,
+    };
+  }
+
+  async removeReactionFromArticle(
+    articleId: string,
+    user: AuthenticatedUser,
+  ): Promise<ArticleReactionResponse> {
+    await this.requireArticle(articleId, user.role === 'ADMIN');
+
+    const existingReaction = await this.articlesRepository.findReaction(
+      user.userId,
+      articleId,
+      ArticleReactionType.HELPFUL,
+    );
+
+    if (existingReaction) {
+      try {
+        await this.articlesRepository.deleteReaction(
+          user.userId,
+          articleId,
+          ArticleReactionType.HELPFUL,
+        );
+      } catch (error) {
+        if (!this.isRecordNotFoundError(error)) {
+          throw error;
+        }
+      }
+    }
+
+    const reactionsCount = await this.articlesRepository.countReactions(
+      articleId,
+      ArticleReactionType.HELPFUL,
+    );
+
+    return {
+      message: 'Reação removida.',
+      isReacted: false,
+      reactionsCount,
+    };
   }
 
   async saveArticle(userId: string, articleId: string) {
@@ -219,12 +321,20 @@ export class ArticlesService {
       }),
       this.articlesRepository.countSavedArticlesByUser(userId),
     ]);
+    const reactedArticleIds = await this.getReactedArticleIds(
+      userId,
+      savedArticles.map(savedArticle => savedArticle.article.id),
+    );
 
     return {
       items: savedArticles.map(savedArticle =>
         toSavedArticleItemResponse(
           savedArticle.article,
           this.resolveReadingTimeMinutes(savedArticle.article),
+          {
+            isReacted: reactedArticleIds.has(savedArticle.article.id),
+            reactionsCount: savedArticle.article._count.reactions,
+          },
         ),
       ),
       page,
@@ -269,6 +379,8 @@ export class ArticlesService {
         this.resolveReadingTimeMinutes(article),
         {
           isSaved: false,
+          isReacted: false,
+          reactionsCount: article._count.reactions,
         },
       );
     } catch (error) {
@@ -352,6 +464,8 @@ export class ArticlesService {
         this.resolveReadingTimeMinutes(existingArticle),
         {
           isSaved: false,
+          isReacted: false,
+          reactionsCount: existingArticle._count.reactions,
         },
       );
     }
@@ -364,6 +478,8 @@ export class ArticlesService {
         this.resolveReadingTimeMinutes(article),
         {
           isSaved: false,
+          isReacted: false,
+          reactionsCount: article._count.reactions,
         },
       );
     } catch (error) {
@@ -594,6 +710,8 @@ export class ArticlesService {
         this.resolveReadingTimeMinutes(updatedArticle),
         {
           isSaved: false,
+          isReacted: false,
+          reactionsCount: updatedArticle._count.reactions,
         },
       );
     } catch (error) {
@@ -633,6 +751,21 @@ export class ArticlesService {
         : {}),
       ...(query.category ? { category: query.category } : {}),
     };
+  }
+
+  private async getReactedArticleIds(userId?: string, articleIds?: string[]) {
+    if (!userId || !articleIds || articleIds.length === 0) {
+      return new Set<string>();
+    }
+
+    const reactedArticleIds =
+      await this.articlesRepository.getReactionArticleIdsForUser(
+        userId,
+        articleIds,
+        ArticleReactionType.HELPFUL,
+      );
+
+    return new Set(reactedArticleIds);
   }
 
   private async requireArticle(id: string, includeUnpublished = false) {

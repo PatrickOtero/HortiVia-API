@@ -7,6 +7,8 @@ import { ArticlesService } from './articles.service';
 describe('ArticlesController', () => {
   const articlesService = {
     getByIdForAdmin: jest.fn(),
+    reactToArticle: jest.fn(),
+    removeReactionFromArticle: jest.fn(),
     createBlockImageUploadUrl: jest.fn(),
     uploadBlockImage: jest.fn(),
     updateBlockImage: jest.fn(),
@@ -15,6 +17,8 @@ describe('ArticlesController', () => {
     Pick<
       ArticlesService,
       | 'getByIdForAdmin'
+      | 'reactToArticle'
+      | 'removeReactionFromArticle'
       | 'createBlockImageUploadUrl'
       | 'uploadBlockImage'
       | 'updateBlockImage'
@@ -76,6 +80,18 @@ describe('ArticlesController', () => {
     ]);
   });
 
+  it('requires authentication to react to an article', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.reactToArticle),
+    ).toEqual(expect.arrayContaining([expect.anything()]));
+  });
+
+  it('requires authentication to remove an article reaction', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.removeReactionFromArticle),
+    ).toEqual(expect.arrayContaining([expect.anything()]));
+  });
+
   it('delegates block image upload URL generation to the service', async () => {
     const response = {
       key: 'articles/article-1/blocks/block-1/1710000000000-folhas.webp',
@@ -116,5 +132,51 @@ describe('ArticlesController', () => {
       response,
     );
     expect(articlesService.getByIdForAdmin).toHaveBeenCalledWith('article-1');
+  });
+
+  it('delegates article reaction creation to the service', async () => {
+    const response = {
+      message: 'Marcado como útil.',
+      isReacted: true,
+      reactionsCount: 12,
+    };
+    const user = {
+      userId: 'user-1',
+      email: 'user@hortivia.local',
+      role: 'USER',
+    };
+
+    articlesService.reactToArticle.mockResolvedValue(response as never);
+
+    await expect(
+      controller.reactToArticle('article-1', user as never),
+    ).resolves.toEqual(response);
+    expect(articlesService.reactToArticle).toHaveBeenCalledWith(
+      'article-1',
+      user,
+    );
+  });
+
+  it('delegates article reaction removal to the service', async () => {
+    const response = {
+      message: 'Reação removida.',
+      isReacted: false,
+      reactionsCount: 11,
+    };
+    const user = {
+      userId: 'user-1',
+      email: 'user@hortivia.local',
+      role: 'USER',
+    };
+
+    articlesService.removeReactionFromArticle.mockResolvedValue(response as never);
+
+    await expect(
+      controller.removeReactionFromArticle('article-1', user as never),
+    ).resolves.toEqual(response);
+    expect(articlesService.removeReactionFromArticle).toHaveBeenCalledWith(
+      'article-1',
+      user,
+    );
   });
 });

@@ -18,6 +18,7 @@ import { UserRole } from '../../generated/prisma/enums';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { CONTENT_IMAGE_MAX_FILE_SIZE } from '../storage/image-upload.constants';
@@ -37,8 +38,12 @@ export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Get()
-  async list(@Query() query: ListArticlesQueryDto) {
-    return this.articlesService.list(query);
+  @UseGuards(OptionalJwtAuthGuard)
+  async list(
+    @Query() query: ListArticlesQueryDto,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    return this.articlesService.list(query, user);
   }
 
   @Get(':id/admin')
@@ -49,8 +54,12 @@ export class ArticlesController {
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string) {
-    return this.articlesService.getById(id);
+  @UseGuards(OptionalJwtAuthGuard)
+  async getById(
+    @Param('id') id: string,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    return this.articlesService.getById(id, user);
   }
 
   @Post(':articleId/save')
@@ -69,6 +78,24 @@ export class ArticlesController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.articlesService.unsaveArticle(user.userId, articleId);
+  }
+
+  @Post(':articleId/reactions')
+  @UseGuards(JwtAuthGuard)
+  async reactToArticle(
+    @Param('articleId') articleId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.reactToArticle(articleId, user);
+  }
+
+  @Delete(':articleId/reactions')
+  @UseGuards(JwtAuthGuard)
+  async removeReactionFromArticle(
+    @Param('articleId') articleId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.removeReactionFromArticle(articleId, user);
   }
 
   @Post()

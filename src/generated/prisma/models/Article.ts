@@ -319,6 +319,7 @@ export type ArticleWhereInput = {
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   blocks?: Prisma.ArticleBlockListRelationFilter
   productRelations?: Prisma.ProductArticleListRelationFilter
+  reactions?: Prisma.ArticleReactionListRelationFilter
   savedBy?: Prisma.SavedArticleListRelationFilter
 }
 
@@ -344,6 +345,7 @@ export type ArticleOrderByWithRelationInput = {
   author?: Prisma.UserOrderByWithRelationInput
   blocks?: Prisma.ArticleBlockOrderByRelationAggregateInput
   productRelations?: Prisma.ProductArticleOrderByRelationAggregateInput
+  reactions?: Prisma.ArticleReactionOrderByRelationAggregateInput
   savedBy?: Prisma.SavedArticleOrderByRelationAggregateInput
 }
 
@@ -372,6 +374,7 @@ export type ArticleWhereUniqueInput = Prisma.AtLeast<{
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   blocks?: Prisma.ArticleBlockListRelationFilter
   productRelations?: Prisma.ProductArticleListRelationFilter
+  reactions?: Prisma.ArticleReactionListRelationFilter
   savedBy?: Prisma.SavedArticleListRelationFilter
 }, "id" | "slug">
 
@@ -446,6 +449,7 @@ export type ArticleCreateInput = {
   author: Prisma.UserCreateNestedOneWithoutArticlesInput
   blocks?: Prisma.ArticleBlockCreateNestedManyWithoutArticleInput
   productRelations?: Prisma.ProductArticleCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleCreateNestedManyWithoutArticleInput
 }
 
@@ -470,6 +474,7 @@ export type ArticleUncheckedCreateInput = {
   updatedAt?: Date | string
   blocks?: Prisma.ArticleBlockUncheckedCreateNestedManyWithoutArticleInput
   productRelations?: Prisma.ProductArticleUncheckedCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionUncheckedCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutArticleInput
 }
 
@@ -494,6 +499,7 @@ export type ArticleUpdateInput = {
   author?: Prisma.UserUpdateOneRequiredWithoutArticlesNestedInput
   blocks?: Prisma.ArticleBlockUpdateManyWithoutArticleNestedInput
   productRelations?: Prisma.ProductArticleUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUpdateManyWithoutArticleNestedInput
 }
 
@@ -518,6 +524,7 @@ export type ArticleUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blocks?: Prisma.ArticleBlockUncheckedUpdateManyWithoutArticleNestedInput
   productRelations?: Prisma.ProductArticleUncheckedUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUncheckedUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUncheckedUpdateManyWithoutArticleNestedInput
 }
 
@@ -758,6 +765,20 @@ export type ArticleUpdateOneRequiredWithoutSavedByNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ArticleUpdateToOneWithWhereWithoutSavedByInput, Prisma.ArticleUpdateWithoutSavedByInput>, Prisma.ArticleUncheckedUpdateWithoutSavedByInput>
 }
 
+export type ArticleCreateNestedOneWithoutReactionsInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutReactionsInput, Prisma.ArticleUncheckedCreateWithoutReactionsInput>
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutReactionsInput
+  connect?: Prisma.ArticleWhereUniqueInput
+}
+
+export type ArticleUpdateOneRequiredWithoutReactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutReactionsInput, Prisma.ArticleUncheckedCreateWithoutReactionsInput>
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutReactionsInput
+  upsert?: Prisma.ArticleUpsertWithoutReactionsInput
+  connect?: Prisma.ArticleWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ArticleUpdateToOneWithWhereWithoutReactionsInput, Prisma.ArticleUpdateWithoutReactionsInput>, Prisma.ArticleUncheckedUpdateWithoutReactionsInput>
+}
+
 export type ArticleCreateNestedOneWithoutProductRelationsInput = {
   create?: Prisma.XOR<Prisma.ArticleCreateWithoutProductRelationsInput, Prisma.ArticleUncheckedCreateWithoutProductRelationsInput>
   connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutProductRelationsInput
@@ -792,6 +813,7 @@ export type ArticleCreateWithoutAuthorInput = {
   updatedAt?: Date | string
   blocks?: Prisma.ArticleBlockCreateNestedManyWithoutArticleInput
   productRelations?: Prisma.ProductArticleCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleCreateNestedManyWithoutArticleInput
 }
 
@@ -815,6 +837,7 @@ export type ArticleUncheckedCreateWithoutAuthorInput = {
   updatedAt?: Date | string
   blocks?: Prisma.ArticleBlockUncheckedCreateNestedManyWithoutArticleInput
   productRelations?: Prisma.ProductArticleUncheckedCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionUncheckedCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutArticleInput
 }
 
@@ -888,6 +911,7 @@ export type ArticleCreateWithoutBlocksInput = {
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutArticlesInput
   productRelations?: Prisma.ProductArticleCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleCreateNestedManyWithoutArticleInput
 }
 
@@ -911,6 +935,7 @@ export type ArticleUncheckedCreateWithoutBlocksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   productRelations?: Prisma.ProductArticleUncheckedCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionUncheckedCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutArticleInput
 }
 
@@ -950,6 +975,7 @@ export type ArticleUpdateWithoutBlocksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutArticlesNestedInput
   productRelations?: Prisma.ProductArticleUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUpdateManyWithoutArticleNestedInput
 }
 
@@ -973,6 +999,7 @@ export type ArticleUncheckedUpdateWithoutBlocksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productRelations?: Prisma.ProductArticleUncheckedUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUncheckedUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUncheckedUpdateManyWithoutArticleNestedInput
 }
 
@@ -997,6 +1024,7 @@ export type ArticleCreateWithoutSavedByInput = {
   author: Prisma.UserCreateNestedOneWithoutArticlesInput
   blocks?: Prisma.ArticleBlockCreateNestedManyWithoutArticleInput
   productRelations?: Prisma.ProductArticleCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionCreateNestedManyWithoutArticleInput
 }
 
 export type ArticleUncheckedCreateWithoutSavedByInput = {
@@ -1020,6 +1048,7 @@ export type ArticleUncheckedCreateWithoutSavedByInput = {
   updatedAt?: Date | string
   blocks?: Prisma.ArticleBlockUncheckedCreateNestedManyWithoutArticleInput
   productRelations?: Prisma.ProductArticleUncheckedCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionUncheckedCreateNestedManyWithoutArticleInput
 }
 
 export type ArticleCreateOrConnectWithoutSavedByInput = {
@@ -1059,6 +1088,7 @@ export type ArticleUpdateWithoutSavedByInput = {
   author?: Prisma.UserUpdateOneRequiredWithoutArticlesNestedInput
   blocks?: Prisma.ArticleBlockUpdateManyWithoutArticleNestedInput
   productRelations?: Prisma.ProductArticleUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUpdateManyWithoutArticleNestedInput
 }
 
 export type ArticleUncheckedUpdateWithoutSavedByInput = {
@@ -1082,6 +1112,119 @@ export type ArticleUncheckedUpdateWithoutSavedByInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blocks?: Prisma.ArticleBlockUncheckedUpdateManyWithoutArticleNestedInput
   productRelations?: Prisma.ProductArticleUncheckedUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUncheckedUpdateManyWithoutArticleNestedInput
+}
+
+export type ArticleCreateWithoutReactionsInput = {
+  id?: string
+  title: string
+  slug: string
+  subtitle?: string | null
+  summary: string
+  content: string
+  category: $Enums.ArticleCategory
+  imageUrl?: string | null
+  coverImageUrl?: string | null
+  coverImageAlt?: string | null
+  readingTimeMinutes?: number | null
+  featured?: boolean
+  tags?: Prisma.ArticleCreatetagsInput | string[]
+  publishedAt?: Date | string | null
+  isPublished?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutArticlesInput
+  blocks?: Prisma.ArticleBlockCreateNestedManyWithoutArticleInput
+  productRelations?: Prisma.ProductArticleCreateNestedManyWithoutArticleInput
+  savedBy?: Prisma.SavedArticleCreateNestedManyWithoutArticleInput
+}
+
+export type ArticleUncheckedCreateWithoutReactionsInput = {
+  id?: string
+  title: string
+  slug: string
+  subtitle?: string | null
+  summary: string
+  content: string
+  category: $Enums.ArticleCategory
+  imageUrl?: string | null
+  coverImageUrl?: string | null
+  coverImageAlt?: string | null
+  readingTimeMinutes?: number | null
+  featured?: boolean
+  tags?: Prisma.ArticleCreatetagsInput | string[]
+  authorId: string
+  publishedAt?: Date | string | null
+  isPublished?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  blocks?: Prisma.ArticleBlockUncheckedCreateNestedManyWithoutArticleInput
+  productRelations?: Prisma.ProductArticleUncheckedCreateNestedManyWithoutArticleInput
+  savedBy?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutArticleInput
+}
+
+export type ArticleCreateOrConnectWithoutReactionsInput = {
+  where: Prisma.ArticleWhereUniqueInput
+  create: Prisma.XOR<Prisma.ArticleCreateWithoutReactionsInput, Prisma.ArticleUncheckedCreateWithoutReactionsInput>
+}
+
+export type ArticleUpsertWithoutReactionsInput = {
+  update: Prisma.XOR<Prisma.ArticleUpdateWithoutReactionsInput, Prisma.ArticleUncheckedUpdateWithoutReactionsInput>
+  create: Prisma.XOR<Prisma.ArticleCreateWithoutReactionsInput, Prisma.ArticleUncheckedCreateWithoutReactionsInput>
+  where?: Prisma.ArticleWhereInput
+}
+
+export type ArticleUpdateToOneWithWhereWithoutReactionsInput = {
+  where?: Prisma.ArticleWhereInput
+  data: Prisma.XOR<Prisma.ArticleUpdateWithoutReactionsInput, Prisma.ArticleUncheckedUpdateWithoutReactionsInput>
+}
+
+export type ArticleUpdateWithoutReactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  subtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumArticleCategoryFieldUpdateOperationsInput | $Enums.ArticleCategory
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  readingTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tags?: Prisma.ArticleUpdatetagsInput | string[]
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutArticlesNestedInput
+  blocks?: Prisma.ArticleBlockUpdateManyWithoutArticleNestedInput
+  productRelations?: Prisma.ProductArticleUpdateManyWithoutArticleNestedInput
+  savedBy?: Prisma.SavedArticleUpdateManyWithoutArticleNestedInput
+}
+
+export type ArticleUncheckedUpdateWithoutReactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  subtitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  summary?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.EnumArticleCategoryFieldUpdateOperationsInput | $Enums.ArticleCategory
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageAlt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  readingTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tags?: Prisma.ArticleUpdatetagsInput | string[]
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  blocks?: Prisma.ArticleBlockUncheckedUpdateManyWithoutArticleNestedInput
+  productRelations?: Prisma.ProductArticleUncheckedUpdateManyWithoutArticleNestedInput
+  savedBy?: Prisma.SavedArticleUncheckedUpdateManyWithoutArticleNestedInput
 }
 
 export type ArticleCreateWithoutProductRelationsInput = {
@@ -1104,6 +1247,7 @@ export type ArticleCreateWithoutProductRelationsInput = {
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutArticlesInput
   blocks?: Prisma.ArticleBlockCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleCreateNestedManyWithoutArticleInput
 }
 
@@ -1127,6 +1271,7 @@ export type ArticleUncheckedCreateWithoutProductRelationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   blocks?: Prisma.ArticleBlockUncheckedCreateNestedManyWithoutArticleInput
+  reactions?: Prisma.ArticleReactionUncheckedCreateNestedManyWithoutArticleInput
   savedBy?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutArticleInput
 }
 
@@ -1166,6 +1311,7 @@ export type ArticleUpdateWithoutProductRelationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutArticlesNestedInput
   blocks?: Prisma.ArticleBlockUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUpdateManyWithoutArticleNestedInput
 }
 
@@ -1189,6 +1335,7 @@ export type ArticleUncheckedUpdateWithoutProductRelationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blocks?: Prisma.ArticleBlockUncheckedUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUncheckedUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUncheckedUpdateManyWithoutArticleNestedInput
 }
 
@@ -1232,6 +1379,7 @@ export type ArticleUpdateWithoutAuthorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blocks?: Prisma.ArticleBlockUpdateManyWithoutArticleNestedInput
   productRelations?: Prisma.ProductArticleUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUpdateManyWithoutArticleNestedInput
 }
 
@@ -1255,6 +1403,7 @@ export type ArticleUncheckedUpdateWithoutAuthorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   blocks?: Prisma.ArticleBlockUncheckedUpdateManyWithoutArticleNestedInput
   productRelations?: Prisma.ProductArticleUncheckedUpdateManyWithoutArticleNestedInput
+  reactions?: Prisma.ArticleReactionUncheckedUpdateManyWithoutArticleNestedInput
   savedBy?: Prisma.SavedArticleUncheckedUpdateManyWithoutArticleNestedInput
 }
 
@@ -1286,12 +1435,14 @@ export type ArticleUncheckedUpdateManyWithoutAuthorInput = {
 export type ArticleCountOutputType = {
   blocks: number
   productRelations: number
+  reactions: number
   savedBy: number
 }
 
 export type ArticleCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   blocks?: boolean | ArticleCountOutputTypeCountBlocksArgs
   productRelations?: boolean | ArticleCountOutputTypeCountProductRelationsArgs
+  reactions?: boolean | ArticleCountOutputTypeCountReactionsArgs
   savedBy?: boolean | ArticleCountOutputTypeCountSavedByArgs
 }
 
@@ -1317,6 +1468,13 @@ export type ArticleCountOutputTypeCountBlocksArgs<ExtArgs extends runtime.Types.
  */
 export type ArticleCountOutputTypeCountProductRelationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ProductArticleWhereInput
+}
+
+/**
+ * ArticleCountOutputType without action
+ */
+export type ArticleCountOutputTypeCountReactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ArticleReactionWhereInput
 }
 
 /**
@@ -1349,6 +1507,7 @@ export type ArticleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   blocks?: boolean | Prisma.Article$blocksArgs<ExtArgs>
   productRelations?: boolean | Prisma.Article$productRelationsArgs<ExtArgs>
+  reactions?: boolean | Prisma.Article$reactionsArgs<ExtArgs>
   savedBy?: boolean | Prisma.Article$savedByArgs<ExtArgs>
   _count?: boolean | Prisma.ArticleCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["article"]>
@@ -1423,6 +1582,7 @@ export type ArticleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   blocks?: boolean | Prisma.Article$blocksArgs<ExtArgs>
   productRelations?: boolean | Prisma.Article$productRelationsArgs<ExtArgs>
+  reactions?: boolean | Prisma.Article$reactionsArgs<ExtArgs>
   savedBy?: boolean | Prisma.Article$savedByArgs<ExtArgs>
   _count?: boolean | Prisma.ArticleCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1439,6 +1599,7 @@ export type $ArticlePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     author: Prisma.$UserPayload<ExtArgs>
     blocks: Prisma.$ArticleBlockPayload<ExtArgs>[]
     productRelations: Prisma.$ProductArticlePayload<ExtArgs>[]
+    reactions: Prisma.$ArticleReactionPayload<ExtArgs>[]
     savedBy: Prisma.$SavedArticlePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1857,6 +2018,7 @@ export interface Prisma__ArticleClient<T, Null = never, ExtArgs extends runtime.
   author<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   blocks<T extends Prisma.Article$blocksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Article$blocksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   productRelations<T extends Prisma.Article$productRelationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Article$productRelationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reactions<T extends Prisma.Article$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Article$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedBy<T extends Prisma.Article$savedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Article$savedByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2351,6 +2513,30 @@ export type Article$productRelationsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.ProductArticleScalarFieldEnum | Prisma.ProductArticleScalarFieldEnum[]
+}
+
+/**
+ * Article.reactions
+ */
+export type Article$reactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ArticleReaction
+   */
+  select?: Prisma.ArticleReactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ArticleReaction
+   */
+  omit?: Prisma.ArticleReactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ArticleReactionInclude<ExtArgs> | null
+  where?: Prisma.ArticleReactionWhereInput
+  orderBy?: Prisma.ArticleReactionOrderByWithRelationInput | Prisma.ArticleReactionOrderByWithRelationInput[]
+  cursor?: Prisma.ArticleReactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ArticleReactionScalarFieldEnum | Prisma.ArticleReactionScalarFieldEnum[]
 }
 
 /**

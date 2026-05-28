@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ArticleReactionType } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -11,6 +12,11 @@ export const articleAuthorSelect = {
 export const articleListInclude = {
   author: {
     select: articleAuthorSelect,
+  },
+  _count: {
+    select: {
+      reactions: true,
+    },
   },
 } satisfies Prisma.ArticleInclude;
 
@@ -240,6 +246,94 @@ export class ArticlesRepository {
     });
 
     return savedArticles.map(savedArticle => savedArticle.articleId);
+  }
+
+  async findReaction(
+    userId: string,
+    articleId: string,
+    type: ArticleReactionType,
+  ) {
+    return this.prisma.articleReaction.findUnique({
+      where: {
+        userId_articleId_type: {
+          userId,
+          articleId,
+          type,
+        },
+      },
+    });
+  }
+
+  async createReaction(
+    userId: string,
+    articleId: string,
+    type: ArticleReactionType,
+  ) {
+    return this.prisma.articleReaction.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        article: {
+          connect: {
+            id: articleId,
+          },
+        },
+        type,
+      },
+    });
+  }
+
+  async deleteReaction(
+    userId: string,
+    articleId: string,
+    type: ArticleReactionType,
+  ) {
+    return this.prisma.articleReaction.delete({
+      where: {
+        userId_articleId_type: {
+          userId,
+          articleId,
+          type,
+        },
+      },
+    });
+  }
+
+  async countReactions(articleId: string, type: ArticleReactionType) {
+    return this.prisma.articleReaction.count({
+      where: {
+        articleId,
+        type,
+      },
+    });
+  }
+
+  async getReactionArticleIdsForUser(
+    userId: string,
+    articleIds: string[],
+    type: ArticleReactionType,
+  ) {
+    if (articleIds.length === 0) {
+      return [];
+    }
+
+    const reactions = await this.prisma.articleReaction.findMany({
+      where: {
+        userId,
+        articleId: {
+          in: articleIds,
+        },
+        type,
+      },
+      select: {
+        articleId: true,
+      },
+    });
+
+    return reactions.map(reaction => reaction.articleId);
   }
 
   async createBlock(data: Prisma.ArticleBlockCreateInput) {

@@ -65,6 +65,8 @@ export function toArticleListItemResponse(
   readingTimeMinutes: number,
   options?: {
     isSaved?: boolean;
+    isReacted?: boolean;
+    reactionsCount?: number;
   },
 ): ArticleListItemResponse {
   return {
@@ -82,6 +84,8 @@ export function toArticleListItemResponse(
     readingTimeMinutes,
     featured: article.featured,
     author: toArticleAuthorResponse(article),
+    reactionsCount: options?.reactionsCount ?? article._count.reactions,
+    isReacted: options?.isReacted ?? false,
     isSaved: options?.isSaved,
   };
 }
@@ -91,6 +95,8 @@ export function toArticleDetailResponse(
   readingTimeMinutes: number,
   options?: {
     isSaved?: boolean;
+    isReacted?: boolean;
+    reactionsCount?: number;
   },
 ): ArticleDetailResponse {
   return {
@@ -114,10 +120,16 @@ export function toArticleBlockItemResponse(
 export function toSavedArticleItemResponse(
   article: ArticleListRecord | ArticleDetailRecord,
   readingTimeMinutes: number,
+  options?: {
+    isReacted?: boolean;
+    reactionsCount?: number;
+  },
 ): SavedArticleItemResponse {
   return {
     ...toArticleListItemResponse(article, readingTimeMinutes, {
       isSaved: true,
+      isReacted: options?.isReacted,
+      reactionsCount: options?.reactionsCount,
     }),
     isSaved: true,
   };

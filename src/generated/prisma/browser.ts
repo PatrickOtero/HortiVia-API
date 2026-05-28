@@ -58,6 +58,11 @@ export type ArticleBlock = Prisma.ArticleBlockModel
  */
 export type SavedArticle = Prisma.SavedArticleModel
 /**
+ * Model ArticleReaction
+ * 
+ */
+export type ArticleReaction = Prisma.ArticleReactionModel
+/**
  * Model ProductArticle
  * 
  */

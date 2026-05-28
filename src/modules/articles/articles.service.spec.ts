@@ -33,6 +33,9 @@ describe('ArticlesService', () => {
     updatedAt: new Date('2026-05-20T09:00:00.000Z'),
     blocks: [],
     productRelations: [],
+    _count: {
+      reactions: 0,
+    },
   };
 
   const baseRelatedProduct = {
@@ -63,6 +66,12 @@ describe('ArticlesService', () => {
     role: 'ADMIN',
   };
 
+  const regularUser: AuthenticatedUser = {
+    userId: 'user-2',
+    email: 'user@hortivia.local',
+    role: 'USER',
+  };
+
   const articlesRepository = {
     findManyWithPagination: jest.fn(),
     count: jest.fn(),
@@ -82,6 +91,11 @@ describe('ArticlesService', () => {
     listSavedArticlesByUser: jest.fn(),
     countSavedArticlesByUser: jest.fn(),
     getSavedArticleIdsForUser: jest.fn(),
+    findReaction: jest.fn(),
+    createReaction: jest.fn(),
+    deleteReaction: jest.fn(),
+    countReactions: jest.fn(),
+    getReactionArticleIdsForUser: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
       ArticlesRepository,
@@ -103,6 +117,11 @@ describe('ArticlesService', () => {
       | 'listSavedArticlesByUser'
       | 'countSavedArticlesByUser'
       | 'getSavedArticleIdsForUser'
+      | 'findReaction'
+      | 'createReaction'
+      | 'deleteReaction'
+      | 'countReactions'
+      | 'getReactionArticleIdsForUser'
     >
   >;
 
@@ -150,6 +169,9 @@ describe('ArticlesService', () => {
       isPublished: (data.isPublished as boolean | undefined) ?? false,
       publishedAt: (data.publishedAt as Date | null | undefined) ?? null,
       blocks: [],
+      _count: {
+        reactions: 0,
+      },
     };
   }
 
@@ -181,6 +203,8 @@ describe('ArticlesService', () => {
       slug: baseArticle.slug,
       category: baseArticle.category,
       author: baseArticle.author,
+      reactionsCount: 0,
+      isReacted: false,
       isSaved: false,
     });
     expect(result.data[0]).not.toHaveProperty('relatedProducts');
@@ -235,6 +259,33 @@ describe('ArticlesService', () => {
     });
   });
 
+  it('includes isReacted in the article feed for an authenticated user', async () => {
+    articlesRepository.findManyWithPagination.mockResolvedValue([baseArticle]);
+    articlesRepository.count.mockResolvedValue(1);
+    articlesRepository.getReactionArticleIdsForUser.mockResolvedValue([
+      baseArticle.id,
+    ]);
+
+    const result = await service.list(
+      {
+        page: 1,
+        limit: 10,
+      },
+      regularUser,
+    );
+
+    expect(articlesRepository.getReactionArticleIdsForUser).toHaveBeenCalledWith(
+      regularUser.userId,
+      [baseArticle.id],
+      'HELPFUL',
+    );
+    expect(result.data[0]).toMatchObject({
+      id: baseArticle.id,
+      reactionsCount: 0,
+      isReacted: true,
+    });
+  });
+
   it('returns article detail by id', async () => {
     articlesRepository.findById.mockResolvedValue({
       ...baseArticle,
@@ -275,6 +326,8 @@ describe('ArticlesService', () => {
       slug: baseArticle.slug,
       author: baseArticle.author,
       readingTimeMinutes: 1,
+      reactionsCount: 0,
+      isReacted: false,
       isSaved: false,
     });
     expect(result.relatedProducts).toEqual([
@@ -319,8 +372,31 @@ describe('ArticlesService', () => {
     expect(result).toMatchObject({
       id: baseArticle.id,
       title: baseArticle.title,
+      reactionsCount: 0,
+      isReacted: false,
       isSaved: false,
     });
+  });
+
+  it('includes isReacted in article detail for an authenticated user', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findReaction.mockResolvedValue({
+      id: 'reaction-1',
+      userId: regularUser.userId,
+      articleId: baseArticle.id,
+      type: 'HELPFUL',
+      createdAt: new Date('2026-05-27T12:00:00.000Z'),
+    } as never);
+
+    const result = await service.getById(baseArticle.id, regularUser);
+
+    expect(articlesRepository.findReaction).toHaveBeenCalledWith(
+      regularUser.userId,
+      baseArticle.id,
+      'HELPFUL',
+    );
+    expect(result.isReacted).toBe(true);
+    expect(result.reactionsCount).toBe(0);
   });
 
   it('returns blocks ordered by sortOrder in article detail', async () => {
@@ -396,6 +472,101 @@ describe('ArticlesService', () => {
     );
     expect(result).toEqual({
       message: 'Artigo salvo.',
+    });
+  });
+
+  it('creates an article reaction idempotently', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findReaction.mockResolvedValue(null);
+    articlesRepository.countReactions.mockResolvedValue(12);
+
+    const result = await service.reactToArticle(baseArticle.id, regularUser);
+
+    expect(articlesRepository.createReaction).toHaveBeenCalledWith(
+      regularUser.userId,
+      baseArticle.id,
+      'HELPFUL',
+    );
+    expect(result).toEqual({
+      message: 'Marcado como útil.',
+      isReacted: true,
+      reactionsCount: 12,
+    });
+  });
+
+  it('does not create duplicate article reactions', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findReaction.mockResolvedValue({
+      id: 'reaction-1',
+      userId: regularUser.userId,
+      articleId: baseArticle.id,
+      type: 'HELPFUL',
+      createdAt: new Date('2026-05-27T12:00:00.000Z'),
+    } as never);
+    articlesRepository.countReactions.mockResolvedValue(12);
+
+    const result = await service.reactToArticle(baseArticle.id, regularUser);
+
+    expect(articlesRepository.createReaction).not.toHaveBeenCalled();
+    expect(result.isReacted).toBe(true);
+    expect(result.reactionsCount).toBe(12);
+  });
+
+  it('removes an article reaction idempotently', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findReaction.mockResolvedValue({
+      id: 'reaction-1',
+      userId: regularUser.userId,
+      articleId: baseArticle.id,
+      type: 'HELPFUL',
+      createdAt: new Date('2026-05-27T12:00:00.000Z'),
+    } as never);
+    articlesRepository.countReactions.mockResolvedValue(11);
+
+    const result = await service.removeReactionFromArticle(
+      baseArticle.id,
+      regularUser,
+    );
+
+    expect(articlesRepository.deleteReaction).toHaveBeenCalledWith(
+      regularUser.userId,
+      baseArticle.id,
+      'HELPFUL',
+    );
+    expect(result).toEqual({
+      message: 'Reação removida.',
+      isReacted: false,
+      reactionsCount: 11,
+    });
+  });
+
+  it('does not fail when removing a missing article reaction', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findReaction.mockResolvedValue(null);
+    articlesRepository.countReactions.mockResolvedValue(0);
+
+    const result = await service.removeReactionFromArticle(
+      baseArticle.id,
+      regularUser,
+    );
+
+    expect(articlesRepository.deleteReaction).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      message: 'Reação removida.',
+      isReacted: false,
+      reactionsCount: 0,
+    });
+  });
+
+  it('returns not found when reacting to an unknown article', async () => {
+    articlesRepository.findById.mockResolvedValue(null);
+
+    await expect(
+      service.reactToArticle('missing-article', regularUser),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Artigo não encontrado.',
+      },
     });
   });
 

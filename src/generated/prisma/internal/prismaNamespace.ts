@@ -392,6 +392,7 @@ export const ModelName = {
   Article: 'Article',
   ArticleBlock: 'ArticleBlock',
   SavedArticle: 'SavedArticle',
+  ArticleReaction: 'ArticleReaction',
   ProductArticle: 'ProductArticle',
   UserPreference: 'UserPreference'
 } as const
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "productArticle" | "userPreference"
+    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "articleReaction" | "productArticle" | "userPreference"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1005,6 +1006,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ArticleReaction: {
+      payload: Prisma.$ArticleReactionPayload<ExtArgs>
+      fields: Prisma.ArticleReactionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ArticleReactionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ArticleReactionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>
+        }
+        findFirst: {
+          args: Prisma.ArticleReactionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ArticleReactionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>
+        }
+        findMany: {
+          args: Prisma.ArticleReactionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>[]
+        }
+        create: {
+          args: Prisma.ArticleReactionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>
+        }
+        createMany: {
+          args: Prisma.ArticleReactionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ArticleReactionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>[]
+        }
+        delete: {
+          args: Prisma.ArticleReactionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>
+        }
+        update: {
+          args: Prisma.ArticleReactionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ArticleReactionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ArticleReactionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ArticleReactionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ArticleReactionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleReactionPayload>
+        }
+        aggregate: {
+          args: Prisma.ArticleReactionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateArticleReaction>
+        }
+        groupBy: {
+          args: Prisma.ArticleReactionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ArticleReactionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ArticleReactionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ArticleReactionCountAggregateOutputType> | number
+        }
+      }
+    }
     ProductArticle: {
       payload: Prisma.$ProductArticlePayload<ExtArgs>
       fields: Prisma.ProductArticleFieldRefs
@@ -1336,6 +1411,17 @@ export const SavedArticleScalarFieldEnum = {
 export type SavedArticleScalarFieldEnum = (typeof SavedArticleScalarFieldEnum)[keyof typeof SavedArticleScalarFieldEnum]
 
 
+export const ArticleReactionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  articleId: 'articleId',
+  type: 'type',
+  createdAt: 'createdAt'
+} as const
+
+export type ArticleReactionScalarFieldEnum = (typeof ArticleReactionScalarFieldEnum)[keyof typeof ArticleReactionScalarFieldEnum]
+
+
 export const ProductArticleScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
@@ -1568,6 +1654,20 @@ export type ListEnumArticleBlockKindFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'ArticleReactionType'
+ */
+export type EnumArticleReactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleReactionType'>
+    
+
+
+/**
+ * Reference to a field of type 'ArticleReactionType[]'
+ */
+export type ListEnumArticleReactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleReactionType[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1698,6 +1798,7 @@ export type GlobalOmitConfig = {
   article?: Prisma.ArticleOmit
   articleBlock?: Prisma.ArticleBlockOmit
   savedArticle?: Prisma.SavedArticleOmit
+  articleReaction?: Prisma.ArticleReactionOmit
   productArticle?: Prisma.ProductArticleOmit
   userPreference?: Prisma.UserPreferenceOmit
 }

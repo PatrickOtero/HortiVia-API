@@ -81,6 +81,13 @@ export const ArticleBlockKind = {
 export type ArticleBlockKind = (typeof ArticleBlockKind)[keyof typeof ArticleBlockKind]
 
 
+export const ArticleReactionType = {
+  HELPFUL: 'HELPFUL'
+} as const
+
+export type ArticleReactionType = (typeof ArticleReactionType)[keyof typeof ArticleReactionType]
+
+
 export const Gender = {
   MALE: 'MALE',
   FEMALE: 'FEMALE',

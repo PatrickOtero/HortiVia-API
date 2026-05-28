@@ -8,6 +8,7 @@ import { AuthController } from './auth.controller';
 import { AUTH_TOKEN_EXPIRES_IN } from './auth.constants';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from './guards/optional-jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -29,7 +30,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, RolesGuard, JwtStrategy],
-  exports: [AuthService, JwtAuthGuard, RolesGuard],
+  providers: [
+    AuthService,
+    JwtAuthGuard,
+    OptionalJwtAuthGuard,
+    RolesGuard,
+    JwtStrategy,
+  ],
+  exports: [AuthService, JwtAuthGuard, OptionalJwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}

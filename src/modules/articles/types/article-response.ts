@@ -35,7 +35,15 @@ export interface ArticleListItemResponse {
   readingTimeMinutes: number;
   featured: boolean;
   author: ArticleAuthorResponse;
+  reactionsCount: number;
+  isReacted: boolean;
   isSaved?: boolean;
+}
+
+export interface ArticleReactionResponse {
+  message: string;
+  isReacted: boolean;
+  reactionsCount: number;
 }
 
 export interface ArticleBlockResponse {

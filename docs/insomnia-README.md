@@ -198,9 +198,18 @@ Tipos aceitos para `kind` da secao:
 - `GET Article By Id`
 - `POST Save Article`
 - `DELETE Save Article`
+- `POST Article Reaction`
+- `DELETE Article Reaction`
 - `GET Saved Articles`
 
 Use `article_search`, `article_category`, `page` e `limit` se quiser filtrar a listagem.
+
+Para marcar um artigo como util:
+
+1. Garanta que `access_token` esta preenchido.
+2. Ajuste `article_id`.
+3. Rode `POST Article Reaction`.
+4. Use `DELETE Article Reaction` quando quiser remover a marcacao.
 
 Categorias aceitas:
 
