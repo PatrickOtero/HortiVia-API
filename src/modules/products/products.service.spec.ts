@@ -59,6 +59,7 @@ describe('ProductsService', () => {
     blocks: [],
     productRelations: [],
     _count: {
+      comments: 0,
       reactions: 0,
     },
   };

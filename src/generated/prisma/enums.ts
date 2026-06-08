@@ -88,6 +88,15 @@ export const ArticleReactionType = {
 export type ArticleReactionType = (typeof ArticleReactionType)[keyof typeof ArticleReactionType]
 
 
+export const ArticleCommentStatus = {
+  VISIBLE: 'VISIBLE',
+  HIDDEN: 'HIDDEN',
+  DELETED: 'DELETED'
+} as const
+
+export type ArticleCommentStatus = (typeof ArticleCommentStatus)[keyof typeof ArticleCommentStatus]
+
+
 export const Gender = {
   MALE: 'MALE',
   FEMALE: 'FEMALE',

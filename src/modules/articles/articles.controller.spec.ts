@@ -6,6 +6,11 @@ import { ArticlesService } from './articles.service';
 
 describe('ArticlesController', () => {
   const articlesService = {
+    listComments: jest.fn(),
+    createComment: jest.fn(),
+    updateComment: jest.fn(),
+    deleteComment: jest.fn(),
+    moderateComment: jest.fn(),
     getByIdForAdmin: jest.fn(),
     reactToArticle: jest.fn(),
     removeReactionFromArticle: jest.fn(),
@@ -16,6 +21,11 @@ describe('ArticlesController', () => {
   } as unknown as jest.Mocked<
     Pick<
       ArticlesService,
+      | 'listComments'
+      | 'createComment'
+      | 'updateComment'
+      | 'deleteComment'
+      | 'moderateComment'
       | 'getByIdForAdmin'
       | 'reactToArticle'
       | 'removeReactionFromArticle'
@@ -80,6 +90,33 @@ describe('ArticlesController', () => {
     ]);
   });
 
+  it('requires authentication to create a comment', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.createComment),
+    ).toEqual(expect.arrayContaining([expect.anything()]));
+  });
+
+  it('requires authentication to update a comment', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.updateComment),
+    ).toEqual(expect.arrayContaining([expect.anything()]));
+  });
+
+  it('requires authentication to delete a comment', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.deleteComment),
+    ).toEqual(expect.arrayContaining([expect.anything()]));
+  });
+
+  it('protects comment moderation for admins', () => {
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, controller.moderateComment),
+    ).toEqual(expect.arrayContaining([expect.anything(), expect.anything()]));
+    expect(Reflect.getMetadata(ROLES_KEY, controller.moderateComment)).toEqual([
+      UserRole.ADMIN,
+    ]);
+  });
+
   it('requires authentication to react to an article', () => {
     expect(
       Reflect.getMetadata(GUARDS_METADATA, controller.reactToArticle),
@@ -132,6 +169,153 @@ describe('ArticlesController', () => {
       response,
     );
     expect(articlesService.getByIdForAdmin).toHaveBeenCalledWith('article-1');
+  });
+
+  it('delegates public comment listing to the service', async () => {
+    const response = {
+      items: [],
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+    };
+
+    articlesService.listComments.mockResolvedValue(response as never);
+
+    await expect(
+      controller.listComments('article-1', {
+        page: 1,
+        limit: 20,
+      }),
+    ).resolves.toEqual(response);
+    expect(articlesService.listComments).toHaveBeenCalledWith('article-1', {
+      page: 1,
+      limit: 20,
+    });
+  });
+
+  it('delegates comment creation to the service', async () => {
+    const response = {
+      id: 'comment-1',
+      body: 'Muito bom.',
+      status: 'VISIBLE',
+      createdAt: '2026-06-02T10:00:00.000Z',
+      updatedAt: '2026-06-02T10:00:00.000Z',
+      author: {
+        id: 'user-1',
+        name: 'Usuario',
+      },
+    };
+    const user = {
+      userId: 'user-1',
+      email: 'user@hortivia.local',
+      role: 'USER',
+    };
+
+    articlesService.createComment.mockResolvedValue(response as never);
+
+    await expect(
+      controller.createComment('article-1', { body: 'Muito bom.' }, user as never),
+    ).resolves.toEqual(response);
+    expect(articlesService.createComment).toHaveBeenCalledWith(
+      'article-1',
+      { body: 'Muito bom.' },
+      user,
+    );
+  });
+
+  it('delegates comment updates to the service', async () => {
+    const response = {
+      id: 'comment-1',
+      body: 'Texto atualizado.',
+      status: 'VISIBLE',
+      createdAt: '2026-06-02T10:00:00.000Z',
+      updatedAt: '2026-06-02T11:00:00.000Z',
+      author: {
+        id: 'user-1',
+        name: 'Usuario',
+      },
+    };
+    const user = {
+      userId: 'user-1',
+      email: 'user@hortivia.local',
+      role: 'USER',
+    };
+
+    articlesService.updateComment.mockResolvedValue(response as never);
+
+    await expect(
+      controller.updateComment(
+        'article-1',
+        'comment-1',
+        { body: 'Texto atualizado.' },
+        user as never,
+      ),
+    ).resolves.toEqual(response);
+    expect(articlesService.updateComment).toHaveBeenCalledWith(
+      'article-1',
+      'comment-1',
+      { body: 'Texto atualizado.' },
+      user,
+    );
+  });
+
+  it('delegates comment deletion to the service', async () => {
+    const response = {
+      message: 'Comentario removido.',
+    };
+    const user = {
+      userId: 'user-1',
+      email: 'user@hortivia.local',
+      role: 'USER',
+    };
+
+    articlesService.deleteComment.mockResolvedValue(response as never);
+
+    await expect(
+      controller.deleteComment('article-1', 'comment-1', user as never),
+    ).resolves.toEqual(response);
+    expect(articlesService.deleteComment).toHaveBeenCalledWith(
+      'article-1',
+      'comment-1',
+      user,
+    );
+  });
+
+  it('delegates comment moderation to the service', async () => {
+    const response = {
+      id: 'comment-1',
+      body: 'Precisa revisar.',
+      status: 'HIDDEN',
+      createdAt: '2026-06-02T10:00:00.000Z',
+      updatedAt: '2026-06-02T11:00:00.000Z',
+      author: {
+        id: 'user-2',
+        name: 'Usuario',
+      },
+    };
+    const user = {
+      userId: 'admin-1',
+      email: 'admin@hortivia.local',
+      role: 'ADMIN',
+    };
+
+    articlesService.moderateComment.mockResolvedValue(response as never);
+
+    await expect(
+      controller.moderateComment(
+        'article-1',
+        'comment-1',
+        { status: 'HIDDEN' as const },
+        user as never,
+      ),
+    ).resolves.toEqual(response);
+    expect(articlesService.moderateComment).toHaveBeenCalledWith(
+      'article-1',
+      'comment-1',
+      { status: 'HIDDEN' },
+      user,
+    );
   });
 
   it('delegates article reaction creation to the service', async () => {

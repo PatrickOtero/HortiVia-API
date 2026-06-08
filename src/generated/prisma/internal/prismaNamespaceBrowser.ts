@@ -60,6 +60,7 @@ export const ModelName = {
   ArticleBlock: 'ArticleBlock',
   SavedArticle: 'SavedArticle',
   ArticleReaction: 'ArticleReaction',
+  ArticleComment: 'ArticleComment',
   ProductArticle: 'ProductArticle',
   UserPreference: 'UserPreference'
 } as const
@@ -233,6 +234,22 @@ export const ArticleReactionScalarFieldEnum = {
 } as const
 
 export type ArticleReactionScalarFieldEnum = (typeof ArticleReactionScalarFieldEnum)[keyof typeof ArticleReactionScalarFieldEnum]
+
+
+export const ArticleCommentScalarFieldEnum = {
+  id: 'id',
+  articleId: 'articleId',
+  userId: 'userId',
+  body: 'body',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt',
+  moderatedAt: 'moderatedAt',
+  moderatedById: 'moderatedById'
+} as const
+
+export type ArticleCommentScalarFieldEnum = (typeof ArticleCommentScalarFieldEnum)[keyof typeof ArticleCommentScalarFieldEnum]
 
 
 export const ProductArticleScalarFieldEnum = {

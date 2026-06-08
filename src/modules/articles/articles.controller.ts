@@ -26,11 +26,15 @@ import { ImageUploadExceptionFilter } from '../storage/image-upload.exception-fi
 import { ArticlesService } from './articles.service';
 import { CreateArticleBlockDto } from './dto/create-article-block.dto';
 import { CreateArticleBlockImageUploadDto } from './dto/create-article-block-image-upload.dto';
+import { CreateArticleCommentDto } from './dto/create-article-comment.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
+import { ListArticleCommentsQueryDto } from './dto/list-article-comments-query.dto';
+import { ModerateArticleCommentDto } from './dto/moderate-article-comment.dto';
 import { UploadArticleBlockImageDto } from './dto/upload-article-block-image.dto';
 import { UpdateArticleBlockDto } from './dto/update-article-block.dto';
 import { UpdateArticleBlockImageDto } from './dto/update-article-block-image.dto';
+import { UpdateArticleCommentDto } from './dto/update-article-comment.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Controller('articles')
@@ -60,6 +64,68 @@ export class ArticlesController {
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     return this.articlesService.getById(id, user);
+  }
+
+  @Get(':articleId/comments')
+  @UseGuards(OptionalJwtAuthGuard)
+  async listComments(
+    @Param('articleId') articleId: string,
+    @Query() query: ListArticleCommentsQueryDto,
+  ) {
+    return this.articlesService.listComments(articleId, query);
+  }
+
+  @Post(':articleId/comments')
+  @UseGuards(JwtAuthGuard)
+  async createComment(
+    @Param('articleId') articleId: string,
+    @Body() createArticleCommentDto: CreateArticleCommentDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.createComment(articleId, createArticleCommentDto, user);
+  }
+
+  @Patch(':articleId/comments/:commentId')
+  @UseGuards(JwtAuthGuard)
+  async updateComment(
+    @Param('articleId') articleId: string,
+    @Param('commentId') commentId: string,
+    @Body() updateArticleCommentDto: UpdateArticleCommentDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.updateComment(
+      articleId,
+      commentId,
+      updateArticleCommentDto,
+      user,
+    );
+  }
+
+  @Delete(':articleId/comments/:commentId')
+  @UseGuards(JwtAuthGuard)
+  async deleteComment(
+    @Param('articleId') articleId: string,
+    @Param('commentId') commentId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.deleteComment(articleId, commentId, user);
+  }
+
+  @Patch(':articleId/comments/:commentId/moderation')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async moderateComment(
+    @Param('articleId') articleId: string,
+    @Param('commentId') commentId: string,
+    @Body() moderateArticleCommentDto: ModerateArticleCommentDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.articlesService.moderateComment(
+      articleId,
+      commentId,
+      moderateArticleCommentDto,
+      user,
+    );
   }
 
   @Post(':articleId/save')

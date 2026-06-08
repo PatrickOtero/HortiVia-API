@@ -1,4 +1,5 @@
 import type {
+  ArticleCommentRecord,
   ArticleBlockRecord,
   ArticleDetailRecord,
   ArticleListRecord,
@@ -6,6 +7,9 @@ import type {
 import type {
   ArticleAuthorResponse,
   ArticleBlockResponse,
+  ArticleCommentAuthorResponse,
+  ArticleCommentListItemResponse,
+  ArticleCommentResponse,
   ArticleDetailResponse,
   ArticleListItemResponse,
   RelatedProductResponse,
@@ -19,6 +23,15 @@ function toArticleAuthorResponse(
     id: article.author.id,
     name: article.author.name,
     avatarUrl: article.author.avatarUrl,
+  };
+}
+
+function toArticleCommentAuthorResponse(
+  comment: ArticleCommentRecord,
+): ArticleCommentAuthorResponse {
+  return {
+    id: comment.user.id,
+    name: comment.user.name,
   };
 }
 
@@ -67,6 +80,7 @@ export function toArticleListItemResponse(
     isSaved?: boolean;
     isReacted?: boolean;
     reactionsCount?: number;
+    commentsCount?: number;
   },
 ): ArticleListItemResponse {
   return {
@@ -85,6 +99,7 @@ export function toArticleListItemResponse(
     featured: article.featured,
     author: toArticleAuthorResponse(article),
     reactionsCount: options?.reactionsCount ?? article._count.reactions,
+    commentsCount: options?.commentsCount ?? article._count.comments,
     isReacted: options?.isReacted ?? false,
     isSaved: options?.isSaved,
   };
@@ -97,6 +112,7 @@ export function toArticleDetailResponse(
     isSaved?: boolean;
     isReacted?: boolean;
     reactionsCount?: number;
+    commentsCount?: number;
   },
 ): ArticleDetailResponse {
   return {
@@ -123,6 +139,7 @@ export function toSavedArticleItemResponse(
   options?: {
     isReacted?: boolean;
     reactionsCount?: number;
+    commentsCount?: number;
   },
 ): SavedArticleItemResponse {
   return {
@@ -130,7 +147,33 @@ export function toSavedArticleItemResponse(
       isSaved: true,
       isReacted: options?.isReacted,
       reactionsCount: options?.reactionsCount,
+      commentsCount: options?.commentsCount,
     }),
     isSaved: true,
+  };
+}
+
+export function toArticleCommentResponse(
+  comment: ArticleCommentRecord,
+): ArticleCommentResponse {
+  return {
+    id: comment.id,
+    body: comment.body,
+    status: comment.status,
+    createdAt: comment.createdAt.toISOString(),
+    updatedAt: comment.updatedAt.toISOString(),
+    author: toArticleCommentAuthorResponse(comment),
+  };
+}
+
+export function toArticleCommentListItemResponse(
+  comment: ArticleCommentRecord,
+): ArticleCommentListItemResponse {
+  return {
+    id: comment.id,
+    body: comment.body,
+    createdAt: comment.createdAt.toISOString(),
+    updatedAt: comment.updatedAt.toISOString(),
+    author: toArticleCommentAuthorResponse(comment),
   };
 }

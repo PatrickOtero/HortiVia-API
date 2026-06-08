@@ -393,6 +393,7 @@ export const ModelName = {
   ArticleBlock: 'ArticleBlock',
   SavedArticle: 'SavedArticle',
   ArticleReaction: 'ArticleReaction',
+  ArticleComment: 'ArticleComment',
   ProductArticle: 'ProductArticle',
   UserPreference: 'UserPreference'
 } as const
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "articleReaction" | "productArticle" | "userPreference"
+    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "articleReaction" | "articleComment" | "productArticle" | "userPreference"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1080,6 +1081,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ArticleComment: {
+      payload: Prisma.$ArticleCommentPayload<ExtArgs>
+      fields: Prisma.ArticleCommentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ArticleCommentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ArticleCommentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>
+        }
+        findFirst: {
+          args: Prisma.ArticleCommentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ArticleCommentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>
+        }
+        findMany: {
+          args: Prisma.ArticleCommentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>[]
+        }
+        create: {
+          args: Prisma.ArticleCommentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>
+        }
+        createMany: {
+          args: Prisma.ArticleCommentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ArticleCommentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>[]
+        }
+        delete: {
+          args: Prisma.ArticleCommentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>
+        }
+        update: {
+          args: Prisma.ArticleCommentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ArticleCommentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ArticleCommentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ArticleCommentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ArticleCommentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ArticleCommentPayload>
+        }
+        aggregate: {
+          args: Prisma.ArticleCommentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateArticleComment>
+        }
+        groupBy: {
+          args: Prisma.ArticleCommentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ArticleCommentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ArticleCommentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ArticleCommentCountAggregateOutputType> | number
+        }
+      }
+    }
     ProductArticle: {
       payload: Prisma.$ProductArticlePayload<ExtArgs>
       fields: Prisma.ProductArticleFieldRefs
@@ -1422,6 +1497,22 @@ export const ArticleReactionScalarFieldEnum = {
 export type ArticleReactionScalarFieldEnum = (typeof ArticleReactionScalarFieldEnum)[keyof typeof ArticleReactionScalarFieldEnum]
 
 
+export const ArticleCommentScalarFieldEnum = {
+  id: 'id',
+  articleId: 'articleId',
+  userId: 'userId',
+  body: 'body',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt',
+  moderatedAt: 'moderatedAt',
+  moderatedById: 'moderatedById'
+} as const
+
+export type ArticleCommentScalarFieldEnum = (typeof ArticleCommentScalarFieldEnum)[keyof typeof ArticleCommentScalarFieldEnum]
+
+
 export const ProductArticleScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
@@ -1668,6 +1759,20 @@ export type ListEnumArticleReactionTypeFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'ArticleCommentStatus'
+ */
+export type EnumArticleCommentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleCommentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ArticleCommentStatus[]'
+ */
+export type ListEnumArticleCommentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleCommentStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1799,6 +1904,7 @@ export type GlobalOmitConfig = {
   articleBlock?: Prisma.ArticleBlockOmit
   savedArticle?: Prisma.SavedArticleOmit
   articleReaction?: Prisma.ArticleReactionOmit
+  articleComment?: Prisma.ArticleCommentOmit
   productArticle?: Prisma.ProductArticleOmit
   userPreference?: Prisma.UserPreferenceOmit
 }

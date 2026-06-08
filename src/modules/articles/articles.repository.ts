@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ArticleReactionType } from '../../generated/prisma/enums';
+import {
+  ArticleCommentStatus,
+  ArticleReactionType,
+} from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -15,6 +18,11 @@ export const articleListInclude = {
   },
   _count: {
     select: {
+      comments: {
+        where: {
+          status: ArticleCommentStatus.VISIBLE,
+        },
+      },
       reactions: true,
     },
   },
@@ -72,6 +80,21 @@ export type SavedArticleRecord = Prisma.SavedArticleGetPayload<{
 
 export type ArticleBlockRecord =
   Prisma.ArticleBlockGetPayload<Prisma.ArticleBlockDefaultArgs>;
+
+export const articleCommentAuthorSelect = {
+  id: true,
+  name: true,
+} as const;
+
+export const articleCommentInclude = {
+  user: {
+    select: articleCommentAuthorSelect,
+  },
+} satisfies Prisma.ArticleCommentInclude;
+
+export type ArticleCommentRecord = Prisma.ArticleCommentGetPayload<{
+  include: typeof articleCommentInclude;
+}>;
 
 @Injectable()
 export class ArticlesRepository {
@@ -334,6 +357,74 @@ export class ArticlesRepository {
     });
 
     return reactions.map(reaction => reaction.articleId);
+  }
+
+  async createComment(articleId: string, userId: string, body: string) {
+    return this.prisma.articleComment.create({
+      data: {
+        article: {
+          connect: {
+            id: articleId,
+          },
+        },
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        body,
+      },
+      include: articleCommentInclude,
+    });
+  }
+
+  async listVisibleCommentsByArticle(params: {
+    articleId: string;
+    skip: number;
+    take: number;
+  }) {
+    return this.prisma.articleComment.findMany({
+      where: {
+        articleId: params.articleId,
+        status: ArticleCommentStatus.VISIBLE,
+      },
+      skip: params.skip,
+      take: params.take,
+      orderBy: [
+        {
+          createdAt: 'desc',
+        },
+      ],
+      include: articleCommentInclude,
+    });
+  }
+
+  async countVisibleCommentsByArticle(articleId: string) {
+    return this.prisma.articleComment.count({
+      where: {
+        articleId,
+        status: ArticleCommentStatus.VISIBLE,
+      },
+    });
+  }
+
+  async findCommentById(commentId: string) {
+    return this.prisma.articleComment.findUnique({
+      where: {
+        id: commentId,
+      },
+      include: articleCommentInclude,
+    });
+  }
+
+  async updateComment(commentId: string, data: Prisma.ArticleCommentUpdateInput) {
+    return this.prisma.articleComment.update({
+      where: {
+        id: commentId,
+      },
+      data,
+      include: articleCommentInclude,
+    });
   }
 
   async createBlock(data: Prisma.ArticleBlockCreateInput) {

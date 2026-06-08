@@ -1,6 +1,7 @@
 import type {
   ArticleBlockKind,
   ArticleCategory,
+  ArticleCommentStatus,
 } from '../../../generated/prisma/enums';
 
 import type { ProductCategory } from '../../../generated/prisma/enums';
@@ -36,6 +37,7 @@ export interface ArticleListItemResponse {
   featured: boolean;
   author: ArticleAuthorResponse;
   reactionsCount: number;
+  commentsCount: number;
   isReacted: boolean;
   isSaved?: boolean;
 }
@@ -59,6 +61,28 @@ export interface ArticleBlockResponse {
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ArticleCommentAuthorResponse {
+  id: string;
+  name: string;
+}
+
+export interface ArticleCommentResponse {
+  id: string;
+  body: string;
+  status: ArticleCommentStatus;
+  createdAt: string;
+  updatedAt: string;
+  author: ArticleCommentAuthorResponse;
+}
+
+export interface ArticleCommentListItemResponse {
+  id: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  author: ArticleCommentAuthorResponse;
 }
 
 export interface ArticleDetailResponse extends ArticleListItemResponse {
@@ -87,6 +111,14 @@ export interface SavedArticleItemResponse extends ArticleListItemResponse {
 
 export interface SavedArticlesListResponse {
   items: SavedArticleItemResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ArticleCommentsListResponse {
+  items: ArticleCommentListItemResponse[];
   page: number;
   limit: number;
   total: number;

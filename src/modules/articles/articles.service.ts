@@ -1,15 +1,22 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client';
-import { ArticleBlockKind, ArticleReactionType } from '../../generated/prisma/enums';
+import {
+  ArticleBlockKind,
+  ArticleCommentStatus,
+  ArticleReactionType,
+} from '../../generated/prisma/enums';
 import { ArticlesRepository } from './articles.repository';
 import {
   toArticleBlockItemResponse,
+  toArticleCommentListItemResponse,
+  toArticleCommentResponse,
   toArticleDetailResponse,
   toArticleListItemResponse,
   toSavedArticleItemResponse,
@@ -17,15 +24,21 @@ import {
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import type { CreateArticleBlockDto } from './dto/create-article-block.dto';
 import type { CreateArticleBlockImageUploadDto } from './dto/create-article-block-image-upload.dto';
+import type { CreateArticleCommentDto } from './dto/create-article-comment.dto';
 import type { CreateArticleDto } from './dto/create-article.dto';
 import type { ListArticlesQueryDto } from './dto/list-articles-query.dto';
+import type { ListArticleCommentsQueryDto } from './dto/list-article-comments-query.dto';
+import type { ModerateArticleCommentDto } from './dto/moderate-article-comment.dto';
 import type { ListSavedArticlesQueryDto } from './dto/list-saved-articles-query.dto';
 import type { UploadArticleBlockImageDto } from './dto/upload-article-block-image.dto';
 import type { UpdateArticleBlockDto } from './dto/update-article-block.dto';
 import type { UpdateArticleBlockImageDto } from './dto/update-article-block-image.dto';
+import type { UpdateArticleCommentDto } from './dto/update-article-comment.dto';
 import type { UpdateArticleDto } from './dto/update-article.dto';
 import type {
   ArticleBlockResponse,
+  ArticleCommentResponse,
+  ArticleCommentsListResponse,
   ArticleDetailResponse,
   ArticleReactionResponse,
   ArticlesListResponse,
@@ -82,6 +95,7 @@ export class ArticlesService {
             isSaved: false,
             isReacted: reactedArticleIds.has(article.id),
             reactionsCount: article._count.reactions,
+            commentsCount: article._count.comments,
           },
         ),
       ),
@@ -103,6 +117,127 @@ export class ArticlesService {
 
   async getByIdForAdmin(id: string): Promise<ArticleDetailResponse> {
     return this.getDetailById(id, true);
+  }
+
+  async listComments(
+    articleId: string,
+    query: ListArticleCommentsQueryDto,
+  ): Promise<ArticleCommentsListResponse> {
+    const page = query.page ?? this.defaultPage;
+    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
+
+    await this.requireArticle(articleId);
+
+    const [comments, total] = await Promise.all([
+      this.articlesRepository.listVisibleCommentsByArticle({
+        articleId,
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.articlesRepository.countVisibleCommentsByArticle(articleId),
+    ]);
+
+    return {
+      items: comments.map(toArticleCommentListItemResponse),
+      page,
+      limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+    };
+  }
+
+  async createComment(
+    articleId: string,
+    createArticleCommentDto: CreateArticleCommentDto,
+    user: AuthenticatedUser,
+  ): Promise<ArticleCommentResponse> {
+    await this.requireArticle(articleId);
+
+    const comment = await this.articlesRepository.createComment(
+      articleId,
+      user.userId,
+      createArticleCommentDto.body,
+    );
+
+    return toArticleCommentResponse(comment);
+  }
+
+  async updateComment(
+    articleId: string,
+    commentId: string,
+    updateArticleCommentDto: UpdateArticleCommentDto,
+    user: AuthenticatedUser,
+  ): Promise<ArticleCommentResponse> {
+    await this.requireArticle(articleId, user.role === 'ADMIN');
+    const comment = await this.requireComment(articleId, commentId);
+
+    if (comment.userId !== user.userId) {
+      throw this.buildCommentOwnerForbiddenException();
+    }
+
+    if (comment.status === ArticleCommentStatus.DELETED) {
+      throw this.buildCommentNotFoundException();
+    }
+
+    if (comment.status !== ArticleCommentStatus.VISIBLE) {
+      throw this.buildCommentEditForbiddenException();
+    }
+
+    const updatedComment = await this.articlesRepository.updateComment(commentId, {
+      body: updateArticleCommentDto.body,
+    });
+
+    return toArticleCommentResponse(updatedComment);
+  }
+
+  async deleteComment(
+    articleId: string,
+    commentId: string,
+    user: AuthenticatedUser,
+  ) {
+    await this.requireArticle(articleId, user.role === 'ADMIN');
+    const comment = await this.requireComment(articleId, commentId);
+
+    if (user.role !== 'ADMIN' && comment.userId !== user.userId) {
+      throw this.buildCommentOwnerForbiddenException();
+    }
+
+    if (comment.status !== ArticleCommentStatus.DELETED) {
+      await this.articlesRepository.updateComment(commentId, {
+        status: ArticleCommentStatus.DELETED,
+        deletedAt: new Date(),
+      });
+    }
+
+    return {
+      message: 'Comentario removido.',
+    };
+  }
+
+  async moderateComment(
+    articleId: string,
+    commentId: string,
+    moderateArticleCommentDto: ModerateArticleCommentDto,
+    user: AuthenticatedUser,
+  ): Promise<ArticleCommentResponse> {
+    await this.requireArticle(articleId, true);
+    const comment = await this.requireComment(articleId, commentId);
+
+    if (comment.status === ArticleCommentStatus.DELETED) {
+      throw this.buildCommentNotFoundException();
+    }
+
+    const updatedComment = await this.articlesRepository.updateComment(commentId, {
+      status: moderateArticleCommentDto.status,
+      moderatedAt: new Date(),
+      moderatedBy: {
+        connect: {
+          id: user.userId,
+        },
+      },
+    });
+
+    return toArticleCommentResponse(updatedComment);
   }
 
   async uploadBlockImage(
@@ -178,6 +313,7 @@ export class ArticlesService {
         isSaved: false,
         isReacted,
         reactionsCount: article._count.reactions,
+        commentsCount: article._count.comments,
       },
     );
   }
@@ -334,6 +470,7 @@ export class ArticlesService {
           {
             isReacted: reactedArticleIds.has(savedArticle.article.id),
             reactionsCount: savedArticle.article._count.reactions,
+            commentsCount: savedArticle.article._count.comments,
           },
         ),
       ),
@@ -381,6 +518,7 @@ export class ArticlesService {
           isSaved: false,
           isReacted: false,
           reactionsCount: article._count.reactions,
+          commentsCount: article._count.comments,
         },
       );
     } catch (error) {
@@ -466,6 +604,7 @@ export class ArticlesService {
           isSaved: false,
           isReacted: false,
           reactionsCount: existingArticle._count.reactions,
+          commentsCount: existingArticle._count.comments,
         },
       );
     }
@@ -480,6 +619,7 @@ export class ArticlesService {
           isSaved: false,
           isReacted: false,
           reactionsCount: article._count.reactions,
+          commentsCount: article._count.comments,
         },
       );
     } catch (error) {
@@ -712,6 +852,7 @@ export class ArticlesService {
           isSaved: false,
           isReacted: false,
           reactionsCount: updatedArticle._count.reactions,
+          commentsCount: updatedArticle._count.comments,
         },
       );
     } catch (error) {
@@ -786,6 +927,16 @@ export class ArticlesService {
     }
 
     return block;
+  }
+
+  private async requireComment(articleId: string, commentId: string) {
+    const comment = await this.articlesRepository.findCommentById(commentId);
+
+    if (!comment || comment.articleId !== articleId) {
+      throw this.buildCommentNotFoundException();
+    }
+
+    return comment;
   }
 
   private async generateUniqueSlug(title: string, currentArticleId?: string) {
@@ -1013,6 +1164,27 @@ export class ArticlesService {
     return new NotFoundException({
       message: 'Bloco do artigo n\u00e3o encontrado.',
       error: 'Not Found',
+    });
+  }
+
+  private buildCommentNotFoundException() {
+    return new NotFoundException({
+      message: 'Comentario nao encontrado.',
+      error: 'Not Found',
+    });
+  }
+
+  private buildCommentOwnerForbiddenException() {
+    return new ForbiddenException({
+      message: 'Voce nao pode gerenciar este comentario.',
+      error: 'Forbidden',
+    });
+  }
+
+  private buildCommentEditForbiddenException() {
+    return new ForbiddenException({
+      message: 'Este comentario nao pode mais ser editado.',
+      error: 'Forbidden',
     });
   }
 

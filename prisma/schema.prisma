@@ -66,6 +66,12 @@ enum ArticleReactionType {
   HELPFUL
 }
 
+enum ArticleCommentStatus {
+  VISIBLE
+  HIDDEN
+  DELETED
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -94,7 +100,9 @@ model User {
   createdAt                       DateTime        @default(now())
   updatedAt                       DateTime        @updatedAt
   articles                        Article[]
+  articleComments                 ArticleComment[]       @relation("ArticleCommentAuthor")
   articleReactions                ArticleReaction[]
+  moderatedArticleComments        ArticleComment[]       @relation("ArticleCommentModerator")
   productFavorites                ProductFavorite[]
   savedArticles                   SavedArticle[]
   preferences                     UserPreference?
@@ -192,6 +200,7 @@ model Article {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   blocks           ArticleBlock[]
+  comments         ArticleComment[]
   productRelations ProductArticle[]
   reactions        ArticleReaction[]
   savedBy          SavedArticle[]
@@ -240,6 +249,26 @@ model ArticleReaction {
   @@unique([userId, articleId, type])
   @@index([userId, createdAt])
   @@index([articleId, type])
+}
+
+model ArticleComment {
+  id            String               @id @default(cuid())
+  articleId     String
+  userId        String
+  body          String
+  status        ArticleCommentStatus @default(VISIBLE)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  deletedAt     DateTime?
+  moderatedAt   DateTime?
+  moderatedById String?
+  article       Article              @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user          User                 @relation("ArticleCommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  moderatedBy   User?                @relation("ArticleCommentModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  @@index([articleId, createdAt])
+  @@index([userId])
+  @@index([status])
 }
 
 model ProductArticle {

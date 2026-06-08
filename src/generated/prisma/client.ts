@@ -85,6 +85,11 @@ export type SavedArticle = Prisma.SavedArticleModel
  */
 export type ArticleReaction = Prisma.ArticleReactionModel
 /**
+ * Model ArticleComment
+ * 
+ */
+export type ArticleComment = Prisma.ArticleCommentModel
+/**
  * Model ProductArticle
  * 
  */

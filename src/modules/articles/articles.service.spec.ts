@@ -1,4 +1,8 @@
-import { ArticleCategory, ProductCategory } from '../../generated/prisma/enums';
+import {
+  ArticleCategory,
+  ArticleCommentStatus,
+  ProductCategory,
+} from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { StorageService } from '../storage/storage.service';
@@ -34,6 +38,7 @@ describe('ArticlesService', () => {
     blocks: [],
     productRelations: [],
     _count: {
+      comments: 0,
       reactions: 0,
     },
   };
@@ -96,6 +101,11 @@ describe('ArticlesService', () => {
     deleteReaction: jest.fn(),
     countReactions: jest.fn(),
     getReactionArticleIdsForUser: jest.fn(),
+    createComment: jest.fn(),
+    listVisibleCommentsByArticle: jest.fn(),
+    countVisibleCommentsByArticle: jest.fn(),
+    findCommentById: jest.fn(),
+    updateComment: jest.fn(),
   } as unknown as jest.Mocked<
     Pick<
       ArticlesRepository,
@@ -122,6 +132,11 @@ describe('ArticlesService', () => {
       | 'deleteReaction'
       | 'countReactions'
       | 'getReactionArticleIdsForUser'
+      | 'createComment'
+      | 'listVisibleCommentsByArticle'
+      | 'countVisibleCommentsByArticle'
+      | 'findCommentById'
+      | 'updateComment'
     >
   >;
 
@@ -170,6 +185,7 @@ describe('ArticlesService', () => {
       publishedAt: (data.publishedAt as Date | null | undefined) ?? null,
       blocks: [],
       _count: {
+        comments: 0,
         reactions: 0,
       },
     };
@@ -203,6 +219,7 @@ describe('ArticlesService', () => {
       slug: baseArticle.slug,
       category: baseArticle.category,
       author: baseArticle.author,
+      commentsCount: 0,
       reactionsCount: 0,
       isReacted: false,
       isSaved: false,
@@ -281,6 +298,7 @@ describe('ArticlesService', () => {
     );
     expect(result.data[0]).toMatchObject({
       id: baseArticle.id,
+      commentsCount: 0,
       reactionsCount: 0,
       isReacted: true,
     });
@@ -326,6 +344,7 @@ describe('ArticlesService', () => {
       slug: baseArticle.slug,
       author: baseArticle.author,
       readingTimeMinutes: 1,
+      commentsCount: 0,
       reactionsCount: 0,
       isReacted: false,
       isSaved: false,
@@ -372,6 +391,7 @@ describe('ArticlesService', () => {
     expect(result).toMatchObject({
       id: baseArticle.id,
       title: baseArticle.title,
+      commentsCount: 0,
       reactionsCount: 0,
       isReacted: false,
       isSaved: false,
@@ -396,6 +416,7 @@ describe('ArticlesService', () => {
       'HELPFUL',
     );
     expect(result.isReacted).toBe(true);
+    expect(result.commentsCount).toBe(0);
     expect(result.reactionsCount).toBe(0);
   });
 
@@ -454,6 +475,349 @@ describe('ArticlesService', () => {
         message: 'Artigo não encontrado.',
       },
     });
+  });
+
+  it('lists visible comments with pagination metadata', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.listVisibleCommentsByArticle.mockResolvedValue([
+      {
+        id: 'comment-1',
+        articleId: baseArticle.id,
+        userId: regularUser.userId,
+        body: 'Muito util.',
+        status: ArticleCommentStatus.VISIBLE,
+        createdAt: new Date('2026-06-01T10:00:00.000Z'),
+        updatedAt: new Date('2026-06-01T10:00:00.000Z'),
+        deletedAt: null,
+        moderatedAt: null,
+        moderatedById: null,
+        user: {
+          id: regularUser.userId,
+          name: 'Usuario comum',
+        },
+      },
+    ] as never);
+    articlesRepository.countVisibleCommentsByArticle.mockResolvedValue(1);
+
+    const result = await service.listComments(baseArticle.id, {
+      page: 1,
+      limit: 20,
+    });
+
+    expect(articlesRepository.listVisibleCommentsByArticle).toHaveBeenCalledWith({
+      articleId: baseArticle.id,
+      skip: 0,
+      take: 20,
+    });
+    expect(result).toEqual({
+      items: [
+        {
+          id: 'comment-1',
+          body: 'Muito util.',
+          createdAt: '2026-06-01T10:00:00.000Z',
+          updatedAt: '2026-06-01T10:00:00.000Z',
+          author: {
+            id: regularUser.userId,
+            name: 'Usuario comum',
+          },
+        },
+      ],
+      page: 1,
+      limit: 20,
+      total: 1,
+      totalPages: 1,
+    });
+  });
+
+  it('creates a comment on a published article', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.createComment.mockResolvedValue({
+      id: 'comment-1',
+      articleId: baseArticle.id,
+      userId: regularUser.userId,
+      body: 'Comentario do usuario',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: new Date('2026-06-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T10:00:00.000Z'),
+      deletedAt: null,
+      moderatedAt: null,
+      moderatedById: null,
+      user: {
+        id: regularUser.userId,
+        name: 'Usuario comum',
+      },
+    } as never);
+
+    const result = await service.createComment(
+      baseArticle.id,
+      { body: 'Comentario do usuario' },
+      regularUser,
+    );
+
+    expect(articlesRepository.createComment).toHaveBeenCalledWith(
+      baseArticle.id,
+      regularUser.userId,
+      'Comentario do usuario',
+    );
+    expect(result).toEqual({
+      id: 'comment-1',
+      body: 'Comentario do usuario',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: '2026-06-01T10:00:00.000Z',
+      updatedAt: '2026-06-01T10:00:00.000Z',
+      author: {
+        id: regularUser.userId,
+        name: 'Usuario comum',
+      },
+    });
+  });
+
+  it('does not allow commenting on an unpublished article as a normal user', async () => {
+    articlesRepository.findById.mockResolvedValue(null);
+
+    await expect(
+      service.createComment(baseArticle.id, { body: 'Comentario' }, regularUser),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Artigo não encontrado.',
+      },
+    });
+  });
+
+  it('updates a visible comment owned by the user', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findCommentById.mockResolvedValue({
+      id: 'comment-1',
+      articleId: baseArticle.id,
+      userId: regularUser.userId,
+      body: 'Texto antigo',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: new Date('2026-06-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T10:00:00.000Z'),
+      deletedAt: null,
+      moderatedAt: null,
+      moderatedById: null,
+      user: {
+        id: regularUser.userId,
+        name: 'Usuario comum',
+      },
+    } as never);
+    articlesRepository.updateComment.mockResolvedValue({
+      id: 'comment-1',
+      articleId: baseArticle.id,
+      userId: regularUser.userId,
+      body: 'Texto atualizado',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: new Date('2026-06-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T11:00:00.000Z'),
+      deletedAt: null,
+      moderatedAt: null,
+      moderatedById: null,
+      user: {
+        id: regularUser.userId,
+        name: 'Usuario comum',
+      },
+    } as never);
+
+    const result = await service.updateComment(
+      baseArticle.id,
+      'comment-1',
+      { body: 'Texto atualizado' },
+      regularUser,
+    );
+
+    expect(articlesRepository.updateComment).toHaveBeenCalledWith('comment-1', {
+      body: 'Texto atualizado',
+    });
+    expect(result.body).toBe('Texto atualizado');
+  });
+
+  it('prevents a user from editing another users comment', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findCommentById.mockResolvedValue({
+      id: 'comment-1',
+      articleId: baseArticle.id,
+      userId: 'other-user',
+      body: 'Texto antigo',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: new Date('2026-06-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T10:00:00.000Z'),
+      deletedAt: null,
+      moderatedAt: null,
+      moderatedById: null,
+      user: {
+        id: 'other-user',
+        name: 'Outra pessoa',
+      },
+    } as never);
+
+    await expect(
+      service.updateComment(
+        baseArticle.id,
+        'comment-1',
+        { body: 'Texto atualizado' },
+        regularUser,
+      ),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Voce nao pode gerenciar este comentario.',
+      },
+    });
+  });
+
+  it('soft deletes a comment owned by the user', async () => {
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+    articlesRepository.findCommentById.mockResolvedValue({
+      id: 'comment-1',
+      articleId: baseArticle.id,
+      userId: regularUser.userId,
+      body: 'Texto antigo',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: new Date('2026-06-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T10:00:00.000Z'),
+      deletedAt: null,
+      moderatedAt: null,
+      moderatedById: null,
+      user: {
+        id: regularUser.userId,
+        name: 'Usuario comum',
+      },
+    } as never);
+    articlesRepository.updateComment.mockResolvedValue({} as never);
+
+    const result = await service.deleteComment(baseArticle.id, 'comment-1', regularUser);
+
+    expect(articlesRepository.updateComment).toHaveBeenCalledWith(
+      'comment-1',
+      expect.objectContaining({
+        status: ArticleCommentStatus.DELETED,
+        deletedAt: expect.any(Date),
+      }),
+    );
+    expect(result).toEqual({
+      message: 'Comentario removido.',
+    });
+  });
+
+  it('allows an admin to delete any comment', async () => {
+    articlesRepository.findById.mockResolvedValue({
+      ...baseArticle,
+      isPublished: false,
+      publishedAt: null,
+    });
+    articlesRepository.findCommentById.mockResolvedValue({
+      id: 'comment-1',
+      articleId: baseArticle.id,
+      userId: regularUser.userId,
+      body: 'Texto antigo',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: new Date('2026-06-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T10:00:00.000Z'),
+      deletedAt: null,
+      moderatedAt: null,
+      moderatedById: null,
+      user: {
+        id: regularUser.userId,
+        name: 'Usuario comum',
+      },
+    } as never);
+    articlesRepository.updateComment.mockResolvedValue({} as never);
+
+    await service.deleteComment(baseArticle.id, 'comment-1', adminUser);
+
+    expect(articlesRepository.updateComment).toHaveBeenCalledWith(
+      'comment-1',
+      expect.objectContaining({
+        status: ArticleCommentStatus.DELETED,
+        deletedAt: expect.any(Date),
+      }),
+    );
+  });
+
+  it('allows an admin to hide and unhide a comment', async () => {
+    articlesRepository.findById.mockResolvedValue({
+      ...baseArticle,
+      isPublished: false,
+      publishedAt: null,
+    });
+    articlesRepository.findCommentById.mockResolvedValue({
+      id: 'comment-1',
+      articleId: baseArticle.id,
+      userId: regularUser.userId,
+      body: 'Texto antigo',
+      status: ArticleCommentStatus.VISIBLE,
+      createdAt: new Date('2026-06-01T10:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T10:00:00.000Z'),
+      deletedAt: null,
+      moderatedAt: null,
+      moderatedById: null,
+      user: {
+        id: regularUser.userId,
+        name: 'Usuario comum',
+      },
+    } as never);
+    articlesRepository.updateComment
+      .mockResolvedValueOnce({
+        id: 'comment-1',
+        articleId: baseArticle.id,
+        userId: regularUser.userId,
+        body: 'Texto antigo',
+        status: ArticleCommentStatus.HIDDEN,
+        createdAt: new Date('2026-06-01T10:00:00.000Z'),
+        updatedAt: new Date('2026-06-01T11:00:00.000Z'),
+        deletedAt: null,
+        moderatedAt: new Date('2026-06-01T11:00:00.000Z'),
+        moderatedById: adminUser.userId,
+        user: {
+          id: regularUser.userId,
+          name: 'Usuario comum',
+        },
+      } as never)
+      .mockResolvedValueOnce({
+        id: 'comment-1',
+        articleId: baseArticle.id,
+        userId: regularUser.userId,
+        body: 'Texto antigo',
+        status: ArticleCommentStatus.VISIBLE,
+        createdAt: new Date('2026-06-01T10:00:00.000Z'),
+        updatedAt: new Date('2026-06-01T12:00:00.000Z'),
+        deletedAt: null,
+        moderatedAt: new Date('2026-06-01T12:00:00.000Z'),
+        moderatedById: adminUser.userId,
+        user: {
+          id: regularUser.userId,
+          name: 'Usuario comum',
+        },
+      } as never);
+
+    const hidden = await service.moderateComment(
+      baseArticle.id,
+      'comment-1',
+      { status: ArticleCommentStatus.HIDDEN },
+      adminUser,
+    );
+    const visible = await service.moderateComment(
+      baseArticle.id,
+      'comment-1',
+      { status: ArticleCommentStatus.VISIBLE },
+      adminUser,
+    );
+
+    expect(hidden.status).toBe(ArticleCommentStatus.HIDDEN);
+    expect(visible.status).toBe(ArticleCommentStatus.VISIBLE);
+    expect(articlesRepository.updateComment).toHaveBeenNthCalledWith(
+      1,
+      'comment-1',
+      expect.objectContaining({
+        status: ArticleCommentStatus.HIDDEN,
+        moderatedAt: expect.any(Date),
+        moderatedBy: {
+          connect: {
+            id: adminUser.userId,
+          },
+        },
+      }),
+    );
   });
 
   it('saves an article idempotently', async () => {
@@ -631,6 +995,7 @@ describe('ArticlesService', () => {
         expect.objectContaining({
           id: baseArticle.id,
           title: baseArticle.title,
+          commentsCount: 0,
           isSaved: true,
         }),
       ],
