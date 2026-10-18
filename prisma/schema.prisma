@@ -106,6 +106,7 @@ model User {
   productFavorites                ProductFavorite[]
   savedArticles                   SavedArticle[]
   preferences                     UserPreference?
+  trainingAttempts                TrainingAttempt[]
 }
 
 model Product {
@@ -128,6 +129,47 @@ model Product {
   guideSections    ProductGuideSection[]
   favorites        ProductFavorite[]
   articleRelations ProductArticle[]
+  trainingQuestions TrainingQuestion[]
+}
+
+model TrainingQuestion {
+  id                 String   @id @default(cuid())
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  prompt             String
+  options            String[]
+  correctOptionIndex Int
+  explanation        String
+  sourceReference    String?
+  sortOrder          Int      @default(0)
+  isPublished        Boolean  @default(false)
+  isDemo             Boolean  @default(false)
+  seedKey            String?  @unique
+  version            Int      @default(1)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  attempts           TrainingAttempt[]
+
+  @@index([productId, isPublished, sortOrder])
+}
+
+model TrainingAttempt {
+  id                 Int      @id @default(autoincrement())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId         String
+  question           TrainingQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionVersion    Int
+  selectedOptionIndex Int
+  isCorrect          Boolean
+  correctOptionIndex Int
+  explanation        String
+  sourceReference    String?
+  submissionKey      String
+  createdAt          DateTime @default(now())
+
+  @@unique([userId, submissionKey])
+  @@index([userId, questionId, id])
 }
 
 model ProductFavorite {
