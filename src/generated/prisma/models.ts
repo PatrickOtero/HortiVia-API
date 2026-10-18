@@ -10,6 +10,8 @@
  */
 export type * from './models/User'
 export type * from './models/Product'
+export type * from './models/TrainingQuestion'
+export type * from './models/TrainingAttempt'
 export type * from './models/ProductFavorite'
 export type * from './models/ProductImage'
 export type * from './models/ProductGuideSection'

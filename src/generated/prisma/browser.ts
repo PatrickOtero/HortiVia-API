@@ -28,6 +28,16 @@ export type User = Prisma.UserModel
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model TrainingQuestion
+ *
+ */
+export type TrainingQuestion = Prisma.TrainingQuestionModel
+/**
+ * Model TrainingAttempt
+ *
+ */
+export type TrainingAttempt = Prisma.TrainingAttemptModel
+/**
  * Model ProductFavorite
  * 
  */

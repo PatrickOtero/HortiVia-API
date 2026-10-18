@@ -11,6 +11,7 @@ import {
   UserRole,
 } from '../src/generated/prisma/enums';
 import { Prisma, PrismaClient } from '../src/generated/prisma/client';
+import { seedTraining } from './training-seed';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -971,7 +972,7 @@ async function main() {
   }
 }
 
-void main()
+void main().then(() => seedTraining(prisma))
   .then(async () => {
     await prisma.$disconnect();
   })

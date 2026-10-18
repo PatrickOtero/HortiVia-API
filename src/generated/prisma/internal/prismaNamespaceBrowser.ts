@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Product: 'Product',
+  TrainingQuestion: 'TrainingQuestion',
+  TrainingAttempt: 'TrainingAttempt',
   ProductFavorite: 'ProductFavorite',
   ProductImage: 'ProductImage',
   ProductGuideSection: 'ProductGuideSection',
@@ -125,6 +127,43 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const TrainingQuestionScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  prompt: 'prompt',
+  options: 'options',
+  correctOptionIndex: 'correctOptionIndex',
+  explanation: 'explanation',
+  sourceReference: 'sourceReference',
+  sortOrder: 'sortOrder',
+  isPublished: 'isPublished',
+  isDemo: 'isDemo',
+  seedKey: 'seedKey',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TrainingQuestionScalarFieldEnum = (typeof TrainingQuestionScalarFieldEnum)[keyof typeof TrainingQuestionScalarFieldEnum]
+
+
+export const TrainingAttemptScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  questionId: 'questionId',
+  questionVersion: 'questionVersion',
+  selectedOptionIndex: 'selectedOptionIndex',
+  isCorrect: 'isCorrect',
+  correctOptionIndex: 'correctOptionIndex',
+  explanation: 'explanation',
+  sourceReference: 'sourceReference',
+  submissionKey: 'submissionKey',
+  createdAt: 'createdAt'
+} as const
+
+export type TrainingAttemptScalarFieldEnum = (typeof TrainingAttemptScalarFieldEnum)[keyof typeof TrainingAttemptScalarFieldEnum]
 
 
 export const ProductFavoriteScalarFieldEnum = {

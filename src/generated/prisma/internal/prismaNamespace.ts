@@ -386,6 +386,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Product: 'Product',
+  TrainingQuestion: 'TrainingQuestion',
+  TrainingAttempt: 'TrainingAttempt',
   ProductFavorite: 'ProductFavorite',
   ProductImage: 'ProductImage',
   ProductGuideSection: 'ProductGuideSection',
@@ -411,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "articleReaction" | "articleComment" | "productArticle" | "userPreference"
+    modelProps: "user" | "product" | "trainingQuestion" | "trainingAttempt" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "articleReaction" | "articleComment" | "productArticle" | "userPreference"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -560,6 +562,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
+    TrainingQuestion: {
+      payload: Prisma.$TrainingQuestionPayload<ExtArgs>
+      fields: Prisma.TrainingQuestionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TrainingQuestionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TrainingQuestionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>
+        }
+        findFirst: {
+          args: Prisma.TrainingQuestionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TrainingQuestionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>
+        }
+        findMany: {
+          args: Prisma.TrainingQuestionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>[]
+        }
+        create: {
+          args: Prisma.TrainingQuestionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>
+        }
+        createMany: {
+          args: Prisma.TrainingQuestionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TrainingQuestionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>[]
+        }
+        delete: {
+          args: Prisma.TrainingQuestionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>
+        }
+        update: {
+          args: Prisma.TrainingQuestionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>
+        }
+        deleteMany: {
+          args: Prisma.TrainingQuestionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TrainingQuestionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TrainingQuestionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>[]
+        }
+        upsert: {
+          args: Prisma.TrainingQuestionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingQuestionPayload>
+        }
+        aggregate: {
+          args: Prisma.TrainingQuestionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTrainingQuestion>
+        }
+        groupBy: {
+          args: Prisma.TrainingQuestionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrainingQuestionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TrainingQuestionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrainingQuestionCountAggregateOutputType> | number
+        }
+      }
+    }
+    TrainingAttempt: {
+      payload: Prisma.$TrainingAttemptPayload<ExtArgs>
+      fields: Prisma.TrainingAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TrainingAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TrainingAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.TrainingAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TrainingAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.TrainingAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.TrainingAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.TrainingAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TrainingAttemptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>[]
+        }
+        delete: {
+          args: Prisma.TrainingAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>
+        }
+        update: {
+          args: Prisma.TrainingAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.TrainingAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TrainingAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TrainingAttemptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>[]
+        }
+        upsert: {
+          args: Prisma.TrainingAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrainingAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.TrainingAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTrainingAttempt>
+        }
+        groupBy: {
+          args: Prisma.TrainingAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrainingAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TrainingAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrainingAttemptCountAggregateOutputType> | number
         }
       }
     }
@@ -1388,6 +1538,43 @@ export const ProductScalarFieldEnum = {
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
 
 
+export const TrainingQuestionScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  prompt: 'prompt',
+  options: 'options',
+  correctOptionIndex: 'correctOptionIndex',
+  explanation: 'explanation',
+  sourceReference: 'sourceReference',
+  sortOrder: 'sortOrder',
+  isPublished: 'isPublished',
+  isDemo: 'isDemo',
+  seedKey: 'seedKey',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TrainingQuestionScalarFieldEnum = (typeof TrainingQuestionScalarFieldEnum)[keyof typeof TrainingQuestionScalarFieldEnum]
+
+
+export const TrainingAttemptScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  questionId: 'questionId',
+  questionVersion: 'questionVersion',
+  selectedOptionIndex: 'selectedOptionIndex',
+  isCorrect: 'isCorrect',
+  correctOptionIndex: 'correctOptionIndex',
+  explanation: 'explanation',
+  sourceReference: 'sourceReference',
+  submissionKey: 'submissionKey',
+  createdAt: 'createdAt'
+} as const
+
+export type TrainingAttemptScalarFieldEnum = (typeof TrainingAttemptScalarFieldEnum)[keyof typeof TrainingAttemptScalarFieldEnum]
+
+
 export const ProductFavoriteScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1897,6 +2084,8 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   product?: Prisma.ProductOmit
+  trainingQuestion?: Prisma.TrainingQuestionOmit
+  trainingAttempt?: Prisma.TrainingAttemptOmit
   productFavorite?: Prisma.ProductFavoriteOmit
   productImage?: Prisma.ProductImageOmit
   productGuideSection?: Prisma.ProductGuideSectionOmit
