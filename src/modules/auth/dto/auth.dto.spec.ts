@@ -175,6 +175,18 @@ describe('Auth DTO validation', () => {
     expect(dto.email).toBe('patrick@email.com');
   });
 
+  it('confirm e-mail rejects a recipient containing header injection characters', async () => {
+    await expect(
+      getValidationMessages(
+        {
+          email: 'patrick@email.com\r\nBcc: attacker@example.com',
+          code: '123456',
+        },
+        ConfirmEmailDto,
+      ),
+    ).resolves.toContain('Informe um e-mail válido.');
+  });
+
   it('confirm e-mail requires a 6-digit code', async () => {
     await expect(
       getValidationMessages(
@@ -201,6 +213,15 @@ describe('Auth DTO validation', () => {
     });
 
     expect(dto.email).toBe('patrick@email.com');
+  });
+
+  it('forgot password rejects a recipient containing header injection characters', async () => {
+    await expect(
+      getValidationMessages(
+        { email: 'patrick@email.com\r\nBcc: attacker@example.com' },
+        ForgotPasswordDto,
+      ),
+    ).resolves.toContain('Informe um e-mail válido.');
   });
 
   it('reset password normalizes the e-mail', () => {

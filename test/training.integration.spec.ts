@@ -16,6 +16,9 @@ import { TrainingService } from '../src/modules/training/training.service';
 import { seedTraining } from '../prisma/training-seed';
 
 const databaseUrl = process.env.TRAINING_TEST_DATABASE_URL;
+if (process.env.CI === 'true' && !databaseUrl) {
+  throw new Error('TRAINING_TEST_DATABASE_URL is required in CI; PostgreSQL integration tests cannot be skipped.');
+}
 const integration = databaseUrl ? describe : describe.skip;
 const form = { prompt: 'Como escolher este produto?', options: ['Firme', 'Amassado', 'Sem observar'],
   correctOptionIndex: 0, explanation: 'O guia recomenda observar a firmeza.', sourceReference: 'Guia local de teste', sortOrder: 0, isPublished: true };
