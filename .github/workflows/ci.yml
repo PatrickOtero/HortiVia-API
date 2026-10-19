@@ -1,0 +1,97 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: PostgreSQL, Prisma, lint, TypeScript, build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: readiness
+          POSTGRES_PASSWORD: readiness-disposable
+          POSTGRES_DB: hortivia_training_test_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U readiness -d hortivia_training_test_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      CI: 'true'
+      DATABASE_URL: postgresql://readiness:readiness-disposable@127.0.0.1:5432/hortivia_training_test_ci?schema=public
+      TRAINING_TEST_DATABASE_URL: postgresql://readiness:readiness-disposable@127.0.0.1:5432/hortivia_training_test_ci?schema=public
+      JWT_SECRET: ci-only-not-a-production-secret
+      NODEMAILER_HOST: 127.0.0.1
+      NODEMAILER_PORT: '2525'
+      NODEMAILER_SECURE: 'false'
+      NODEMAILER_REQUIRE_TLS: 'false'
+      NODEMAILER_USER: ci@example.invalid
+      NODEMAILER_PASS: ci-only-not-a-production-password
+      NODEMAILER_FROM: ci@example.invalid
+      EMAIL_CONFIRMATION_CODE_EXPIRES_IN_MINUTES: '10'
+      EMAIL_CONFIRMATION_RESEND_COOLDOWN_SECONDS: '60'
+      EMAIL_CONFIRMATION_MAX_ATTEMPTS: '5'
+      PASSWORD_RESET_CODE_EXPIRES_IN_MINUTES: '10'
+      PASSWORD_RESET_RESEND_COOLDOWN_SECONDS: '60'
+      PASSWORD_RESET_MAX_ATTEMPTS: '5'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install from lockfile
+        run: npm ci
+
+      - name: Validate Prisma schema
+        run: npm exec -- prisma validate
+
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
+
+      - name: Apply migrations to an empty database
+        run: npm exec -- prisma migrate deploy
+
+      - name: Verify migration history and reapplication
+        run: |
+          npm exec -- prisma migrate status
+          npm exec -- prisma migrate deploy
+          npm exec -- prisma migrate status
+
+      - name: Seed disposable integration catalog
+        run: npm run prisma:seed
+
+      - name: Lint
+        run: npm run lint
+
+      - name: TypeScript without emission
+        run: npm exec -- tsc --noEmit
+
+      - name: Build NestJS
+        run: npm run build
+
+      - name: Reject critical production dependency advisories
+        run: npm audit --omit=dev --audit-level=critical
+
+      - name: Run Jest with PostgreSQL integration tests required
+        run: npm test -- --runInBand --json --outputFile=backend-ci-results.json
+
+      - name: Reject skipped database integration tests
+        run: node scripts/assert-ci-test-results.cjs backend-ci-results.json
