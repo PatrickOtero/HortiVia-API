@@ -16,7 +16,8 @@
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "training:editorial": "ts-node scripts/apply-training-editorial.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1051.0",

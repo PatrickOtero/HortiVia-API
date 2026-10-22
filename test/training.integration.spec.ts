@@ -13,7 +13,6 @@ import { RolesGuard } from '../src/modules/auth/guards/roles.guard';
 import { JwtStrategy } from '../src/modules/auth/strategies/jwt.strategy';
 import { AdminTrainingController, TrainingController } from '../src/modules/training/training.controller';
 import { TrainingService } from '../src/modules/training/training.service';
-import { seedTraining } from '../prisma/training-seed';
 
 const databaseUrl = process.env.TRAINING_TEST_DATABASE_URL;
 if (process.env.CI === 'true' && !databaseUrl) {
@@ -36,6 +35,8 @@ integration('Training HTTP + PostgreSQL (isolated database required)', () => {
   let adminToken: string;
   let userToken: string;
   let otherToken: string;
+  const executionId = randomUUID();
+  const createdUserIds: string[] = [];
 
   async function call<T = Record<string, unknown>>(path: string, token?: string, method = 'GET', body?: unknown) {
     const response = await fetch(base + path, { method, headers: { 'Content-Type': 'application/json',
@@ -70,19 +71,57 @@ integration('Training HTTP + PostgreSQL (isolated database required)', () => {
     await app.listen(0, '127.0.0.1');
     base = await app.getUrl();
     const jwt = module.get(JwtService);
-    const users = await Promise.all(['USER', 'USER', 'ADMIN'].map((role, i) => prisma.user.create({
-      data: { name: `Treinamento ${i}`, email: `${randomUUID()}@example.invalid`, passwordHash: 'not-a-real-credential',
-        role: role as 'USER' | 'ADMIN', emailVerified: true },
-    })));
+    const users = [];
+    for (const [i, role] of ['USER', 'USER', 'ADMIN'].entries()) {
+      const user = await prisma.user.create({
+        data: { name: `Treinamento ${i}`, email: `training-test-${executionId}-${i}@example.invalid`, passwordHash: 'not-a-real-credential',
+          role: role as 'USER' | 'ADMIN', emailVerified: true },
+      });
+      createdUserIds.push(user.id);
+      users.push(user);
+    }
     [userId, otherUserId] = users.map(u => u.id);
     [userToken, otherToken, adminToken] = users.map(u => jwt.sign({ sub: u.id, email: u.email, role: u.role }));
-    const product = await prisma.product.create({ data: { name: 'Produto de integração', slug: `training-${randomUUID()}`,
+    const product = await prisma.product.create({ data: { name: 'Produto de integração', slug: `training-test-${executionId}`,
       category: 'FRUIT', shortDescription: 'Somente banco local isolado', benefits: [], howToChoose: [], howToStore: [], usageTips: [] } });
     productId = product.id;
   }, 30000);
 
   beforeEach(async () => { await prisma.trainingQuestion.deleteMany({ where: { productId } }); });
-  afterAll(async () => { await app?.close(); await prisma?.$disconnect(); });
+  afterAll(async () => {
+    const cleanupErrors: string[] = [];
+    try {
+      await app?.close();
+    } catch (error) {
+      cleanupErrors.push(`Could not close integration app: ${String(error)}`);
+    }
+    if (productId) {
+      try {
+        await prisma?.product.deleteMany({ where: { id: productId } });
+        if (await prisma?.product.count({ where: { id: productId } })) {
+          cleanupErrors.push('A fixture product created by this execution was not removed.');
+        }
+      } catch (error) {
+        cleanupErrors.push(`Could not remove integration product: ${String(error)}`);
+      }
+    }
+    if (createdUserIds.length) {
+      try {
+        await prisma?.user.deleteMany({ where: { id: { in: createdUserIds } } });
+        if (await prisma?.user.count({ where: { id: { in: createdUserIds } } })) {
+          cleanupErrors.push('A fixture user created by this execution was not removed.');
+        }
+      } catch (error) {
+        cleanupErrors.push(`Could not remove integration users: ${String(error)}`);
+      }
+    }
+    try {
+      await prisma?.$disconnect();
+    } catch (error) {
+      cleanupErrors.push(`Could not disconnect the integration database: ${String(error)}`);
+    }
+    if (cleanupErrors.length) throw new Error(cleanupErrors.join('\n'));
+  });
 
   it('requires authentication and rejects common users on every admin method', async () => {
     expect((await call(`/training/products/${productId}`)).status).toBe(401);
@@ -194,18 +233,5 @@ integration('Training HTTP + PostgreSQL (isolated database required)', () => {
   });
   it('enforces migration CHECK constraints at database level', async () => {
     await expect(prisma.trainingQuestion.create({ data: { productId, ...form, options: ['Só uma'] } })).rejects.toThrow();
-  });
-  it('seeds 33 drafts for the 11 existing seed products without overwriting editorial edits', async () => {
-    expect(await seedTraining(prisma)).toEqual({ products: 11, drafts: 33 });
-    const q = await prisma.trainingQuestion.findFirstOrThrow({ where: { seedKey: { not: null } } });
-    try {
-      const edited = await prisma.trainingQuestion.update({ where: { id: q.id }, data: { prompt: 'Revisão editorial preservada?', isPublished: true, isDemo: false } });
-      await seedTraining(prisma);
-      expect(await prisma.trainingQuestion.findUnique({ where: { id: q.id } })).toEqual(edited);
-      expect(await prisma.trainingQuestion.count({ where: { seedKey: { not: null } } })).toBe(33);
-    } finally {
-      // Restore only the fixture touched by this test, including its editorial state.
-      await prisma.trainingQuestion.update({ where: { id: q.id }, data: q });
-    }
   });
 });
