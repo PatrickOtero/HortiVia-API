@@ -381,6 +381,32 @@ describe('ProductsService', () => {
     ]);
   });
 
+  it('uses the article cover image in related product previews', async () => {
+    productsRepository.findById.mockResolvedValue({
+      ...baseProduct,
+      articleRelations: [
+        {
+          id: 'relation-1',
+          productId: baseProduct.id,
+          articleId: baseArticle.id,
+          sortOrder: 0,
+          createdAt: new Date('2026-05-20T11:00:00.000Z'),
+          article: {
+            ...baseArticle,
+            imageUrl: 'https://cdn.hortivia.com/legacy.jpg',
+            coverImageUrl: 'https://cdn.hortivia.com/cover.jpg',
+          },
+        },
+      ],
+    });
+
+    const result = await service.getById(baseProduct.id);
+
+    expect(result.relatedArticles[0].imageUrl).toBe(
+      'https://cdn.hortivia.com/cover.jpg',
+    );
+  });
+
   it('allows an admin flow to relate a product and an article idempotently', async () => {
     productsRepository.findById.mockResolvedValue(baseProduct);
     articlesRepository.findById.mockResolvedValue(baseArticle);
@@ -394,6 +420,27 @@ describe('ProductsService', () => {
     expect(result).toEqual({
       message: 'Relação salva com sucesso.',
     });
+  });
+
+  it('allows one article to be related to multiple products', async () => {
+    productsRepository.findById
+      .mockResolvedValueOnce(baseProduct)
+      .mockResolvedValueOnce({ ...baseProduct, id: 'product-2', name: 'Tomate' });
+    articlesRepository.findById.mockResolvedValue(baseArticle);
+
+    await service.relateArticle(baseProduct.id, baseArticle.id);
+    await service.relateArticle('product-2', baseArticle.id);
+
+    expect(productsRepository.upsertProductArticleRelation).toHaveBeenNthCalledWith(
+      1,
+      baseProduct.id,
+      baseArticle.id,
+    );
+    expect(productsRepository.upsertProductArticleRelation).toHaveBeenNthCalledWith(
+      2,
+      'product-2',
+      baseArticle.id,
+    );
   });
 
   it('allows updating the sort order of an existing product and article relation', async () => {

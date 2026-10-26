@@ -132,7 +132,7 @@ function toRelatedArticles(
     slug: relation.article.slug,
     summary: relation.article.summary,
     category: relation.article.category,
-    imageUrl: relation.article.imageUrl,
+    imageUrl: relation.article.coverImageUrl ?? relation.article.imageUrl,
     publishedAt: (relation.article.publishedAt ?? relation.article.createdAt).toISOString(),
   }));
 }

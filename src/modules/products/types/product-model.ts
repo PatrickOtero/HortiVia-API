@@ -36,7 +36,19 @@ export const productDetailInclude = {
       },
     ],
     include: {
-      article: true,
+      article: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          summary: true,
+          category: true,
+          imageUrl: true,
+          coverImageUrl: true,
+          publishedAt: true,
+          createdAt: true,
+        },
+      },
     },
   },
 } satisfies Prisma.ProductInclude;
