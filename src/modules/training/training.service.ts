@@ -16,11 +16,11 @@ type ProgressQuestion = {
   attempts: { questionVersion: number; isCorrect: boolean }[];
 };
 
-export function summarizeProgress(questions: ProgressQuestion[]) {
-  const latest = questions.flatMap(q => q.attempts.filter(a => a.questionVersion === q.version));
+export function summarizeProgress(questions: ProgressQuestion[], total = questions.length) {
+  const latest = questions.flatMap(q => q.attempts.slice(0, 1).filter(a => a.questionVersion === q.version));
   const correct = latest.filter(a => a.isCorrect).length;
-  return { total: questions.length, answered: latest.length, correct,
-    percent: questions.length ? Math.round(correct / questions.length * 100) : 0 };
+  return { total, answered: latest.length, correct,
+    percent: total ? Math.round(correct / total * 100) : 0 };
 }
 
 @Injectable()
@@ -54,9 +54,64 @@ export class TrainingService {
         where: { isPublished: true }, select: questionProgressSelect(userId),
       } },
     });
-    return { products: products.map(({ trainingQuestions, ...product }) => ({
+    return { summary: summarizeProgress(products.flatMap(product => product.trainingQuestions)),
+      products: products.map(({ trainingQuestions, ...product }) => ({
       product, progress: summarizeProgress(trainingQuestions),
     })) };
+  }
+
+  async ranking(userId: string) {
+    // One projection of eligible questions and the latest answer per participant.
+    // Do not select contact details, roles or answer keys for this public response.
+    const questions = await this.prisma.trainingQuestion.findMany({
+      where: { isPublished: true, product: { isActive: true } },
+      select: {
+        version: true,
+        attempts: {
+          distinct: ['userId'], orderBy: { id: 'desc' },
+          select: {
+            questionVersion: true, isCorrect: true,
+            user: { select: {
+              id: true, name: true, avatarUrl: true, store: true,
+              jobTitle: true, specialBadge: true,
+            } },
+          },
+        },
+      },
+    });
+    type Participant = {
+      user: (typeof questions)[number]['attempts'][number]['user'];
+      questions: ProgressQuestion[];
+    };
+    const participants = new Map<string, Participant>();
+    for (const question of questions) {
+      for (const attempt of question.attempts) {
+        if (attempt.questionVersion !== question.version) continue;
+        const participant = participants.get(attempt.user.id) ?? {
+          user: attempt.user, questions: [],
+        };
+        participant.questions.push({ version: question.version, attempts: [attempt] });
+        participants.set(attempt.user.id, participant);
+      }
+    }
+    const ordered = [...participants.values()].map(participant => ({
+      user: participant.user,
+      progress: summarizeProgress(participant.questions, questions.length),
+    })).sort((a, b) => b.progress.correct - a.progress.correct ||
+      b.progress.percent - a.progress.percent || a.user.name.localeCompare(b.user.name, 'pt-BR') ||
+      a.user.id.localeCompare(b.user.id));
+    let position = 0;
+    const ranked = ordered.map((entry, index) => {
+      const previous = ordered[index - 1];
+      if (!previous || previous.progress.correct !== entry.progress.correct ||
+        previous.progress.percent !== entry.progress.percent) position = index + 1;
+      return { ...entry, position };
+    });
+    return {
+      participants: ranked.length,
+      top: ranked.slice(0, 10),
+      currentUser: ranked.find(entry => entry.user.id === userId) ?? null,
+    };
   }
 
   async adminList(productId: string) {

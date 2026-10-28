@@ -1,7 +1,13 @@
-import type { Gender, UserRole } from '../../../generated/prisma/enums';
+import type { Gender, UserRole, UserBadge } from '../../../generated/prisma/enums';
 import type { UserModel } from '../../../generated/prisma/models/User';
 
 export interface SafeUser {
+  specialBadge: UserBadge | null;
+  store: string | null;
+  jobTitle: string | null;
+  phone: string | null;
+  city: string | null;
+  state: string | null;
   id: string;
   name: string;
   email: string;
@@ -74,6 +80,7 @@ export interface UpdatePasswordHashAndClearResetCodeInput {
 }
 
 export interface UpdateUserInput {
+  specialBadge?: UserBadge | null;
   name?: string;
   email?: string;
   avatarUrl?: string | null;

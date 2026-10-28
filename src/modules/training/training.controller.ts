@@ -14,6 +14,11 @@ import { TrainingService } from './training.service';
 export class TrainingController {
   constructor(private readonly training: TrainingService) {}
 
+  @Get('ranking')
+  ranking(@CurrentUser() user: AuthenticatedUser) {
+    return this.training.ranking(user.userId);
+  }
+
   @Get('progress')
   progress(@CurrentUser() user: AuthenticatedUser) {
     return this.training.progress(user.userId);

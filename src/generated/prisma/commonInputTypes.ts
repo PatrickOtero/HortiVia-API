@@ -44,6 +44,13 @@ export type StringNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedStringNullableFilter<$PrismaModel> | string | null
 }
 
+export type EnumUserBadgeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserBadge | Prisma.EnumUserBadgeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumUserBadgeNullableFilter<$PrismaModel> | $Enums.UserBadge | null
+}
+
 export type EnumGenderNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.Gender | Prisma.EnumGenderFieldRefInput<$PrismaModel> | null
   in?: $Enums.Gender[] | Prisma.ListEnumGenderFieldRefInput<$PrismaModel> | null
@@ -135,6 +142,16 @@ export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedStringNullableFilter<$PrismaModel>
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
+}
+
+export type EnumUserBadgeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserBadge | Prisma.EnumUserBadgeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumUserBadgeNullableWithAggregatesFilter<$PrismaModel> | $Enums.UserBadge | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserBadgeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserBadgeNullableFilter<$PrismaModel>
 }
 
 export type EnumGenderNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -434,6 +451,13 @@ export type NestedStringNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedStringNullableFilter<$PrismaModel> | string | null
 }
 
+export type NestedEnumUserBadgeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserBadge | Prisma.EnumUserBadgeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumUserBadgeNullableFilter<$PrismaModel> | $Enums.UserBadge | null
+}
+
 export type NestedEnumGenderNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.Gender | Prisma.EnumGenderFieldRefInput<$PrismaModel> | null
   in?: $Enums.Gender[] | Prisma.ListEnumGenderFieldRefInput<$PrismaModel> | null
@@ -529,6 +553,16 @@ export type NestedIntNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
   gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
   not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumUserBadgeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserBadge | Prisma.EnumUserBadgeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.UserBadge[] | Prisma.ListEnumUserBadgeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumUserBadgeNullableWithAggregatesFilter<$PrismaModel> | $Enums.UserBadge | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserBadgeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserBadgeNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumGenderNullableWithAggregatesFilter<$PrismaModel = never> = {

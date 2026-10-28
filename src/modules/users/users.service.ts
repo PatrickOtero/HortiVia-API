@@ -102,6 +102,10 @@ export class UsersService {
 
     const data: UpdateUserInput = {};
 
+    if (updateUserDto.specialBadge !== undefined) {
+      data.specialBadge = updateUserDto.specialBadge;
+    }
+
     if (updateUserDto.name !== undefined) {
       data.name = updateUserDto.name.trim();
     }

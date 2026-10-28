@@ -10,6 +10,7 @@ export const articleAuthorSelect = {
   id: true,
   name: true,
   avatarUrl: true,
+  specialBadge: true,
 } as const;
 
 export const articleListInclude = {
@@ -84,6 +85,8 @@ export type ArticleBlockRecord =
 export const articleCommentAuthorSelect = {
   id: true,
   name: true,
+  avatarUrl: true,
+  specialBadge: true,
 } as const;
 
 export const articleCommentInclude = {

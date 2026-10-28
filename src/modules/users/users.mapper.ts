@@ -3,6 +3,12 @@ import type { SafeUser } from './types/user-response';
 
 export function toSafeUser(user: UserModel): SafeUser {
   return {
+    specialBadge: user.specialBadge,
+    store: user.store,
+    jobTitle: user.jobTitle,
+    phone: user.phone,
+    city: user.city,
+    state: user.state,
     id: user.id,
     name: user.name,
     email: user.email,

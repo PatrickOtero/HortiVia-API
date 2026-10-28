@@ -2,11 +2,13 @@ import type {
   ArticleBlockKind,
   ArticleCategory,
   ArticleCommentStatus,
+  UserBadge,
 } from '../../../generated/prisma/enums';
 
 import type { ProductCategory } from '../../../generated/prisma/enums';
 
 export interface ArticleAuthorResponse {
+  specialBadge: UserBadge | null;
   id: string;
   name: string;
   avatarUrl: string | null;
@@ -64,6 +66,8 @@ export interface ArticleBlockResponse {
 }
 
 export interface ArticleCommentAuthorResponse {
+  avatarUrl: string | null;
+  specialBadge: UserBadge | null;
   id: string;
   name: string;
 }

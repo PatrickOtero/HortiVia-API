@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { StorageService } from '../storage/storage.service';
@@ -11,6 +12,8 @@ import { toProfileResponse } from './mappers/profile-response.mapper';
 import { ProfileRepository } from './profile.repository';
 import type { UpdateProfileDto } from './dto/update-profile.dto';
 import type { ProfileResponse } from './types/profile-response';
+import { TrainingService } from '../training/training.service';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 
 export const PROFILE_AVATAR_MAX_FILE_SIZE = 2 * 1024 * 1024;
 
@@ -25,7 +28,26 @@ export class ProfileService {
   constructor(
     private readonly profileRepository: ProfileRepository,
     private readonly storageService: StorageService,
+    private readonly trainingService: TrainingService,
   ) {}
+
+  async getUserProfile(userId: string, viewer: AuthenticatedUser) {
+    const user = await this.profileRepository.findUserById(userId);
+    if (!user) throw new NotFoundException('Usuário não encontrado.');
+    const [progress, ranking] = await Promise.all([
+      this.trainingService.progress(userId),
+      this.trainingService.ranking(userId),
+    ]);
+    const canReadPrivate = viewer.userId === user.id || viewer.role === 'ADMIN';
+    return {
+      id: user.id, name: user.name, avatarUrl: user.avatarUrl,
+      store: user.store, jobTitle: user.jobTitle, specialBadge: user.specialBadge,
+      ...(canReadPrivate ? {
+        email: user.email, phone: user.phone, city: user.city, state: user.state,
+      } : {}),
+      learning: { ...progress, position: ranking.currentUser?.position ?? null },
+    };
+  }
 
   async getProfile(userId: string): Promise<ProfileResponse> {
     const user = await this.profileRepository.findUserById(userId);
@@ -48,6 +70,11 @@ export class ProfileService {
     }
 
     const data = {
+      ...Object.fromEntries(
+        (['store', 'jobTitle', 'phone', 'city', 'state'] as const)
+          .filter(field => updateProfileDto[field] !== undefined)
+          .map(field => [field, this.normalizeOptionalText(updateProfileDto[field] ?? null)]),
+      ),
       ...(updateProfileDto.name !== undefined
         ? { name: updateProfileDto.name.trim() }
         : {}),
@@ -133,8 +160,8 @@ export class ProfileService {
     return email.trim().toLowerCase();
   }
 
-  private normalizeOptionalText(value: string) {
-    const normalizedValue = value.trim();
+  private normalizeOptionalText(value: string | null) {
+    const normalizedValue = value?.trim() ?? '';
 
     return normalizedValue.length > 0 ? normalizedValue : null;
   }

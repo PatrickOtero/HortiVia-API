@@ -51,6 +51,7 @@ describe('ProductsService', () => {
       id: 'user-1',
       name: 'Equipe HortiVia',
       avatarUrl: null,
+      specialBadge: null,
     },
     publishedAt: new Date('2026-05-20T10:00:00.000Z'),
     isPublished: true,

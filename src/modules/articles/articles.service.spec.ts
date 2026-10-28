@@ -30,6 +30,7 @@ describe('ArticlesService', () => {
       id: 'user-1',
       name: 'Equipe HortiVia',
       avatarUrl: null,
+      specialBadge: null,
     },
     publishedAt: new Date('2026-05-20T10:00:00.000Z'),
     isPublished: true,
@@ -494,6 +495,8 @@ describe('ArticlesService', () => {
         user: {
           id: regularUser.userId,
           name: 'Usuario comum',
+          avatarUrl: null,
+          specialBadge: null,
         },
       },
     ] as never);
@@ -519,6 +522,8 @@ describe('ArticlesService', () => {
           author: {
             id: regularUser.userId,
             name: 'Usuario comum',
+            avatarUrl: null,
+            specialBadge: null,
           },
         },
       ],
@@ -545,6 +550,8 @@ describe('ArticlesService', () => {
       user: {
         id: regularUser.userId,
         name: 'Usuario comum',
+        avatarUrl: null,
+        specialBadge: null,
       },
     } as never);
 
@@ -568,6 +575,8 @@ describe('ArticlesService', () => {
       author: {
         id: regularUser.userId,
         name: 'Usuario comum',
+        avatarUrl: null,
+        specialBadge: null,
       },
     });
   });
@@ -600,6 +609,8 @@ describe('ArticlesService', () => {
       user: {
         id: regularUser.userId,
         name: 'Usuario comum',
+        avatarUrl: null,
+        specialBadge: null,
       },
     } as never);
     articlesRepository.updateComment.mockResolvedValue({
@@ -616,6 +627,8 @@ describe('ArticlesService', () => {
       user: {
         id: regularUser.userId,
         name: 'Usuario comum',
+        avatarUrl: null,
+        specialBadge: null,
       },
     } as never);
 
@@ -648,6 +661,8 @@ describe('ArticlesService', () => {
       user: {
         id: 'other-user',
         name: 'Outra pessoa',
+        avatarUrl: null,
+        specialBadge: null,
       },
     } as never);
 
@@ -681,6 +696,8 @@ describe('ArticlesService', () => {
       user: {
         id: regularUser.userId,
         name: 'Usuario comum',
+        avatarUrl: null,
+        specialBadge: null,
       },
     } as never);
     articlesRepository.updateComment.mockResolvedValue({} as never);
@@ -719,6 +736,8 @@ describe('ArticlesService', () => {
       user: {
         id: regularUser.userId,
         name: 'Usuario comum',
+        avatarUrl: null,
+        specialBadge: null,
       },
     } as never);
     articlesRepository.updateComment.mockResolvedValue({} as never);
@@ -754,6 +773,8 @@ describe('ArticlesService', () => {
       user: {
         id: regularUser.userId,
         name: 'Usuario comum',
+        avatarUrl: null,
+        specialBadge: null,
       },
     } as never);
     articlesRepository.updateComment
@@ -771,6 +792,8 @@ describe('ArticlesService', () => {
         user: {
           id: regularUser.userId,
           name: 'Usuario comum',
+          avatarUrl: null,
+          specialBadge: null,
         },
       } as never)
       .mockResolvedValueOnce({
@@ -787,6 +810,8 @@ describe('ArticlesService', () => {
         user: {
           id: regularUser.userId,
           name: 'Usuario comum',
+          avatarUrl: null,
+          specialBadge: null,
         },
       } as never);
 

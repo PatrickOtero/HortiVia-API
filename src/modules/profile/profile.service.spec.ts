@@ -2,6 +2,7 @@ import { Gender, UserRole } from '../../generated/prisma/enums';
 import { StorageService } from '../storage/storage.service';
 import { ProfileRepository } from './profile.repository';
 import { ProfileService } from './profile.service';
+import { TrainingService } from '../training/training.service';
 
 describe('ProfileService', () => {
   const baseUser = {
@@ -11,6 +12,7 @@ describe('ProfileService', () => {
     passwordHash: 'hashed-password',
     avatarUrl: null,
     gender: null,
+    store: null, jobTitle: null, phone: null, city: null, state: null, specialBadge: null,
     role: UserRole.USER,
     emailVerified: true,
     emailVerifiedAt: new Date('2026-05-20T00:00:00.000Z'),
@@ -43,13 +45,49 @@ describe('ProfileService', () => {
   } as unknown as jest.Mocked<Pick<StorageService, 'uploadAvatar'>>;
 
   let service: ProfileService;
+  const training = { progress: jest.fn(), ranking: jest.fn() };
 
   beforeEach(() => {
     jest.clearAllMocks();
     service = new ProfileService(
       profileRepository as unknown as ProfileRepository,
       storageService as unknown as StorageService,
+      training as unknown as TrainingService,
     );
+  });
+
+  it.each(['USER', 'ADMIN'] as const)('returns private fields to the owner with role %s', async role => {
+    profileRepository.findUserById.mockResolvedValue({ ...baseUser, phone: '11999999999', city: 'Recife', state: 'PE', store: 'Loja A', jobTitle: 'Repositor' });
+    training.progress.mockResolvedValue({ products: [], summary: { total: 0, answered: 0, correct: 0, percent: 0 } });
+    training.ranking.mockResolvedValue({ currentUser: null });
+    const result = await service.getUserProfile(baseUser.id, { userId: baseUser.id, email: baseUser.email, role });
+    expect(result).toMatchObject({ email: baseUser.email, phone: '11999999999', city: 'Recife', state: 'PE', store: 'Loja A', jobTitle: 'Repositor' });
+    expect(result).not.toHaveProperty('passwordHash');
+  });
+
+  it('omits all private fields for another ordinary user, but allows an administrator', async () => {
+    profileRepository.findUserById.mockResolvedValue({ ...baseUser, phone: '11999999999', city: 'Recife', state: 'PE' });
+    training.progress.mockResolvedValue({ products: [], summary: { total: 0, answered: 0, correct: 0, percent: 0 } });
+    training.ranking.mockResolvedValue({ currentUser: { position: 2 } });
+    const viewer = { userId: 'another-user', email: 'qa@example.invalid', role: UserRole.USER };
+    const publicProfile = await service.getUserProfile(baseUser.id, viewer);
+    for (const field of ['email', 'phone', 'city', 'state', 'passwordHash', 'role', 'emailConfirmationCodeHash']) {
+      expect(publicProfile).not.toHaveProperty(field);
+    }
+    expect(publicProfile.learning.position).toBe(2);
+    const privateProfile = await service.getUserProfile(baseUser.id, { ...viewer, role: UserRole.ADMIN });
+    expect(privateProfile.email).toBe(baseUser.email);
+    expect(privateProfile.phone).toBe('11999999999');
+  });
+
+  it('updates optional employment/contact fields and never accepts a badge or role through profile updates', async () => {
+    profileRepository.findUserById.mockResolvedValue(baseUser);
+    profileRepository.updateUserProfile.mockResolvedValue(baseUser);
+    await service.updateProfile(baseUser.id, { store: ' Loja B ', jobTitle: ' Repositor ', phone: null, city: ' ', state: null,
+      ...{ specialBadge: 'FOUNDER', role: 'ADMIN' } });
+    expect(profileRepository.updateUserProfile).toHaveBeenCalledWith(baseUser.id, {
+      store: 'Loja B', jobTitle: 'Repositor', phone: null, city: null, state: null,
+    });
   });
 
   it('returns the authenticated profile without passwordHash', async () => {
@@ -63,6 +101,7 @@ describe('ProfileService', () => {
       email: baseUser.email,
       avatarUrl: null,
       gender: null,
+      store: null, jobTitle: null, phone: null, city: null, state: null, specialBadge: null,
       role: UserRole.USER,
       createdAt: baseUser.createdAt.toISOString(),
       updatedAt: baseUser.updatedAt.toISOString(),
@@ -220,6 +259,7 @@ describe('ProfileService', () => {
       email: baseUser.email,
       avatarUrl: 'https://cdn.hortivia.com/avatars/user-1/avatar.webp',
       gender: null,
+      store: null, jobTitle: null, phone: null, city: null, state: null, specialBadge: null,
       role: UserRole.USER,
       createdAt: baseUser.createdAt.toISOString(),
       updatedAt: baseUser.updatedAt.toISOString(),

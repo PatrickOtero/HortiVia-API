@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Patch,
   Post,
   UploadedFile,
@@ -26,6 +27,11 @@ export class ProfileController {
   @Get()
   async getProfile(@CurrentUser() user: AuthenticatedUser) {
     return this.profileService.getProfile(user.userId);
+  }
+
+  @Get(':userId')
+  getUserProfile(@Param('userId') userId: string, @CurrentUser() viewer: AuthenticatedUser) {
+    return this.profileService.getUserProfile(userId, viewer);
   }
 
   @Patch()

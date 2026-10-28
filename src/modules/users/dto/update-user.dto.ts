@@ -10,9 +10,13 @@ import {
   MinLength,
 } from 'class-validator';
 import { normalizeEmail } from '../../../common/utils/normalize-email';
-import { Gender, UserRole } from '../../../generated/prisma/enums';
+import { Gender, UserRole, UserBadge } from '../../../generated/prisma/enums';
 
 export class UpdateUserDto {
+  @IsOptional()
+  @IsEnum(UserBadge)
+  specialBadge?: UserBadge | null;
+
   @IsOptional()
   @IsString()
   @MinLength(2, { message: 'O nome deve ter entre 2 e 80 caracteres.' })

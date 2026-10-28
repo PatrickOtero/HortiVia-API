@@ -23,6 +23,7 @@ function toArticleAuthorResponse(
     id: article.author.id,
     name: article.author.name,
     avatarUrl: article.author.avatarUrl,
+    specialBadge: article.author.specialBadge,
   };
 }
 
@@ -32,6 +33,8 @@ function toArticleCommentAuthorResponse(
   return {
     id: comment.user.id,
     name: comment.user.name,
+    avatarUrl: comment.user.avatarUrl,
+    specialBadge: comment.user.specialBadge,
   };
 }
 

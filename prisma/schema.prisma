@@ -13,6 +13,12 @@ enum UserRole {
   ADMIN
 }
 
+enum UserBadge {
+  FOUNDER
+  CO_FOUNDER
+  SPECIALIST
+}
+
 enum ProductCategory {
   FRUIT
   VEGETABLE
@@ -85,6 +91,12 @@ model User {
   email                           String          @unique
   passwordHash                    String
   avatarUrl                       String?
+  store                           String?
+  jobTitle                        String?
+  phone                           String?
+  city                            String?
+  state                           String?
+  specialBadge                    UserBadge?
   gender                          Gender?
   role                            UserRole        @default(USER)
   emailVerified                   Boolean         @default(false)

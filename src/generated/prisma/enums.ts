@@ -17,6 +17,15 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
+export const UserBadge = {
+  FOUNDER: 'FOUNDER',
+  CO_FOUNDER: 'CO_FOUNDER',
+  SPECIALIST: 'SPECIALIST'
+} as const
+
+export type UserBadge = (typeof UserBadge)[keyof typeof UserBadge]
+
+
 export const ProductCategory = {
   FRUIT: 'FRUIT',
   VEGETABLE: 'VEGETABLE',

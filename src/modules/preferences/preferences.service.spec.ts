@@ -10,6 +10,7 @@ describe('PreferencesService', () => {
     passwordHash: 'hashed-password',
     avatarUrl: null,
     gender: null,
+    store: null, jobTitle: null, phone: null, city: null, state: null, specialBadge: null,
     role: UserRole.USER,
     emailVerified: true,
     emailVerifiedAt: new Date('2026-05-20T00:00:00.000Z'),

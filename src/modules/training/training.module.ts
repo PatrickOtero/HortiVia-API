@@ -7,5 +7,6 @@ import { TrainingService } from './training.service';
   imports: [AuthModule],
   controllers: [TrainingController, AdminTrainingController],
   providers: [TrainingService],
+  exports: [TrainingService],
 })
 export class TrainingModule {}

@@ -42,6 +42,12 @@ export type UserMinAggregateOutputType = {
   email: string | null
   passwordHash: string | null
   avatarUrl: string | null
+  store: string | null
+  jobTitle: string | null
+  phone: string | null
+  city: string | null
+  state: string | null
+  specialBadge: $Enums.UserBadge | null
   gender: $Enums.Gender | null
   role: $Enums.UserRole | null
   emailVerified: boolean | null
@@ -64,6 +70,12 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   passwordHash: string | null
   avatarUrl: string | null
+  store: string | null
+  jobTitle: string | null
+  phone: string | null
+  city: string | null
+  state: string | null
+  specialBadge: $Enums.UserBadge | null
   gender: $Enums.Gender | null
   role: $Enums.UserRole | null
   emailVerified: boolean | null
@@ -86,6 +98,12 @@ export type UserCountAggregateOutputType = {
   email: number
   passwordHash: number
   avatarUrl: number
+  store: number
+  jobTitle: number
+  phone: number
+  city: number
+  state: number
+  specialBadge: number
   gender: number
   role: number
   emailVerified: number
@@ -120,6 +138,12 @@ export type UserMinAggregateInputType = {
   email?: true
   passwordHash?: true
   avatarUrl?: true
+  store?: true
+  jobTitle?: true
+  phone?: true
+  city?: true
+  state?: true
+  specialBadge?: true
   gender?: true
   role?: true
   emailVerified?: true
@@ -142,6 +166,12 @@ export type UserMaxAggregateInputType = {
   email?: true
   passwordHash?: true
   avatarUrl?: true
+  store?: true
+  jobTitle?: true
+  phone?: true
+  city?: true
+  state?: true
+  specialBadge?: true
   gender?: true
   role?: true
   emailVerified?: true
@@ -164,6 +194,12 @@ export type UserCountAggregateInputType = {
   email?: true
   passwordHash?: true
   avatarUrl?: true
+  store?: true
+  jobTitle?: true
+  phone?: true
+  city?: true
+  state?: true
+  specialBadge?: true
   gender?: true
   role?: true
   emailVerified?: true
@@ -273,6 +309,12 @@ export type UserGroupByOutputType = {
   email: string
   passwordHash: string
   avatarUrl: string | null
+  store: string | null
+  jobTitle: string | null
+  phone: string | null
+  city: string | null
+  state: string | null
+  specialBadge: $Enums.UserBadge | null
   gender: $Enums.Gender | null
   role: $Enums.UserRole
   emailVerified: boolean
@@ -318,6 +360,12 @@ export type UserWhereInput = {
   email?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  store?: Prisma.StringNullableFilter<"User"> | string | null
+  jobTitle?: Prisma.StringNullableFilter<"User"> | string | null
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
+  city?: Prisma.StringNullableFilter<"User"> | string | null
+  state?: Prisma.StringNullableFilter<"User"> | string | null
+  specialBadge?: Prisma.EnumUserBadgeNullableFilter<"User"> | $Enums.UserBadge | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
@@ -348,6 +396,12 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  store?: Prisma.SortOrderInput | Prisma.SortOrder
+  jobTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  state?: Prisma.SortOrderInput | Prisma.SortOrder
+  specialBadge?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
@@ -381,6 +435,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  store?: Prisma.StringNullableFilter<"User"> | string | null
+  jobTitle?: Prisma.StringNullableFilter<"User"> | string | null
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
+  city?: Prisma.StringNullableFilter<"User"> | string | null
+  state?: Prisma.StringNullableFilter<"User"> | string | null
+  specialBadge?: Prisma.EnumUserBadgeNullableFilter<"User"> | $Enums.UserBadge | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
@@ -411,6 +471,12 @@ export type UserOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  store?: Prisma.SortOrderInput | Prisma.SortOrder
+  jobTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  state?: Prisma.SortOrderInput | Prisma.SortOrder
+  specialBadge?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
@@ -441,6 +507,12 @@ export type UserScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  store?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  jobTitle?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  city?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  state?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  specialBadge?: Prisma.EnumUserBadgeNullableWithAggregatesFilter<"User"> | $Enums.UserBadge | null
   gender?: Prisma.EnumGenderNullableWithAggregatesFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
@@ -463,6 +535,12 @@ export type UserCreateInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -493,6 +571,12 @@ export type UserUncheckedCreateInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -523,6 +607,12 @@ export type UserUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -553,6 +643,12 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -583,6 +679,12 @@ export type UserCreateManyInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -605,6 +707,12 @@ export type UserUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -627,6 +735,12 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -649,6 +763,12 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  store?: Prisma.SortOrder
+  jobTitle?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  specialBadge?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
@@ -676,6 +796,12 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  store?: Prisma.SortOrder
+  jobTitle?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  specialBadge?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
@@ -698,6 +824,12 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  store?: Prisma.SortOrder
+  jobTitle?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  specialBadge?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
@@ -735,6 +867,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableEnumUserBadgeFieldUpdateOperationsInput = {
+  set?: $Enums.UserBadge | null
 }
 
 export type NullableEnumGenderFieldUpdateOperationsInput = {
@@ -885,6 +1021,12 @@ export type UserCreateWithoutTrainingAttemptsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -914,6 +1056,12 @@ export type UserUncheckedCreateWithoutTrainingAttemptsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -959,6 +1107,12 @@ export type UserUpdateWithoutTrainingAttemptsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -988,6 +1142,12 @@ export type UserUncheckedUpdateWithoutTrainingAttemptsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1017,6 +1177,12 @@ export type UserCreateWithoutProductFavoritesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1046,6 +1212,12 @@ export type UserUncheckedCreateWithoutProductFavoritesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1091,6 +1263,12 @@ export type UserUpdateWithoutProductFavoritesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1120,6 +1298,12 @@ export type UserUncheckedUpdateWithoutProductFavoritesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1149,6 +1333,12 @@ export type UserCreateWithoutArticlesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1178,6 +1368,12 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1223,6 +1419,12 @@ export type UserUpdateWithoutArticlesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1252,6 +1454,12 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1281,6 +1489,12 @@ export type UserCreateWithoutSavedArticlesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1310,6 +1524,12 @@ export type UserUncheckedCreateWithoutSavedArticlesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1355,6 +1575,12 @@ export type UserUpdateWithoutSavedArticlesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1384,6 +1610,12 @@ export type UserUncheckedUpdateWithoutSavedArticlesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1413,6 +1645,12 @@ export type UserCreateWithoutArticleReactionsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1442,6 +1680,12 @@ export type UserUncheckedCreateWithoutArticleReactionsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1487,6 +1731,12 @@ export type UserUpdateWithoutArticleReactionsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1516,6 +1766,12 @@ export type UserUncheckedUpdateWithoutArticleReactionsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1545,6 +1801,12 @@ export type UserCreateWithoutArticleCommentsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1574,6 +1836,12 @@ export type UserUncheckedCreateWithoutArticleCommentsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1608,6 +1876,12 @@ export type UserCreateWithoutModeratedArticleCommentsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1637,6 +1911,12 @@ export type UserUncheckedCreateWithoutModeratedArticleCommentsInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1682,6 +1962,12 @@ export type UserUpdateWithoutArticleCommentsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1711,6 +1997,12 @@ export type UserUncheckedUpdateWithoutArticleCommentsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1751,6 +2043,12 @@ export type UserUpdateWithoutModeratedArticleCommentsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1780,6 +2078,12 @@ export type UserUncheckedUpdateWithoutModeratedArticleCommentsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1809,6 +2113,12 @@ export type UserCreateWithoutPreferencesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1838,6 +2148,12 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   email: string
   passwordHash: string
   avatarUrl?: string | null
+  store?: string | null
+  jobTitle?: string | null
+  phone?: string | null
+  city?: string | null
+  state?: string | null
+  specialBadge?: $Enums.UserBadge | null
   gender?: $Enums.Gender | null
   role?: $Enums.UserRole
   emailVerified?: boolean
@@ -1883,6 +2199,12 @@ export type UserUpdateWithoutPreferencesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1912,6 +2234,12 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  store?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jobTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialBadge?: Prisma.NullableEnumUserBadgeFieldUpdateOperationsInput | $Enums.UserBadge | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2026,6 +2354,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  store?: boolean
+  jobTitle?: boolean
+  phone?: boolean
+  city?: boolean
+  state?: boolean
+  specialBadge?: boolean
   gender?: boolean
   role?: boolean
   emailVerified?: boolean
@@ -2057,6 +2391,12 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  store?: boolean
+  jobTitle?: boolean
+  phone?: boolean
+  city?: boolean
+  state?: boolean
+  specialBadge?: boolean
   gender?: boolean
   role?: boolean
   emailVerified?: boolean
@@ -2079,6 +2419,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  store?: boolean
+  jobTitle?: boolean
+  phone?: boolean
+  city?: boolean
+  state?: boolean
+  specialBadge?: boolean
   gender?: boolean
   role?: boolean
   emailVerified?: boolean
@@ -2101,6 +2447,12 @@ export type UserSelectScalar = {
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  store?: boolean
+  jobTitle?: boolean
+  phone?: boolean
+  city?: boolean
+  state?: boolean
+  specialBadge?: boolean
   gender?: boolean
   role?: boolean
   emailVerified?: boolean
@@ -2117,7 +2469,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "avatarUrl" | "gender" | "role" | "emailVerified" | "emailVerifiedAt" | "emailConfirmationCodeHash" | "emailConfirmationCodeExpiresAt" | "emailConfirmationCodeSentAt" | "emailConfirmationAttempts" | "passwordResetCodeHash" | "passwordResetCodeExpiresAt" | "passwordResetCodeSentAt" | "passwordResetAttempts" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "avatarUrl" | "store" | "jobTitle" | "phone" | "city" | "state" | "specialBadge" | "gender" | "role" | "emailVerified" | "emailVerifiedAt" | "emailConfirmationCodeHash" | "emailConfirmationCodeExpiresAt" | "emailConfirmationCodeSentAt" | "emailConfirmationAttempts" | "passwordResetCodeHash" | "passwordResetCodeExpiresAt" | "passwordResetCodeSentAt" | "passwordResetAttempts" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   articleComments?: boolean | Prisma.User$articleCommentsArgs<ExtArgs>
@@ -2150,6 +2502,12 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string
     passwordHash: string
     avatarUrl: string | null
+    store: string | null
+    jobTitle: string | null
+    phone: string | null
+    city: string | null
+    state: string | null
+    specialBadge: $Enums.UserBadge | null
     gender: $Enums.Gender | null
     role: $Enums.UserRole
     emailVerified: boolean
@@ -2600,6 +2958,12 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
+  readonly store: Prisma.FieldRef<"User", 'String'>
+  readonly jobTitle: Prisma.FieldRef<"User", 'String'>
+  readonly phone: Prisma.FieldRef<"User", 'String'>
+  readonly city: Prisma.FieldRef<"User", 'String'>
+  readonly state: Prisma.FieldRef<"User", 'String'>
+  readonly specialBadge: Prisma.FieldRef<"User", 'UserBadge'>
   readonly gender: Prisma.FieldRef<"User", 'Gender'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
