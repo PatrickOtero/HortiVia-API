@@ -1,0 +1,2604 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-10-26T20:47:40.880Z",
+  "__export_source": "insomnia.desktop.app:2026.7.0",
+  "resources": [
+    {
+      "_id": "wrk_hortivia_api",
+      "parentId": null,
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "HortiVia API",
+      "description": "Coleção criada a partir dos controllers e DTOs atuais. Ambiente padrão: homologação. Não inclua segredos exportados.",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_hortivia_base",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "Base Environment — Homologação",
+      "data": {
+        "base_url": "https://p01--oterofficia-backend--rfp2dvf84z2n.code.run",
+        "token": "",
+        "name": "",
+        "email": "",
+        "password": "",
+        "new_password": "",
+        "email_confirmation_code": "",
+        "password_reset_code": "",
+        "search": "",
+        "product_category": "FRUIT",
+        "article_category": "TIPS",
+        "user_role": "USER",
+        "email_verified": "true",
+        "product_id": "",
+        "article_id": "",
+        "question_id": "",
+        "comment_id": "",
+        "block_id": "",
+        "image_id": "",
+        "section_id": "",
+        "user_id": "",
+        "submission_key": "insomnia-test-0001",
+        "image_file": "",
+        "file_size": "102400"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "token",
+          "name",
+          "email",
+          "password",
+          "new_password",
+          "email_confirmation_code",
+          "password_reset_code",
+          "search",
+          "product_category",
+          "article_category",
+          "user_role",
+          "email_verified",
+          "product_id",
+          "article_id",
+          "question_id",
+          "comment_id",
+          "block_id",
+          "image_id",
+          "section_id",
+          "user_id",
+          "submission_key",
+          "image_file",
+          "file_size"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_hortivia_local",
+      "parentId": "env_hortivia_base",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "Local",
+      "data": {
+        "base_url": "http://127.0.0.1:3001"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url"
+        ]
+      },
+      "color": "#4caf50",
+      "isPrivate": false,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_hortivia_homolog",
+      "parentId": "env_hortivia_base",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "Homologação",
+      "data": {
+        "base_url": "https://p01--oterofficia-backend--rfp2dvf84z2n.code.run"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url"
+        ]
+      },
+      "color": "#ff9800",
+      "isPrivate": false,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_hortivia_production",
+      "parentId": "env_hortivia_base",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "Produção — cuidado",
+      "data": {
+        "base_url": "https://p01--frutinavigator--h2j28jgg9qgs.code.run"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url"
+        ]
+      },
+      "color": "#f44336",
+      "isPrivate": false,
+      "_type": "environment"
+    },
+    {
+      "_id": "jar_hortivia_api",
+      "parentId": "wrk_hortivia_api",
+      "name": "Default Jar",
+      "cookies": [],
+      "_type": "cookie_jar"
+    },
+    {
+      "_id": "fld_00_sa_de",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "00 — Saúde",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_01_autentica_o",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "01 — Autenticação",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -2,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_02_produtos",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "02 — Produtos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -3,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_03_favoritos",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "03 — Favoritos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -4,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_04_artigos",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "04 — Artigos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -5,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_05_artigos_salvos",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "05 — Artigos salvos",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -6,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_06_treinamento",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "06 — Treinamento",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -7,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_07_perfil_e_prefer_ncias",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "07 — Perfil e preferências",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -8,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_08_usu_rios_admin",
+      "parentId": "wrk_hortivia_api",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "name": "08 — Usuários (admin)",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -9,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_001_health",
+      "parentId": "fld_00_sa_de",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/health",
+      "name": "Health",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_002_registrar_usu_rio",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/register",
+      "name": "Registrar usuário",
+      "description": "Cria conta USER não verificada e inicia o fluxo de confirmação de e-mail.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"{{ _.name }}\",\n  \"email\": \"{{ _.email }}\",\n  \"password\": \"{{ _.password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -2,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_003_login",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/login",
+      "name": "Login",
+      "description": "Copie accessToken da resposta para a variável token do ambiente ativo.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\",\n  \"password\": \"{{ _.password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -3,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_004_confirmar_e_mail",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/confirm-email",
+      "name": "Confirmar e-mail",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\",\n  \"code\": \"{{ _.email_confirmation_code }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -4,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_005_reenviar_confirma_o_de_e_mai",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/resend-confirmation",
+      "name": "Reenviar confirmação de e-mail",
+      "description": "Envia e-mail; use apenas endereço de teste controlado.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -5,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_006_solicitar_recupera_o_de_senh",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/forgot-password",
+      "name": "Solicitar recuperação de senha",
+      "description": "Envia e-mail; use apenas endereço de teste controlado.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -6,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_007_redefinir_senha",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/reset-password",
+      "name": "Redefinir senha",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\",\n  \"code\": \"{{ _.password_reset_code }}\",\n  \"password\": \"{{ _.new_password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -7,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_008_reenviar_c_digo_de_recupera_",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/resend-password-reset-code",
+      "name": "Reenviar código de recuperação",
+      "description": "Envia e-mail; use apenas endereço de teste controlado.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -8,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_009_usu_rio_autenticado",
+      "parentId": "fld_01_autentica_o",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/auth/me",
+      "name": "Usuário autenticado",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -9,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_010_listar_produtos",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products?page=1&limit=10&search={{ _.search }}&category={{ _.product_category }}",
+      "name": "Listar produtos",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -10,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_011_detalhe_do_produto",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}",
+      "name": "Detalhe do produto",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -11,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_012_favoritar_produto",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/favorite",
+      "name": "Favoritar produto",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -12,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_013_remover_produto_dos_favorito",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/favorite",
+      "name": "Remover produto dos favoritos",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -13,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_014_criar_produto",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products",
+      "name": "Criar produto",
+      "description": "Requer Bearer token de usuário ADMIN. Exemplo baseado no CreateProductDto. Não contém URL de imagem fictícia.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Produto de teste\",\n  \"category\": \"FRUIT\",\n  \"shortDescription\": \"Descrição curta para teste.\",\n  \"description\": \"Descrição completa de teste.\",\n  \"benefits\": [],\n  \"howToChoose\": [],\n  \"howToStore\": [],\n  \"usageTips\": [],\n  \"nutrients\": [\n    {\n      \"label\": \"Nutriente\",\n      \"value\": \"Valor descritivo\"\n    }\n  ]\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -14,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_015_atualizar_produto",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}",
+      "name": "Atualizar produto",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"shortDescription\": \"Descrição atualizada para teste.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -15,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_016_desativar_produto",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}",
+      "name": "Desativar produto",
+      "description": "Requer Bearer token de usuário ADMIN. Desativa o produto; alteração persistente.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -16,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_017_vincular_artigo_ao_produto",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/articles/{{ _.article_id }}",
+      "name": "Vincular artigo ao produto",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -17,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_018_atualizar_ordem_do_artigo_re",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/articles/{{ _.article_id }}",
+      "name": "Atualizar ordem do artigo relacionado",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"sortOrder\": 0\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -18,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_019_remover_v_nculo_de_artigo",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/articles/{{ _.article_id }}",
+      "name": "Remover vínculo de artigo",
+      "description": "Requer Bearer token de usuário ADMIN. Remove apenas o vínculo produto-artigo.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -19,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_020_enviar_imagem_legada_do_prod",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/image",
+      "name": "Enviar imagem legada do produto",
+      "description": "Requer Bearer token de usuário ADMIN. Multipart field image; limite 5 MB.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "image",
+            "value": "",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -20,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_021_criar_imagem_por_url",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images",
+      "name": "Criar imagem por URL",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"url\": \"{{ _.image_url }}\",\n  \"kind\": \"HERO\",\n  \"alt\": \"Texto alternativo\",\n  \"caption\": \"Legenda\",\n  \"sortOrder\": 0,\n  \"isPrimary\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -21,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_022_criar_imagem_com_upload",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/upload",
+      "name": "Criar imagem com upload",
+      "description": "Requer Bearer token de usuário ADMIN. Multipart: metadados e arquivo no campo image; limite 5 MB.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "kind",
+            "value": "HERO",
+            "type": "text"
+          },
+          {
+            "name": "alt",
+            "value": "Texto alternativo",
+            "type": "text"
+          },
+          {
+            "name": "caption",
+            "value": "Legenda",
+            "type": "text"
+          },
+          {
+            "name": "sortOrder",
+            "value": "0",
+            "type": "text"
+          },
+          {
+            "name": "isPrimary",
+            "value": "true",
+            "type": "text"
+          },
+          {
+            "name": "image",
+            "value": "",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -22,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_023_atualizar_metadados_da_image",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/{{ _.image_id }}",
+      "name": "Atualizar metadados da imagem",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"kind\": \"CUT\",\n  \"alt\": \"Produto cortado\",\n  \"caption\": \"Legenda atualizada\",\n  \"sortOrder\": 1,\n  \"isPrimary\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -23,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_024_substituir_arquivo_da_imagem",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/{{ _.image_id }}/file",
+      "name": "Substituir arquivo da imagem",
+      "description": "Requer Bearer token de usuário ADMIN. Multipart: arquivo no campo image e metadados opcionais; limite 5 MB.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "kind",
+            "value": "CUT",
+            "type": "text"
+          },
+          {
+            "name": "alt",
+            "value": "Produto cortado",
+            "type": "text"
+          },
+          {
+            "name": "caption",
+            "value": "Legenda",
+            "type": "text"
+          },
+          {
+            "name": "sortOrder",
+            "value": "1",
+            "type": "text"
+          },
+          {
+            "name": "isPrimary",
+            "value": "false",
+            "type": "text"
+          },
+          {
+            "name": "image",
+            "value": "",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -24,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_025_excluir_imagem_do_produto",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/images/{{ _.image_id }}",
+      "name": "Excluir imagem do produto",
+      "description": "Requer Bearer token de usuário ADMIN. Exclusão persistente.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -25,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_026_criar_se_o_de_guia",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections",
+      "name": "Criar seção de guia",
+      "description": "Requer Bearer token de usuário ADMIN. O DTO atual aceita os valores enum CHOOSE, OBSERVE, STORE, USE, QUICK_FACTS e OTHER.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"kind\": \"CHOOSE\",\n  \"title\": \"Como escolher\",\n  \"body\": \"Descrição do guia.\",\n  \"imageAlt\": \"Texto alternativo\",\n  \"imageCaption\": \"Legenda\",\n  \"bullets\": [\n    \"Ponto de observação\"\n  ],\n  \"idealPoints\": [],\n  \"avoidPoints\": [],\n  \"sortOrder\": 0\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -26,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_027_atualizar_se_o_de_guia",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.section_id }}",
+      "name": "Atualizar seção de guia",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Como escolher\",\n  \"body\": \"Descrição atualizada.\",\n  \"bullets\": [\n    \"Ponto atualizado\"\n  ],\n  \"sortOrder\": 0\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -27,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_028_enviar_imagem_para_se_o_de_g",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.section_id }}/image",
+      "name": "Enviar imagem para seção de guia",
+      "description": "Requer Bearer token de usuário ADMIN. Multipart field image; limite 5 MB.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "image",
+            "value": "",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -28,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_029_remover_imagem_de_se_o_de_gu",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.section_id }}/image",
+      "name": "Remover imagem de seção de guia",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -29,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_030_excluir_se_o_de_guia",
+      "parentId": "fld_02_produtos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/products/{{ _.product_id }}/guide-sections/{{ _.section_id }}",
+      "name": "Excluir seção de guia",
+      "description": "Requer Bearer token de usuário ADMIN. Exclusão persistente.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -30,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_031_listar_produtos_favoritos",
+      "parentId": "fld_03_favoritos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/favorites/products?page=1&limit=10",
+      "name": "Listar produtos favoritos",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -31,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_032_listar_artigos_publicados",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles?page=1&limit=10&search={{ _.search }}&category={{ _.article_category }}",
+      "name": "Listar artigos publicados",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -32,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_033_detalhe_do_artigo",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
+      "name": "Detalhe do artigo",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -33,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_034_detalhe_administrativo_do_ar",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/admin",
+      "name": "Detalhe administrativo do artigo",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -34,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_035_listar_coment_rios",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/comments?page=1&limit=10",
+      "name": "Listar comentários",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -35,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_036_criar_coment_rio",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/comments",
+      "name": "Criar comentário",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"body\": \"Comentário de teste com conteúdo controlado.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -36,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_037_editar_coment_rio_pr_prio",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/comments/{{ _.comment_id }}",
+      "name": "Editar comentário próprio",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"body\": \"Comentário de teste atualizado.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -37,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_038_excluir_coment_rio_pr_prio",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/comments/{{ _.comment_id }}",
+      "name": "Excluir comentário próprio",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -38,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_039_moderar_coment_rio",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/comments/{{ _.comment_id }}/moderation",
+      "name": "Moderar comentário",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"HIDDEN\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -39,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_040_salvar_artigo",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/save",
+      "name": "Salvar artigo",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -40,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_041_remover_artigo_salvo",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/save",
+      "name": "Remover artigo salvo",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -41,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_042_reagir_ao_artigo",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/reactions",
+      "name": "Reagir ao artigo",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -42,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_043_remover_rea_o",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/reactions",
+      "name": "Remover reação",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -43,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_044_criar_artigo_como_rascunho",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles",
+      "name": "Criar artigo como rascunho",
+      "description": "Requer Bearer token de usuário ADMIN. Salvo como rascunho para evitar publicação acidental. Categorias: TIPS, STORAGE, SEASONALITY, RECIPES, WASTE_REDUCTION.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Artigo de teste\",\n  \"subtitle\": \"Subtítulo opcional\",\n  \"summary\": \"Resumo do artigo de teste.\",\n  \"content\": \"Conteúdo de teste.\",\n  \"category\": \"TIPS\",\n  \"readingTimeMinutes\": 1,\n  \"featured\": false,\n  \"tags\": [\n    \"teste\"\n  ],\n  \"isPublished\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -44,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_045_atualizar_artigo",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
+      "name": "Atualizar artigo",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"summary\": \"Resumo atualizado.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -45,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_046_excluir_artigo",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}",
+      "name": "Excluir artigo",
+      "description": "Requer Bearer token de usuário ADMIN. Exclusão persistente.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -46,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_047_enviar_imagem_de_capa_do_art",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/image",
+      "name": "Enviar imagem de capa do artigo",
+      "description": "Requer Bearer token de usuário ADMIN. Multipart field image; limite 5 MB.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "image",
+            "value": "",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -47,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_048_criar_bloco_do_artigo",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks",
+      "name": "Criar bloco do artigo",
+      "description": "Requer Bearer token de usuário ADMIN. Kinds incluem PARAGRAPH, HEADING, IMAGE, TIP, WARNING, CHECKLIST, STEPS, QUOTE, PRODUCT_REFERENCE, SECTION e OTHER.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"kind\": \"PARAGRAPH\",\n  \"title\": \"Título opcional\",\n  \"body\": \"Texto do bloco.\",\n  \"imageAlt\": \"Texto alternativo\",\n  \"imageCaption\": \"Legenda\",\n  \"items\": [],\n  \"sortOrder\": 0\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -48,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_049_solicitar_url_de_upload_pr_a",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.block_id }}/image-upload",
+      "name": "Solicitar URL de upload pr?-assinado para bloco",
+      "description": "Requer Bearer token de usuário ADMIN. Retorna instruções/URL pré-assinada para upload no storage.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fileName\": \"imagem.jpg\",\n  \"contentType\": \"image/jpeg\",\n  \"fileSize\": 102400\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -49,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_050_atualizar_bloco",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.block_id }}",
+      "name": "Atualizar bloco",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Título atualizado\",\n  \"body\": \"Texto atualizado.\",\n  \"sortOrder\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -50,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_051_atualizar_url_da_imagem_do_b",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.block_id }}/image",
+      "name": "Atualizar URL da imagem do bloco",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"imageUrl\": \"{{ _.image_url }}\",\n  \"imageAlt\": \"Texto alternativo\",\n  \"imageCaption\": \"Legenda\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -51,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_052_enviar_arquivo_de_imagem_do_",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.block_id }}/image",
+      "name": "Enviar arquivo de imagem do bloco",
+      "description": "Requer Bearer token de usuário ADMIN. Multipart field image; limite 5 MB.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "imageAlt",
+            "value": "Texto alternativo",
+            "type": "text"
+          },
+          {
+            "name": "imageCaption",
+            "value": "Legenda",
+            "type": "text"
+          },
+          {
+            "name": "image",
+            "value": "",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -52,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_053_excluir_bloco",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.block_id }}",
+      "name": "Excluir bloco",
+      "description": "Requer Bearer token de usuário ADMIN. Exclusão persistente.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -53,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_054_remover_imagem_de_bloco",
+      "parentId": "fld_04_artigos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/articles/{{ _.article_id }}/blocks/{{ _.block_id }}/image",
+      "name": "Remover imagem de bloco",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -54,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_055_listar_artigos_salvos",
+      "parentId": "fld_05_artigos_salvos",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/saved/articles?page=1&limit=10",
+      "name": "Listar artigos salvos",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -55,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_056_consultar_progresso",
+      "parentId": "fld_06_treinamento",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/training/progress",
+      "name": "Consultar progresso",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -56,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_057_consultar_treinamento_public",
+      "parentId": "fld_06_treinamento",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/training/products/{{ _.product_id }}",
+      "name": "Consultar treinamento publicado do produto",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -57,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_058_enviar_resposta",
+      "parentId": "fld_06_treinamento",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/training/questions/{{ _.question_id }}/answers",
+      "name": "Enviar resposta",
+      "description": "Requer Bearer token de usuário autenticado. submissionKey deve ser único por tentativa (8 a 100 caracteres; letras, números, _ e -).",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"selectedOptionIndex\": 0,\n  \"version\": 1,\n  \"submissionKey\": \"{{ _.submission_key }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -58,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_059_listar_perguntas_administrat",
+      "parentId": "fld_06_treinamento",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/admin/training/products/{{ _.product_id }}/questions",
+      "name": "Listar perguntas administrativas",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -59,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_060_criar_pergunta_de_rascunho",
+      "parentId": "fld_06_treinamento",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/admin/training/products/{{ _.product_id }}/questions",
+      "name": "Criar pergunta de rascunho",
+      "description": "Requer Bearer token de usuário ADMIN. Se publicar, sourceReference precisa ser não vazia e validada.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"prompt\": \"Pergunta de teste sobre o produto?\",\n  \"options\": [\n    \"Opção A\",\n    \"Opção B\",\n    \"Opção C\"\n  ],\n  \"correctOptionIndex\": 0,\n  \"explanation\": \"Explicação de teste.\",\n  \"sourceReference\": \"Guia do produto: seção de teste.\",\n  \"sortOrder\": 0,\n  \"isPublished\": false\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -60,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_061_atualizar_pergunta",
+      "parentId": "fld_06_treinamento",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/admin/training/products/{{ _.product_id }}/questions/{{ _.question_id }}",
+      "name": "Atualizar pergunta",
+      "description": "Requer Bearer token de usuário ADMIN. PATCH recebe o formulário completo; informe version para controle otimista.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"prompt\": \"Pergunta revisada sobre o produto?\",\n  \"options\": [\n    \"Opção A\",\n    \"Opção B\",\n    \"Opção C\"\n  ],\n  \"correctOptionIndex\": 0,\n  \"explanation\": \"Explicação revisada.\",\n  \"sourceReference\": \"Guia do produto: seção de teste.\",\n  \"sortOrder\": 0,\n  \"isPublished\": false,\n  \"version\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -61,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_062_consultar_perfil",
+      "parentId": "fld_07_perfil_e_prefer_ncias",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/profile",
+      "name": "Consultar perfil",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -62,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_063_atualizar_perfil",
+      "parentId": "fld_07_perfil_e_prefer_ncias",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/profile",
+      "name": "Atualizar perfil",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Nome de teste\",\n  \"gender\": \"PREFER_NOT_TO_SAY\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -63,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_064_enviar_avatar",
+      "parentId": "fld_07_perfil_e_prefer_ncias",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/profile/avatar",
+      "name": "Enviar avatar",
+      "description": "Requer Bearer token de usuário autenticado. Multipart field avatar.",
+      "method": "POST",
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "avatar",
+            "value": "",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -64,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_065_consultar_prefer_ncias",
+      "parentId": "fld_07_perfil_e_prefer_ncias",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/preferences",
+      "name": "Consultar preferências",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -65,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_066_atualizar_prefer_ncias",
+      "parentId": "fld_07_perfil_e_prefer_ncias",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/preferences",
+      "name": "Atualizar preferências",
+      "description": "Requer Bearer token de usuário autenticado.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"notificationsEnabled\": true,\n  \"seasonalTipsEnabled\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -66,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_067_listar_usu_rios",
+      "parentId": "fld_08_usu_rios_admin",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/users?page=1&limit=10&search={{ _.search }}&role={{ _.user_role }}&emailVerified={{ _.email_verified }}",
+      "name": "Listar usuários",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -67,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_068_consultar_usu_rio",
+      "parentId": "fld_08_usu_rios_admin",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/users/{{ _.user_id }}",
+      "name": "Consultar usuário",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -68,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_069_atualizar_usu_rio",
+      "parentId": "fld_08_usu_rios_admin",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/users/{{ _.user_id }}",
+      "name": "Atualizar usuário",
+      "description": "Requer Bearer token de usuário ADMIN.",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"role\": \"USER\",\n  \"emailVerified\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -69,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_070_remover_usu_rio",
+      "parentId": "fld_08_usu_rios_admin",
+      "modified": 1793047660880,
+      "created": 1793047660880,
+      "url": "{{ _.base_url }}/users/{{ _.user_id }}",
+      "name": "Remover usuário",
+      "description": "Requer Bearer token de usuário ADMIN. Ação destrutiva; testar somente com conta local descartável.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -70,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    }
+  ]
+}
