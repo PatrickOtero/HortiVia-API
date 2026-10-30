@@ -5,10 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { normalizeEmail } from '../../common/utils/normalize-email';
-import {
-  createPaginationMeta,
-  resolvePagination,
-} from '../../common/pagination/pagination';
 import type { Prisma } from '../../generated/prisma/client';
 import { UsersRepository } from './users.repository';
 import { toSafeUser } from './users.mapper';
@@ -26,6 +22,10 @@ import type { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly defaultPage = 1;
+  private readonly defaultLimit = 10;
+  private readonly maxLimit = 50;
+
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async create(data: CreateUserInput) {
@@ -59,13 +59,14 @@ export class UsersService {
   }
 
   async list(query: ListUsersQueryDto): Promise<UsersListResponse> {
-    const { page, limit, skip } = resolvePagination(query);
+    const page = query.page ?? this.defaultPage;
+    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
     const where = this.buildListWhereInput(query);
 
     const [users, total] = await Promise.all([
       this.usersRepository.findManyWithPagination({
         where,
-        skip,
+        skip: (page - 1) * limit,
         take: limit,
       }),
       this.usersRepository.count(where),
@@ -73,7 +74,12 @@ export class UsersService {
 
     return {
       data: users.map(toSafeUser),
-      meta: createPaginationMeta(page, limit, total),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+      },
     };
   }
 

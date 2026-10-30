@@ -12,10 +12,6 @@ import {
   ArticleCommentStatus,
   ArticleReactionType,
 } from '../../generated/prisma/enums';
-import {
-  createPaginationMeta,
-  resolvePagination,
-} from '../../common/pagination/pagination';
 import { ArticlesRepository } from './articles.repository';
 import {
   toArticleBlockItemResponse,
@@ -60,6 +56,10 @@ import type { UploadFile } from '../storage/types/upload-file';
 
 @Injectable()
 export class ArticlesService {
+  private readonly defaultPage = 1;
+  private readonly defaultLimit = 10;
+  private readonly maxLimit = 50;
+
   constructor(
     private readonly articlesRepository: ArticlesRepository,
     private readonly storageService: StorageService,
@@ -69,13 +69,14 @@ export class ArticlesService {
     query: ListArticlesQueryDto,
     user?: AuthenticatedUser,
   ): Promise<ArticlesListResponse> {
-    const { page, limit, skip } = resolvePagination(query);
+    const page = query.page ?? this.defaultPage;
+    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
     const where = this.buildListWhereInput(query);
 
     const [articles, total] = await Promise.all([
       this.articlesRepository.findManyWithPagination({
         where,
-        skip,
+        skip: (page - 1) * limit,
         take: limit,
       }),
       this.articlesRepository.count(where),
@@ -98,7 +99,12 @@ export class ArticlesService {
           },
         ),
       ),
-      meta: createPaginationMeta(page, limit, total),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+      },
     };
   }
 
@@ -117,14 +123,15 @@ export class ArticlesService {
     articleId: string,
     query: ListArticleCommentsQueryDto,
   ): Promise<ArticleCommentsListResponse> {
-    const { page, limit, skip } = resolvePagination(query);
+    const page = query.page ?? this.defaultPage;
+    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
 
     await this.requireArticle(articleId);
 
     const [comments, total] = await Promise.all([
       this.articlesRepository.listVisibleCommentsByArticle({
         articleId,
-        skip,
+        skip: (page - 1) * limit,
         take: limit,
       }),
       this.articlesRepository.countVisibleCommentsByArticle(articleId),
@@ -132,7 +139,10 @@ export class ArticlesService {
 
     return {
       items: comments.map(toArticleCommentListItemResponse),
-      ...createPaginationMeta(page, limit, total),
+      page,
+      limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
     };
   }
 
@@ -436,12 +446,13 @@ export class ArticlesService {
     userId: string,
     query: ListSavedArticlesQueryDto,
   ): Promise<SavedArticlesListResponse> {
-    const { page, limit, skip } = resolvePagination(query);
+    const page = query.page ?? this.defaultPage;
+    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
 
     const [savedArticles, total] = await Promise.all([
       this.articlesRepository.listSavedArticlesByUser({
         userId,
-        skip,
+        skip: (page - 1) * limit,
         take: limit,
       }),
       this.articlesRepository.countSavedArticlesByUser(userId),
@@ -463,7 +474,10 @@ export class ArticlesService {
           },
         ),
       ),
-      ...createPaginationMeta(page, limit, total),
+      page,
+      limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
     };
   }
 

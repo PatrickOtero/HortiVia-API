@@ -1,6 +1,5 @@
 import type { Gender, UserRole } from '../../../generated/prisma/enums';
 import type { UserModel } from '../../../generated/prisma/models/User';
-import type { PaginationMeta } from '../../../common/pagination/pagination';
 
 export interface SafeUser {
   id: string;
@@ -16,7 +15,12 @@ export interface SafeUser {
 
 export interface UsersListResponse {
   data: SafeUser[];
-  meta: PaginationMeta;
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface CreateUserInput {
