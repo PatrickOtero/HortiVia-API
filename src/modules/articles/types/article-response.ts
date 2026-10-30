@@ -4,6 +4,7 @@ import type {
   ArticleCommentStatus,
   UserBadge,
 } from '../../../generated/prisma/enums';
+import type { PaginationMeta } from '../../../common/pagination/pagination';
 
 import type { ProductCategory } from '../../../generated/prisma/enums';
 
@@ -97,12 +98,7 @@ export interface ArticleDetailResponse extends ArticleListItemResponse {
   updatedAt: string;
 }
 
-export interface ArticlesListMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
+export type ArticlesListMeta = PaginationMeta;
 
 export interface ArticlesListResponse {
   data: ArticleListItemResponse[];
@@ -113,18 +109,10 @@ export interface SavedArticleItemResponse extends ArticleListItemResponse {
   isSaved: true;
 }
 
-export interface SavedArticlesListResponse {
+export interface SavedArticlesListResponse extends PaginationMeta {
   items: SavedArticleItemResponse[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }
 
-export interface ArticleCommentsListResponse {
+export interface ArticleCommentsListResponse extends PaginationMeta {
   items: ArticleCommentListItemResponse[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }
