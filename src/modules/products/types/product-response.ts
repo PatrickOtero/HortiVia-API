@@ -4,7 +4,6 @@ import type {
   ProductGuideSectionKind,
   ProductImageKind,
 } from '../../../generated/prisma/enums';
-import type { PaginationMeta } from '../../../common/pagination/pagination';
 
 export interface ProductNutrientResponse {
   label: string;
@@ -69,7 +68,12 @@ export interface ProductDetailResponse extends ProductListItemResponse {
   updatedAt: string;
 }
 
-export type ProductsListMeta = PaginationMeta;
+export interface ProductsListMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 
 export interface ProductsListResponse {
   data: ProductListItemResponse[];
@@ -80,6 +84,10 @@ export interface FavoriteProductItemResponse extends ProductListItemResponse {
   isFavorite: true;
 }
 
-export interface FavoriteProductsListResponse extends PaginationMeta {
+export interface FavoriteProductsListResponse {
   items: FavoriteProductItemResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
