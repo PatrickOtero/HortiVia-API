@@ -880,53 +880,34 @@ async function main() {
           },
         },
       },
-      update: {
-        title: article.title,
-        subtitle: article.subtitle,
-        summary: article.summary,
-        content: article.content,
-        category: article.category,
-        imageUrl: article.imageUrl,
-        coverImageUrl: article.coverImageUrl,
-        coverImageAlt: article.coverImageAlt,
-        readingTimeMinutes: article.readingTimeMinutes,
-        featured: article.featured,
-        tags: article.tags,
-        isPublished: article.isPublished,
-        publishedAt: article.publishedAt,
-        authorId: author.id,
-      },
+      update: {},
       select: {
         id: true,
       },
     });
 
     if (article.blocks.length > 0) {
-      await prisma.articleBlock.deleteMany({
+      const existingBlockCount = await prisma.articleBlock.count({
         where: {
           articleId: savedArticle.id,
         },
       });
 
-      await prisma.articleBlock.createMany({
-        data: article.blocks.map((block, index) => ({
-          articleId: savedArticle.id,
-          kind: block.kind,
-          title: block.title,
-          body: block.body,
-          imageUrl: block.imageUrl,
-          imageAlt: block.imageAlt,
-          imageCaption: block.imageCaption,
-          items: block.items,
-          sortOrder: block.sortOrder ?? index,
-        })),
-      });
-    } else {
-      await prisma.articleBlock.deleteMany({
-        where: {
-          articleId: savedArticle.id,
-        },
-      });
+      if (existingBlockCount === 0) {
+        await prisma.articleBlock.createMany({
+          data: article.blocks.map((block, index) => ({
+            articleId: savedArticle.id,
+            kind: block.kind,
+            title: block.title,
+            body: block.body,
+            imageUrl: block.imageUrl,
+            imageAlt: block.imageAlt,
+            imageCaption: block.imageCaption,
+            items: block.items,
+            sortOrder: block.sortOrder ?? index,
+          })),
+        });
+      }
     }
   }
 
