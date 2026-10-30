@@ -43,13 +43,13 @@ import type {
   ProductsListResponse,
 } from './types/product-response';
 import { slugifyProductName } from './utils/slug.util';
+import {
+  createPaginationMeta,
+  resolvePagination,
+} from '../../common/pagination/pagination';
 
 @Injectable()
 export class ProductsService {
-  private readonly defaultPage = 1;
-  private readonly defaultLimit = 10;
-  private readonly maxLimit = 50;
-
   constructor(
     private readonly productsRepository: ProductsRepository,
     private readonly articlesRepository: ArticlesRepository,
@@ -57,14 +57,13 @@ export class ProductsService {
   ) {}
 
   async list(query: ListProductsQueryDto): Promise<ProductsListResponse> {
-    const page = query.page ?? this.defaultPage;
-    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
+    const { page, limit, skip } = resolvePagination(query);
     const where = this.buildListWhereInput(query);
 
     const [products, total] = await Promise.all([
       this.productsRepository.findManyWithPagination({
         where,
-        skip: (page - 1) * limit,
+        skip,
         take: limit,
       }),
       this.productsRepository.count(where),
@@ -72,12 +71,7 @@ export class ProductsService {
 
     return {
       data: products.map(product => toProductListItemResponse(product)),
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: total === 0 ? 0 : Math.ceil(total / limit),
-      },
+      meta: createPaginationMeta(page, limit, total),
     };
   }
 
@@ -197,13 +191,12 @@ export class ProductsService {
     userId: string,
     query: ListFavoriteProductsQueryDto,
   ): Promise<FavoriteProductsListResponse> {
-    const page = query.page ?? this.defaultPage;
-    const limit = Math.min(query.limit ?? this.defaultLimit, this.maxLimit);
+    const { page, limit, skip } = resolvePagination(query);
 
     const [favorites, total] = await Promise.all([
       this.productsRepository.listFavoritesByUser({
         userId,
-        skip: (page - 1) * limit,
+        skip,
         take: limit,
       }),
       this.productsRepository.countFavoritesByUser(userId),
@@ -213,10 +206,7 @@ export class ProductsService {
       items: favorites.map(favorite =>
         toFavoriteProductItemResponse(favorite.product),
       ),
-      page,
-      limit,
-      total,
-      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+      ...createPaginationMeta(page, limit, total),
     };
   }
 
