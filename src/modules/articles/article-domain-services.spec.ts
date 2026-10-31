@@ -10,6 +10,7 @@ import { ArticleManagementService } from './article-management.service';
 import { ArticleSlugService } from './article-slug.service';
 import { ArticleImagesService } from './article-images.service';
 import { ArticleBlockImagesService } from './article-block-images.service';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 import {
   BadRequestException,
   ConflictException,
@@ -206,7 +207,7 @@ describe('article domain services', () => {
   it('validates the main image before calling storage', async () => {
     const repository = { findById: jest.fn().mockResolvedValue({}) } as unknown as ArticlesRepository;
     const storage = { uploadArticleImage: jest.fn() } as unknown as StorageService;
-    const service = new ArticleImagesService(repository, new ArticleAccessService(repository), storage);
+    const service = new ArticleImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
 
     await expect(service.uploadMainImage('article-1')).rejects.toBeInstanceOf(BadRequestException);
     expect(storage.uploadArticleImage).not.toHaveBeenCalled();
@@ -217,11 +218,32 @@ describe('article domain services', () => {
     const storage = {
       uploadArticleImage: jest.fn().mockRejectedValue(new Error('storage unavailable')),
     } as unknown as StorageService;
-    const service = new ArticleImagesService(repository, new ArticleAccessService(repository), storage);
+    const service = new ArticleImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
 
     await expect(service.uploadMainImage('article-1', {
       buffer: Buffer.from('image'), mimeType: 'image/png', size: 5,
     })).rejects.toBeInstanceOf(InternalServerErrorException);
+  });
+
+  it('compensates a confirmed article-image persistence failure and preserves its cause', async () => {
+    const persistenceError = new Error('article update failed');
+    const repository = {
+      findById: jest.fn().mockResolvedValue({ id: 'article-1' }),
+      updateImageUrl: jest.fn().mockRejectedValue(persistenceError),
+    } as unknown as ArticlesRepository;
+    const uploaded = {
+      url: 'https://cdn.example.test/articles/article-1/1716163200000-cover.webp',
+      key: 'articles/article-1/1716163200000-cover.webp',
+    };
+    const storage = { uploadArticleImage: jest.fn().mockResolvedValue(uploaded) } as unknown as StorageService;
+    const compensation = { removeIfUnreferenced: jest.fn().mockResolvedValue(true) } as unknown as StorageUploadCompensationService;
+    const service = new ArticleImagesService(repository, new ArticleAccessService(repository), storage, compensation);
+    await expect(service.uploadMainImage('article-1', {
+      buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
+    })).rejects.toMatchObject({ status: 500, cause: persistenceError });
+    expect(compensation.removeIfUnreferenced).toHaveBeenCalledWith(uploaded, {
+      kind: 'article-main', articleId: 'article-1',
+    });
   });
 
   it('rejects a block upload request with an unsafe file name before storage', async () => {
@@ -230,7 +252,7 @@ describe('article domain services', () => {
       findBlockById: jest.fn().mockResolvedValue({ id: 'block-1', articleId: 'article-1' }),
     } as unknown as ArticlesRepository;
     const storage = { createArticleBlockImageUploadUrl: jest.fn() } as unknown as StorageService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage);
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
 
     await expect(service.createUploadUrl('article-1', 'block-1', {
       fileName: '../image.png', contentType: 'image/png', fileSize: 10,
@@ -246,11 +268,49 @@ describe('article domain services', () => {
     const storage = {
       createArticleBlockImageUploadUrl: jest.fn().mockRejectedValue(new Error('storage unavailable')),
     } as unknown as StorageService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage);
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
 
     await expect(service.createUploadUrl('article-1', 'block-1', {
       fileName: 'image.png', contentType: 'image/png', fileSize: 10,
     })).rejects.toBeInstanceOf(InternalServerErrorException);
+  });
+
+  it('compensates a block image only after a successful upload and failed persistence', async () => {
+    const persistenceError = new Error('block update failed');
+    const repository = {
+      findById: jest.fn().mockResolvedValue({ id: 'article-1' }),
+      findBlockById: jest.fn().mockResolvedValue({
+        id: 'block-1', articleId: 'article-1', imageAlt: 'Anterior', imageCaption: 'Legenda',
+      }),
+      updateBlock: jest.fn().mockRejectedValue(persistenceError),
+    } as unknown as ArticlesRepository;
+    const uploaded = {
+      url: 'https://cdn.example.test/articles/article-1/blocks/block-1/1716163200000-photo.webp',
+      key: 'articles/article-1/blocks/block-1/1716163200000-photo.webp',
+    };
+    const storage = { uploadArticleBlockImage: jest.fn().mockResolvedValue(uploaded) } as unknown as StorageService;
+    const compensation = { removeIfUnreferenced: jest.fn().mockResolvedValue(true) } as unknown as StorageUploadCompensationService;
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation);
+    await expect(service.uploadImage('article-1', 'block-1', {}, {
+      buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
+    })).rejects.toMatchObject({ status: 500, cause: persistenceError });
+    expect(compensation.removeIfUnreferenced).toHaveBeenCalledWith(uploaded, {
+      kind: 'article-block', articleId: 'article-1', blockId: 'block-1',
+    });
+  });
+
+  it('does not compensate when a block upload fails before returning an object key', async () => {
+    const repository = {
+      findById: jest.fn().mockResolvedValue({ id: 'article-1' }),
+      findBlockById: jest.fn().mockResolvedValue({ id: 'block-1', articleId: 'article-1' }),
+    } as unknown as ArticlesRepository;
+    const storage = { uploadArticleBlockImage: jest.fn().mockRejectedValue(new Error('R2 outcome unknown')) } as unknown as StorageService;
+    const compensation = { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService;
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation);
+    await expect(service.uploadImage('article-1', 'block-1', {}, {
+      buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
+    })).rejects.toBeInstanceOf(InternalServerErrorException);
+    expect(compensation.removeIfUnreferenced).not.toHaveBeenCalled();
   });
 
   it('keeps saved-article pagination in the engagement service', async () => {

@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { CloudflareR2StorageService } from '../storage/cloudflare-r2-storage.service';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 import { ArticlesModule } from './articles.module';
 import { ArticleAccessService } from './article-access.service';
 import { ArticleBlockImagesService } from './article-block-images.service';
@@ -47,6 +48,7 @@ describe('ArticlesModule providers', () => {
     await app.init();
 
     expect(app.get(ArticlesService)).toBeInstanceOf(ArticlesService);
+    expect(app.get(StorageUploadCompensationService)).toBeInstanceOf(StorageUploadCompensationService);
     expect(app.get(ArticleAccessService)).toBeInstanceOf(ArticleAccessService);
     expect(app.get(ArticleQueriesService)).toBeInstanceOf(ArticleQueriesService);
     expect(app.get(ArticleManagementService)).toBeInstanceOf(ArticleManagementService);

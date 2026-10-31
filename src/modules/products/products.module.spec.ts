@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { CloudflareR2StorageService } from '../storage/cloudflare-r2-storage.service';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 import { ProductAccessService } from './product-access.service';
 import { ProductArticleRelationsService } from './product-article-relations.service';
 import { ProductFavoritesService } from './product-favorites.service';
@@ -49,6 +50,7 @@ describe('ProductsModule providers', () => {
     const app = module.createNestApplication();
     await app.init();
     for (const provider of [
+      StorageUploadCompensationService,
       ProductsService,
       ProductAccessService,
       ProductArticleRelationsService,

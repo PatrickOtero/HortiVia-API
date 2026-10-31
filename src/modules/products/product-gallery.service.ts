@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 import type { CreateProductImageDto } from './dto/create-product-image.dto';
 import type { CreateProductImageUploadDto } from './dto/create-product-image-upload.dto';
@@ -10,15 +10,18 @@ import { ProductsRepository } from './products.repository';
 import { StorageService } from '../storage/storage.service';
 import type { UploadFile } from '../storage/types/upload-file';
 import { validateContentImageFile } from '../storage/image-upload.validation';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 import type { ProductImageResponse } from './types/product-response';
 import { normalizeOptionalProductText } from './utils/product-content.util';
 
 @Injectable()
 export class ProductGalleryService {
+  private readonly logger = new Logger(ProductGalleryService.name);
   constructor(
     private readonly productsRepository: ProductsRepository,
     private readonly productAccessService: ProductAccessService,
     private readonly storageService: StorageService,
+    private readonly uploadCompensation: StorageUploadCompensationService,
   ) {}
 
   async create(productId: string, dto: CreateProductImageDto): Promise<ProductImageResponse> {
@@ -45,9 +48,9 @@ export class ProductGalleryService {
   ): Promise<ProductImageResponse> {
     await this.productAccessService.requireActiveProduct(productId);
     const imageFile = validateContentImageFile(file);
-    let createdImageId: string | null = null;
+    let image: Awaited<ReturnType<ProductsRepository['createProductImage']>>;
     try {
-      const image = await this.productsRepository.createProductImage(productId, {
+      image = await this.productsRepository.createProductImage(productId, {
         productId,
         url: '',
         alt: normalizeOptionalProductText(dto.alt),
@@ -56,25 +59,55 @@ export class ProductGalleryService {
         sortOrder: dto.sortOrder ?? 0,
         isPrimary: dto.isPrimary ?? false,
       });
-      createdImageId = image.id;
-      const uploaded = await this.storageService.uploadProductGalleryImage(
+    } catch (error) {
+      throw this.uploadFailed(error);
+    }
+
+    const imageId = image.id;
+    let uploaded: Awaited<ReturnType<StorageService['uploadProductGalleryImage']>> | null = null;
+    try {
+      uploaded = await this.storageService.uploadProductGalleryImage(
         productId,
         image.id,
         imageFile,
       );
-      const updated = await this.productsRepository.updateProductImage(image.id, {
-        url: uploaded.url,
-      });
-      if (updated.isPrimary) {
-        await this.productsRepository.clearPrimaryProductImages(productId, updated.id);
-      }
-      return toProductImageResponse(updated);
-    } catch {
-      if (createdImageId) {
-        await this.productsRepository.deleteProductImage(createdImageId).catch(() => undefined);
-      }
-      throw this.uploadFailed();
+    } catch (error) {
+      await this.deleteTemporaryImageRow(imageId);
+      throw this.uploadFailed(error);
     }
+
+    let updated: Awaited<ReturnType<ProductsRepository['updateProductImage']>>;
+    try {
+      updated = await this.productsRepository.updateProductImage(imageId, { url: uploaded.url });
+    } catch (error) {
+      let currentImage;
+      try {
+        currentImage = await this.productsRepository.findProductImageById(imageId);
+      } catch (stateCheckError) {
+        this.logger.warn(
+          'Gallery image persistence state is uncertain; uploaded object was preserved.',
+          stateCheckError instanceof Error ? stateCheckError.name : 'UnknownError',
+        );
+        throw this.uploadFailed(error);
+      }
+
+      if (currentImage?.url === uploaded.url) {
+        updated = currentImage;
+      } else {
+        await this.uploadCompensation.removeIfUnreferenced(uploaded, {
+          kind: 'product-gallery',
+          productId,
+          imageId,
+        });
+        if (currentImage?.url === '') await this.deleteTemporaryImageRow(imageId);
+        throw this.uploadFailed(error);
+      }
+    }
+
+    if (updated.isPrimary) {
+      await this.productsRepository.clearPrimaryProductImages(productId, updated.id);
+    }
+    return toProductImageResponse(updated);
   }
 
   async update(
@@ -108,8 +141,9 @@ export class ProductGalleryService {
     await this.productAccessService.requireActiveProduct(productId);
     await this.productAccessService.requireProductImage(productId, imageId);
     const imageFile = validateContentImageFile(file);
+    let uploaded: Awaited<ReturnType<StorageService['uploadProductGalleryImage']>> | null = null;
     try {
-      const uploaded = await this.storageService.uploadProductGalleryImage(
+      uploaded = await this.storageService.uploadProductGalleryImage(
         productId,
         imageId,
         imageFile,
@@ -125,8 +159,15 @@ export class ProductGalleryService {
         await this.productsRepository.clearPrimaryProductImages(productId, imageId);
       }
       return toProductImageResponse(updated);
-    } catch {
-      throw this.uploadFailed();
+    } catch (error) {
+      if (uploaded) {
+        await this.uploadCompensation.removeIfUnreferenced(uploaded, {
+          kind: 'product-gallery',
+          productId,
+          imageId,
+        });
+      }
+      throw this.uploadFailed(error);
     }
   }
 
@@ -137,10 +178,21 @@ export class ProductGalleryService {
     return { message: 'Imagem removida.' };
   }
 
-  private uploadFailed() {
+  private async deleteTemporaryImageRow(imageId: string) {
+    try {
+      await this.productsRepository.deleteProductImageIfUrlEmpty(imageId);
+    } catch (cleanupError) {
+      this.logger.warn(
+        'Could not remove a blank temporary gallery record after upload failure.',
+        cleanupError instanceof Error ? cleanupError.name : 'UnknownError',
+      );
+    }
+  }
+
+  private uploadFailed(cause?: unknown) {
     return new InternalServerErrorException({
       message: 'N\u00e3o foi poss\u00edvel enviar a imagem.',
       error: 'Internal Server Error',
-    });
+    }, cause ? { cause } : undefined);
   }
 }

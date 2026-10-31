@@ -3,6 +3,7 @@ import { StorageService } from '../storage/storage.service';
 import { ProfileRepository } from './profile.repository';
 import { ProfileService } from './profile.service';
 import { TrainingService } from '../training/training.service';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 
 describe('ProfileService', () => {
   const baseUser = {
@@ -43,6 +44,9 @@ describe('ProfileService', () => {
   const storageService = {
     uploadAvatar: jest.fn(),
   } as unknown as jest.Mocked<Pick<StorageService, 'uploadAvatar'>>;
+  const uploadCompensation = {
+    removeIfUnreferenced: jest.fn().mockResolvedValue(false),
+  } as unknown as StorageUploadCompensationService;
 
   let service: ProfileService;
   const training = { progress: jest.fn(), ranking: jest.fn() };
@@ -53,6 +57,7 @@ describe('ProfileService', () => {
       profileRepository as unknown as ProfileRepository,
       storageService as unknown as StorageService,
       training as unknown as TrainingService,
+      uploadCompensation,
     );
   });
 
@@ -63,6 +68,23 @@ describe('ProfileService', () => {
     const result = await service.getUserProfile(baseUser.id, { userId: baseUser.id, email: baseUser.email, role });
     expect(result).toMatchObject({ email: baseUser.email, phone: '11999999999', city: 'Recife', state: 'PE', store: 'Loja A', jobTitle: 'Repositor' });
     expect(result).not.toHaveProperty('passwordHash');
+  });
+
+  it('compensates a persisted avatar upload when the user update fails', async () => {
+    const uploaded = {
+      url: 'https://cdn.hortivia.com/avatars/user-1/1716163200000-a1b2c3d4.webp',
+      key: 'avatars/user-1/1716163200000-a1b2c3d4.webp',
+    };
+    const persistenceError = new Error('profile update failed');
+    profileRepository.findUserById.mockResolvedValue(baseUser);
+    storageService.uploadAvatar.mockResolvedValue(uploaded);
+    profileRepository.updateAvatar.mockRejectedValue(persistenceError);
+    await expect(service.uploadAvatar(baseUser.id, {
+      buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
+    })).rejects.toMatchObject({ status: 500, cause: persistenceError });
+    expect(uploadCompensation.removeIfUnreferenced).toHaveBeenCalledWith(uploaded, {
+      kind: 'avatar', userId: baseUser.id,
+    });
   });
 
   it('omits all private fields for another ordinary user, but allows an administrator', async () => {
@@ -230,6 +252,7 @@ describe('ProfileService', () => {
     profileRepository.findUserById.mockResolvedValue(baseUser);
     storageService.uploadAvatar.mockResolvedValue({
       url: 'https://cdn.hortivia.com/avatars/user-1/avatar.webp',
+      key: 'avatars/user-1/1716163200000-a1b2c3d4.webp',
     });
     profileRepository.updateAvatar.mockResolvedValue({
       ...baseUser,
@@ -265,5 +288,6 @@ describe('ProfileService', () => {
       updatedAt: baseUser.updatedAt.toISOString(),
     });
     expect(result).not.toHaveProperty('passwordHash');
+    expect(uploadCompensation.removeIfUnreferenced).not.toHaveBeenCalled();
   });
 });

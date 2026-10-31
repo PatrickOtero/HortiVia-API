@@ -8,6 +8,7 @@ import { ProductsRepository } from './products.repository';
 import { StorageService } from '../storage/storage.service';
 import type { UploadFile } from '../storage/types/upload-file';
 import { validateContentImageFile } from '../storage/image-upload.validation';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 import type { ProductGuideSectionResponse } from './types/product-response';
 import {
   normalizeOptionalProductText,
@@ -21,6 +22,7 @@ export class ProductGuideSectionsService {
     private readonly productsRepository: ProductsRepository,
     private readonly productAccessService: ProductAccessService,
     private readonly storageService: StorageService,
+    private readonly uploadCompensation: StorageUploadCompensationService,
   ) {}
 
   async create(
@@ -75,8 +77,9 @@ export class ProductGuideSectionsService {
     await this.productAccessService.requireActiveProduct(productId);
     const section = await this.productAccessService.requireGuideSection(productId, sectionId);
     const imageFile = validateContentImageFile(file);
+    let uploaded: Awaited<ReturnType<StorageService['uploadProductGuideSectionImage']>> | null = null;
     try {
-      const uploaded = await this.storageService.uploadProductGuideSectionImage(
+      uploaded = await this.storageService.uploadProductGuideSectionImage(
         productId,
         sectionId,
         imageFile,
@@ -87,8 +90,15 @@ export class ProductGuideSectionsService {
         section.imageAlt,
       );
       return toProductGuideSectionResponse(updated);
-    } catch {
-      throw this.uploadFailed();
+    } catch (error) {
+      if (uploaded) {
+        await this.uploadCompensation.removeIfUnreferenced(uploaded, {
+          kind: 'product-guide',
+          productId,
+          sectionId,
+        });
+      }
+      throw this.uploadFailed(error);
     }
   }
 
@@ -113,10 +123,10 @@ export class ProductGuideSectionsService {
     return { message: 'Se\u00e7\u00e3o removida.' };
   }
 
-  private uploadFailed() {
+  private uploadFailed(cause?: unknown) {
     return new InternalServerErrorException({
       message: 'N\u00e3o foi poss\u00edvel enviar a imagem.',
       error: 'Internal Server Error',
-    });
+    }, cause ? { cause } : undefined);
   }
 }

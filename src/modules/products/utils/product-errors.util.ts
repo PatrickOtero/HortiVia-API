@@ -8,11 +8,11 @@ export function isProductPrismaError(error: unknown, code: 'P2002' | 'P2025') {
     (error as { code?: string }).code === code;
 }
 
-export function productNotFoundException() {
+export function productNotFoundException(cause?: unknown) {
   return new NotFoundException({
     message: 'Produto n\u00e3o encontrado.',
     error: 'Not Found',
-  });
+  }, cause ? { cause } : undefined);
 }
 
 export function productImageNotFoundException() {

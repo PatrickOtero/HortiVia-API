@@ -5,6 +5,7 @@ import { CloudflareR2StorageService } from './cloudflare-r2-storage.service';
 import type { UploadFile } from './types/upload-file';
 import type { PresignedUploadResult } from './types/presigned-upload-result';
 import type { UploadResult } from './types/upload-result';
+import type { ManagedImageScope } from './types/managed-image-scope';
 
 const FILE_EXTENSION_BY_MIME_TYPE: Record<string, string> = {
   'image/jpeg': 'jpg',
@@ -22,6 +23,26 @@ export class StorageService {
     const objectKey = this.buildObjectKey('avatars', userId, file.mimeType);
 
     return this.cloudflareR2StorageService.uploadFile(objectKey, file);
+  }
+
+  async deleteManagedUpload(upload: UploadResult, scope: ManagedImageScope) {
+    const expectedPrefix = this.getManagedImagePrefix(scope);
+    const publicBaseUrl = this.cloudflareR2StorageService.getPublicBaseUrl();
+    const fileName = upload.key.startsWith(`${expectedPrefix}/`)
+      ? upload.key.slice(expectedPrefix.length + 1)
+      : '';
+
+    if (
+      upload.url !== `${publicBaseUrl}/${upload.key}` ||
+      !/^\d+-[a-z0-9-]+\.(?:jpg|png|webp)$/i.test(fileName) ||
+      fileName.includes('/') ||
+      fileName.includes('\\') ||
+      fileName.includes('..')
+    ) {
+      throw new Error('Refusing to delete an object outside the expected managed image scope.');
+    }
+
+    await this.cloudflareR2StorageService.deleteFile(upload.key);
   }
 
   async uploadProductImage(
@@ -125,6 +146,27 @@ export class StorageService {
     return `${prefix}/${entityId}/${Date.now()}-${randomSuffix}.${extension}`;
   }
 
+  private getManagedImagePrefix(scope: ManagedImageScope) {
+    const entityIds = 'userId' in scope
+      ? [scope.userId]
+      : 'productId' in scope
+        ? [scope.productId, ...('imageId' in scope ? [scope.imageId] : []), ...('sectionId' in scope ? [scope.sectionId] : [])]
+        : [scope.articleId, ...('blockId' in scope ? [scope.blockId] : [])];
+
+    if (entityIds.some(id => !/^[a-z0-9_-]+$/i.test(id))) {
+      throw new Error('Refusing to delete an object for an invalid entity identifier.');
+    }
+
+    switch (scope.kind) {
+      case 'avatar': return `avatars/${scope.userId}`;
+      case 'product-main': return `products/${scope.productId}`;
+      case 'product-gallery': return `products/${scope.productId}/gallery/${scope.imageId}`;
+      case 'product-guide': return `products/${scope.productId}/guide-sections/${scope.sectionId}`;
+      case 'article-main': return `articles/${scope.articleId}`;
+      case 'article-block': return `articles/${scope.articleId}/blocks/${scope.blockId}`;
+    }
+  }
+
   private buildArticleBlockImageObjectKey(
     articleId: string,
     blockId: string,
@@ -134,7 +176,9 @@ export class StorageService {
     const extension = FILE_EXTENSION_BY_MIME_TYPE[contentType] ?? 'bin';
     const safeFileName = this.buildSafeFileName(fileName);
 
-    return `articles/${articleId}/blocks/${blockId}/${Date.now()}-${safeFileName}.${extension}`;
+    const randomSuffix = randomBytes(4).toString('hex');
+
+    return `articles/${articleId}/blocks/${blockId}/${Date.now()}-${randomSuffix}-${safeFileName}.${extension}`;
   }
 
   private buildSafeFileName(fileName: string) {

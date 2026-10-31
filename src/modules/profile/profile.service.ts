@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { StorageService } from '../storage/storage.service';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 import type { UploadFile } from '../storage/types/upload-file';
 import { toProfileResponse } from './mappers/profile-response.mapper';
 import { ProfileRepository } from './profile.repository';
@@ -29,6 +30,7 @@ export class ProfileService {
     private readonly profileRepository: ProfileRepository,
     private readonly storageService: StorageService,
     private readonly trainingService: TrainingService,
+    private readonly uploadCompensation: StorageUploadCompensationService,
   ) {}
 
   async getUserProfile(userId: string, viewer: AuthenticatedUser) {
@@ -133,26 +135,29 @@ export class ProfileService {
 
     const avatarFile = this.validateAvatarFile(file);
 
+    let uploaded: Awaited<ReturnType<StorageService['uploadAvatar']>> | null = null;
     try {
-      const uploadResult = await this.storageService.uploadAvatar(
+      uploaded = await this.storageService.uploadAvatar(
         userId,
         avatarFile,
       );
       const updatedUser = await this.profileRepository.updateAvatar(
         userId,
-        uploadResult.url,
+        uploaded.url,
       );
 
       return toProfileResponse(updatedUser);
     } catch (error) {
-      if (this.isDuplicateEmailError(error)) {
-        throw this.buildDuplicateEmailException();
+      if (uploaded) {
+        await this.uploadCompensation.removeIfUnreferenced(uploaded, {
+          kind: 'avatar',
+          userId,
+        });
       }
-
       throw new InternalServerErrorException({
         message: 'Não foi possível enviar a imagem agora.',
         error: 'Internal Server Error',
-      });
+      }, { cause: error });
     }
   }
 
