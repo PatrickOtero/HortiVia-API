@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client';
+import { StorageService } from '../storage/storage.service';
 import { ArticlesRepository } from './articles.repository';
 import { ArticleAccessService } from './article-access.service';
 import type { ArticleBlockResponse } from './types/article-response';
@@ -19,6 +20,7 @@ export class ArticleBlocksService {
     private readonly articlesRepository: ArticlesRepository,
     private readonly articleAccessService: ArticleAccessService,
     private readonly articleBlockImagesService: ArticleBlockImagesService,
+    private readonly storageService: StorageService,
   ) {}
 
   async createBlock(
@@ -26,12 +28,19 @@ export class ArticleBlocksService {
     dto: CreateArticleBlockDto,
   ): Promise<ArticleBlockResponse> {
     await this.articleAccessService.requireArticle(articleId, true);
+    const imageUrl = normalizeOptionalArticleText(dto.imageUrl);
+    if (imageUrl && this.storageService.isManagedPublicUrl(imageUrl)) {
+      throw new BadRequestException({
+        message: 'Crie o bloco antes de associar uma imagem gerenciada.',
+        error: 'Bad Request',
+      });
+    }
     const block = await this.articlesRepository.createBlock({
       article: { connect: { id: articleId } },
       kind: dto.kind,
       title: normalizeOptionalArticleText(dto.title),
       body: normalizeOptionalArticleText(dto.body),
-      imageUrl: normalizeOptionalArticleText(dto.imageUrl),
+      imageUrl,
       imageAlt: normalizeOptionalArticleText(dto.imageAlt),
       imageCaption: normalizeOptionalArticleText(dto.imageCaption),
       items: normalizeArticleBlockItems(dto.items),

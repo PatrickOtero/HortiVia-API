@@ -96,7 +96,12 @@ describe('article domain services', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       }),
     } as unknown as ArticlesRepository;
-    const service = new ArticleBlocksService(repository, new ArticleAccessService(repository), {} as ArticleBlockImagesService);
+    const service = new ArticleBlocksService(
+      repository,
+      new ArticleAccessService(repository),
+      {} as ArticleBlockImagesService,
+      { isManagedPublicUrl: jest.fn().mockReturnValue(false) } as never,
+    );
 
     await service.createBlock('article-1', {
       kind: ArticleBlockKind.PARAGRAPH,
@@ -119,7 +124,12 @@ describe('article domain services', () => {
       }),
     } as unknown as ArticlesRepository;
     const blockImages = { updateImage: jest.fn().mockResolvedValue({ id: 'block-1', imageUrl }) } as unknown as ArticleBlockImagesService;
-    const service = new ArticleBlocksService(repository, new ArticleAccessService(repository), blockImages);
+    const service = new ArticleBlocksService(
+      repository,
+      new ArticleAccessService(repository),
+      blockImages,
+      { isManagedPublicUrl: jest.fn().mockReturnValue(true) } as never,
+    );
 
     await service.updateBlock('article-1', 'block-1', { imageUrl, title: 'Imagem atualizada' });
 
@@ -129,6 +139,26 @@ describe('article domain services', () => {
       { imageUrl, imageAlt: 'Alt antigo', imageCaption: 'Legenda antiga' },
       { title: 'Imagem atualizada' },
     );
+  });
+
+  it('requires a managed image to be associated after its block has an ID', async () => {
+    const repository = {
+      findById: jest.fn().mockResolvedValue({ id: 'article-1' }),
+      createBlock: jest.fn(),
+    } as unknown as ArticlesRepository;
+    const storage = { isManagedPublicUrl: jest.fn().mockReturnValue(true) } as never;
+    const service = new ArticleBlocksService(
+      repository,
+      new ArticleAccessService(repository),
+      {} as ArticleBlockImagesService,
+      storage,
+    );
+
+    await expect(service.createBlock('article-1', {
+      kind: ArticleBlockKind.IMAGE,
+      imageUrl: 'https://cdn.example.test/articles/another-article/blocks/another-block/image.webp',
+    })).rejects.toBeInstanceOf(BadRequestException);
+    expect(repository.createBlock).not.toHaveBeenCalled();
   });
 
   it('builds public article filters and pagination in the query service', async () => {

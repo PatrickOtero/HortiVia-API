@@ -188,6 +188,7 @@ describe('ArticlesService', () => {
         repository,
         access,
         new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation, uploadTracking as never),
+        storageService as unknown as StorageService,
       ),
       new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation, uploadTracking as never),
       new ArticleImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation),
