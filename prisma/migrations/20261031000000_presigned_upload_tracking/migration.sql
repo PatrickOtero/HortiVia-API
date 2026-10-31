@@ -1,4 +1,4 @@
-﻿CREATE TYPE "PresignedUploadResourceType" AS ENUM ('ARTICLE_BLOCK_IMAGE');
+CREATE TYPE "PresignedUploadResourceType" AS ENUM ('ARTICLE_BLOCK_IMAGE');
 CREATE TYPE "PresignedUploadIntentStatus" AS ENUM ('PENDING', 'ASSOCIATED', 'SIGNING_FAILED');
 
 CREATE TABLE "PresignedUploadIntent" (
