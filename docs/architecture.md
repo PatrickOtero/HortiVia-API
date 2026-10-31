@@ -70,3 +70,19 @@ Regras determinísticas ficam em `utils`: publicação e datas, normalização e
 ## Validação local
 
 `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npx prisma validate` e `npm test -- --runInBand` são os comandos principais. Execute a suíte de integração contra banco descartável e nunca contra homologação ou produção. Preparação de deploy está em [deployment-readiness.md](deployment-readiness.md).
+
+### Módulo de produtos
+
+`ProductsService` é uma fachada de compatibilidade para os controllers. As operações do domínio ficam distribuídas conforme o fluxo:
+
+- `ProductQueriesService`: catálogo, busca, paginação e detalhe; usa o mapper público existente.
+- `ProductManagementService` e `ProductSlugService`: cadastro, edição, desativação lógica, normalização do conteúdo e geração de slug exclusivo.
+- `ProductFavoritesService`: inclusão, remoção idempotente e listagem paginada de favoritos.
+- `ProductArticleRelationsService`: criação, atualização da ordenação e remoção de vínculos entre produtos e artigos.
+- `ProductImagesService`: imagem principal do cadastro.
+- `ProductGalleryService`: metadados, uploads, substituição, imagem primária e exclusão das imagens adicionais. A compensação do registro criado permanece no fluxo de upload que pode falhar.
+- `ProductGuideSectionsService`: criação, edição, exclusão e imagem das seções educativas.
+- `ProductAccessService`: verifica produto ativo e associação de artigos, imagens e seções aos respectivos pais.
+- `ProductsRepository` permanece como fronteira única de acesso Prisma.
+
+A validação de arquivos é compartilhada em `storage/image-upload.validation.ts`, mantendo regras e mensagens de MIME e tamanho iguais para artigos e produtos. Normalização e erros específicos de produto ficam em funções pequenas do domínio; operações com dependências permanecem em serviços NestJS.

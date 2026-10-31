@@ -7,7 +7,7 @@ import type { ArticleDetailResponse } from './types/article-response';
 import { toArticleDetailResponse } from './mappers/article-response.mapper';
 import { articleNotFoundException, isPrismaErrorCode } from './utils/article-errors.util';
 import { resolveArticleReadingTime } from './utils/article-content.util';
-import { validateArticleImageFile } from './utils/article-image-validation.util';
+import { validateContentImageFile } from '../storage/image-upload.validation';
 
 @Injectable()
 export class ArticleImagesService {
@@ -19,7 +19,7 @@ export class ArticleImagesService {
 
   async uploadMainImage(id: string, file?: UploadFile): Promise<ArticleDetailResponse> {
     await this.articleAccessService.requireArticle(id, true);
-    const imageFile = validateArticleImageFile(file);
+    const imageFile = validateContentImageFile(file);
     try {
       const upload = await this.storageService.uploadArticleImage(id, imageFile);
       const article = await this.articlesRepository.updateImageUrl(id, upload.url);
