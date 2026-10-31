@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -9,7 +8,6 @@ import {
 import { Prisma } from '../../generated/prisma/client';
 import {
   ArticleBlockKind,
-  ArticleCommentStatus,
   ArticleReactionType,
 } from '../../generated/prisma/enums';
 import {
@@ -18,9 +16,6 @@ import {
 } from '../../common/pagination/pagination';
 import { ArticlesRepository } from './articles.repository';
 import {
-  toArticleBlockItemResponse,
-  toArticleCommentListItemResponse,
-  toArticleCommentResponse,
   toArticleDetailResponse,
   toArticleListItemResponse,
   toSavedArticleItemResponse,
@@ -51,6 +46,9 @@ import type {
 import { calculateReadingTimeMinutes } from './utils/reading-time.util';
 import { slugifyProductName } from '../products/utils/slug.util';
 import { StorageService } from '../storage/storage.service';
+import { ArticleCommentsService } from './article-comments.service';
+import { ArticleEngagementService } from './article-engagement.service';
+import { ArticleBlocksService } from './article-blocks.service';
 import {
   ALLOWED_CONTENT_IMAGE_MIME_TYPES,
   CONTENT_IMAGE_MAX_FILE_SIZE,
@@ -63,6 +61,9 @@ export class ArticlesService {
   constructor(
     private readonly articlesRepository: ArticlesRepository,
     private readonly storageService: StorageService,
+    private readonly articleCommentsService: ArticleCommentsService,
+    private readonly articleEngagementService: ArticleEngagementService,
+    private readonly articleBlocksService: ArticleBlocksService,
   ) {}
 
   async list(
@@ -117,23 +118,7 @@ export class ArticlesService {
     articleId: string,
     query: ListArticleCommentsQueryDto,
   ): Promise<ArticleCommentsListResponse> {
-    const { page, limit, skip } = resolvePagination(query);
-
-    await this.requireArticle(articleId);
-
-    const [comments, total] = await Promise.all([
-      this.articlesRepository.listVisibleCommentsByArticle({
-        articleId,
-        skip,
-        take: limit,
-      }),
-      this.articlesRepository.countVisibleCommentsByArticle(articleId),
-    ]);
-
-    return {
-      items: comments.map(toArticleCommentListItemResponse),
-      ...createPaginationMeta(page, limit, total),
-    };
+    return this.articleCommentsService.listComments(articleId, query);
   }
 
   async createComment(
@@ -141,15 +126,11 @@ export class ArticlesService {
     createArticleCommentDto: CreateArticleCommentDto,
     user: AuthenticatedUser,
   ): Promise<ArticleCommentResponse> {
-    await this.requireArticle(articleId);
-
-    const comment = await this.articlesRepository.createComment(
+    return this.articleCommentsService.createComment(
       articleId,
-      user.userId,
-      createArticleCommentDto.body,
+      createArticleCommentDto,
+      user,
     );
-
-    return toArticleCommentResponse(comment);
   }
 
   async updateComment(
@@ -158,26 +139,12 @@ export class ArticlesService {
     updateArticleCommentDto: UpdateArticleCommentDto,
     user: AuthenticatedUser,
   ): Promise<ArticleCommentResponse> {
-    await this.requireArticle(articleId, user.role === 'ADMIN');
-    const comment = await this.requireComment(articleId, commentId);
-
-    if (comment.userId !== user.userId) {
-      throw this.buildCommentOwnerForbiddenException();
-    }
-
-    if (comment.status === ArticleCommentStatus.DELETED) {
-      throw this.buildCommentNotFoundException();
-    }
-
-    if (comment.status !== ArticleCommentStatus.VISIBLE) {
-      throw this.buildCommentEditForbiddenException();
-    }
-
-    const updatedComment = await this.articlesRepository.updateComment(commentId, {
-      body: updateArticleCommentDto.body,
-    });
-
-    return toArticleCommentResponse(updatedComment);
+    return this.articleCommentsService.updateComment(
+      articleId,
+      commentId,
+      updateArticleCommentDto,
+      user,
+    );
   }
 
   async deleteComment(
@@ -185,23 +152,7 @@ export class ArticlesService {
     commentId: string,
     user: AuthenticatedUser,
   ) {
-    await this.requireArticle(articleId, user.role === 'ADMIN');
-    const comment = await this.requireComment(articleId, commentId);
-
-    if (user.role !== 'ADMIN' && comment.userId !== user.userId) {
-      throw this.buildCommentOwnerForbiddenException();
-    }
-
-    if (comment.status !== ArticleCommentStatus.DELETED) {
-      await this.articlesRepository.updateComment(commentId, {
-        status: ArticleCommentStatus.DELETED,
-        deletedAt: new Date(),
-      });
-    }
-
-    return {
-      message: 'Comentario removido.',
-    };
+    return this.articleCommentsService.deleteComment(articleId, commentId, user);
   }
 
   async moderateComment(
@@ -210,24 +161,12 @@ export class ArticlesService {
     moderateArticleCommentDto: ModerateArticleCommentDto,
     user: AuthenticatedUser,
   ): Promise<ArticleCommentResponse> {
-    await this.requireArticle(articleId, true);
-    const comment = await this.requireComment(articleId, commentId);
-
-    if (comment.status === ArticleCommentStatus.DELETED) {
-      throw this.buildCommentNotFoundException();
-    }
-
-    const updatedComment = await this.articlesRepository.updateComment(commentId, {
-      status: moderateArticleCommentDto.status,
-      moderatedAt: new Date(),
-      moderatedBy: {
-        connect: {
-          id: user.userId,
-        },
-      },
-    });
-
-    return toArticleCommentResponse(updatedComment);
+    return this.articleCommentsService.moderateComment(
+      articleId,
+      commentId,
+      moderateArticleCommentDto,
+      user,
+    );
   }
 
   async uploadBlockImage(
@@ -236,40 +175,12 @@ export class ArticlesService {
     uploadArticleBlockImageDto: UploadArticleBlockImageDto,
     file?: UploadFile,
   ): Promise<ArticleBlockResponse> {
-    await this.requireArticle(articleId, true);
-    const existingBlock = await this.requireArticleBlock(articleId, blockId);
-    const imageFile = this.validateImageFile(file);
-
-    try {
-      const uploadResult = await this.storageService.uploadArticleBlockImage(
-        articleId,
-        blockId,
-        imageFile,
-      );
-
-      const updatedBlock = await this.articlesRepository.updateBlock(blockId, {
-        imageUrl: uploadResult.url,
-        imageAlt: this.resolveUploadedBlockImageText(
-          uploadArticleBlockImageDto.imageAlt,
-          existingBlock.imageAlt,
-        ),
-        imageCaption: this.resolveUploadedBlockImageText(
-          uploadArticleBlockImageDto.imageCaption,
-          existingBlock.imageCaption,
-        ),
-      });
-
-      return toArticleBlockItemResponse(updatedBlock);
-    } catch (error) {
-      if (this.isRecordNotFoundError(error)) {
-        throw this.buildArticleBlockNotFoundException();
-      }
-
-      throw new InternalServerErrorException({
-        message: 'Nao foi possivel enviar a imagem do bloco.',
-        error: 'Internal Server Error',
-      });
-    }
+    return this.articleBlocksService.uploadBlockImage(
+      articleId,
+      blockId,
+      uploadArticleBlockImageDto,
+      file,
+    );
   }
 
   private async getDetailById(
@@ -308,128 +219,20 @@ export class ArticlesService {
     );
   }
 
-  async reactToArticle(
-    articleId: string,
-    user: AuthenticatedUser,
-  ): Promise<ArticleReactionResponse> {
-    await this.requireArticle(articleId, user.role === 'ADMIN');
-
-    const existingReaction = await this.articlesRepository.findReaction(
-      user.userId,
-      articleId,
-      ArticleReactionType.HELPFUL,
-    );
-
-    if (!existingReaction) {
-      try {
-        await this.articlesRepository.createReaction(
-          user.userId,
-          articleId,
-          ArticleReactionType.HELPFUL,
-        );
-      } catch (error) {
-        if (!this.isUniqueConstraintError(error)) {
-          throw error;
-        }
-      }
-    }
-
-    const reactionsCount = await this.articlesRepository.countReactions(
-      articleId,
-      ArticleReactionType.HELPFUL,
-    );
-
-    return {
-      message: 'Marcado como útil.',
-      isReacted: true,
-      reactionsCount,
-    };
+  async reactToArticle(articleId: string, user: AuthenticatedUser): Promise<ArticleReactionResponse> {
+    return this.articleEngagementService.reactToArticle(articleId, user);
   }
 
-  async removeReactionFromArticle(
-    articleId: string,
-    user: AuthenticatedUser,
-  ): Promise<ArticleReactionResponse> {
-    await this.requireArticle(articleId, user.role === 'ADMIN');
-
-    const existingReaction = await this.articlesRepository.findReaction(
-      user.userId,
-      articleId,
-      ArticleReactionType.HELPFUL,
-    );
-
-    if (existingReaction) {
-      try {
-        await this.articlesRepository.deleteReaction(
-          user.userId,
-          articleId,
-          ArticleReactionType.HELPFUL,
-        );
-      } catch (error) {
-        if (!this.isRecordNotFoundError(error)) {
-          throw error;
-        }
-      }
-    }
-
-    const reactionsCount = await this.articlesRepository.countReactions(
-      articleId,
-      ArticleReactionType.HELPFUL,
-    );
-
-    return {
-      message: 'Reação removida.',
-      isReacted: false,
-      reactionsCount,
-    };
+  async removeReactionFromArticle(articleId: string, user: AuthenticatedUser): Promise<ArticleReactionResponse> {
+    return this.articleEngagementService.removeReactionFromArticle(articleId, user);
   }
 
   async saveArticle(userId: string, articleId: string) {
-    await this.requireArticle(articleId);
-
-    const existingSavedArticle =
-      await this.articlesRepository.findSavedArticleByUserAndArticle(
-        userId,
-        articleId,
-      );
-
-    if (!existingSavedArticle) {
-      try {
-        await this.articlesRepository.createSavedArticle(userId, articleId);
-      } catch (error) {
-        if (!this.isUniqueConstraintError(error)) {
-          throw error;
-        }
-      }
-    }
-
-    return {
-      message: 'Artigo salvo.',
-    };
+    return this.articleEngagementService.saveArticle(userId, articleId);
   }
 
   async unsaveArticle(userId: string, articleId: string) {
-    await this.requireArticle(articleId, true);
-
-    const existingSavedArticle =
-      await this.articlesRepository.findSavedArticleByUserAndArticle(
-        userId,
-        articleId,
-      );
-
-    if (existingSavedArticle) {
-      try {
-        await this.articlesRepository.deleteSavedArticle(userId, articleId);
-      } catch (error) {
-        if (!this.isRecordNotFoundError(error)) {
-          throw error;
-        }
-      }
-    }
-
-    return {
-      message: 'Artigo removido das leituras salvas.',
-    };
+    return this.articleEngagementService.unsaveArticle(userId, articleId);
   }
 
   async listSavedArticles(
@@ -639,185 +442,28 @@ export class ArticlesService {
     };
   }
 
-  async createBlock(
-    articleId: string,
-    createArticleBlockDto: CreateArticleBlockDto,
-  ): Promise<ArticleBlockResponse> {
-    await this.requireArticle(articleId, true);
-
-    const block = await this.articlesRepository.createBlock({
-      article: {
-        connect: {
-          id: articleId,
-        },
-      },
-      kind: createArticleBlockDto.kind,
-      title: this.normalizeOptionalText(createArticleBlockDto.title),
-      body: this.normalizeOptionalText(createArticleBlockDto.body),
-      imageUrl: this.normalizeOptionalText(createArticleBlockDto.imageUrl),
-      imageAlt: this.normalizeOptionalText(createArticleBlockDto.imageAlt),
-      imageCaption: this.normalizeOptionalText(createArticleBlockDto.imageCaption),
-      items: this.normalizeBlockItems(createArticleBlockDto.items),
-      sortOrder: createArticleBlockDto.sortOrder ?? 0,
-    });
-
-    return toArticleBlockItemResponse(block);
+  async createBlock(articleId: string, dto: CreateArticleBlockDto): Promise<ArticleBlockResponse> {
+    return this.articleBlocksService.createBlock(articleId, dto);
   }
 
-  async createBlockImageUploadUrl(
-    articleId: string,
-    blockId: string,
-    createArticleBlockImageUploadDto: CreateArticleBlockImageUploadDto,
-  ): Promise<PresignedUploadResult> {
-    await this.requireArticle(articleId, true);
-    await this.requireArticleBlock(articleId, blockId);
-    this.validateImageUploadRequest(createArticleBlockImageUploadDto);
-
-    try {
-      return await this.storageService.createArticleBlockImageUploadUrl(
-        articleId,
-        blockId,
-        createArticleBlockImageUploadDto.fileName,
-        createArticleBlockImageUploadDto.contentType,
-      );
-    } catch {
-      throw new InternalServerErrorException({
-        message: 'Nao foi possivel preparar o upload da imagem.',
-        error: 'Internal Server Error',
-      });
-    }
+  async createBlockImageUploadUrl(articleId: string, blockId: string, dto: CreateArticleBlockImageUploadDto): Promise<PresignedUploadResult> {
+    return this.articleBlocksService.createBlockImageUploadUrl(articleId, blockId, dto);
   }
 
-  async updateBlock(
-    articleId: string,
-    blockId: string,
-    updateArticleBlockDto: UpdateArticleBlockDto,
-  ): Promise<ArticleBlockResponse> {
-    await this.requireArticle(articleId, true);
-    const existingBlock = await this.requireArticleBlock(articleId, blockId);
-    const data: Prisma.ArticleBlockUpdateInput = {};
-
-    if (updateArticleBlockDto.kind !== undefined) {
-      data.kind = updateArticleBlockDto.kind;
-    }
-
-    if (updateArticleBlockDto.title !== undefined) {
-      data.title = this.normalizeOptionalText(updateArticleBlockDto.title);
-    }
-
-    if (updateArticleBlockDto.body !== undefined) {
-      data.body = this.normalizeOptionalText(updateArticleBlockDto.body);
-    }
-
-    if (updateArticleBlockDto.imageUrl !== undefined) {
-      data.imageUrl = this.normalizeOptionalText(updateArticleBlockDto.imageUrl);
-    }
-
-    if (updateArticleBlockDto.imageAlt !== undefined) {
-      data.imageAlt = this.normalizeOptionalText(updateArticleBlockDto.imageAlt);
-    }
-
-    if (updateArticleBlockDto.imageCaption !== undefined) {
-      data.imageCaption = this.normalizeOptionalText(updateArticleBlockDto.imageCaption);
-    }
-
-    if (updateArticleBlockDto.items !== undefined) {
-      data.items = this.normalizeBlockItems(updateArticleBlockDto.items);
-    }
-
-    if (updateArticleBlockDto.sortOrder !== undefined) {
-      data.sortOrder = updateArticleBlockDto.sortOrder;
-    }
-
-    if (Object.keys(data).length === 0) {
-      return toArticleBlockItemResponse(existingBlock);
-    }
-
-    try {
-      const block = await this.articlesRepository.updateBlock(blockId, data);
-      return toArticleBlockItemResponse(block);
-    } catch (error) {
-      if (this.isRecordNotFoundError(error)) {
-        throw this.buildArticleBlockNotFoundException();
-      }
-
-      throw error;
-    }
+  async updateBlock(articleId: string, blockId: string, dto: UpdateArticleBlockDto): Promise<ArticleBlockResponse> {
+    return this.articleBlocksService.updateBlock(articleId, blockId, dto);
   }
 
-  async updateBlockImage(
-    articleId: string,
-    blockId: string,
-    updateArticleBlockImageDto: UpdateArticleBlockImageDto,
-  ): Promise<ArticleBlockResponse> {
-    await this.requireArticle(articleId, true);
-    await this.requireArticleBlock(articleId, blockId);
-    this.validateManagedBlockImageUrl(
-      articleId,
-      blockId,
-      updateArticleBlockImageDto.imageUrl,
-    );
-
-    try {
-      const block = await this.articlesRepository.updateBlock(blockId, {
-        imageUrl: this.normalizeText(updateArticleBlockImageDto.imageUrl),
-        imageAlt: this.normalizeOptionalText(updateArticleBlockImageDto.imageAlt),
-        imageCaption: this.normalizeOptionalText(
-          updateArticleBlockImageDto.imageCaption,
-        ),
-      });
-
-      return toArticleBlockItemResponse(block);
-    } catch (error) {
-      if (this.isRecordNotFoundError(error)) {
-        throw this.buildArticleBlockNotFoundException();
-      }
-
-      throw error;
-    }
+  async updateBlockImage(articleId: string, blockId: string, dto: UpdateArticleBlockImageDto): Promise<ArticleBlockResponse> {
+    return this.articleBlocksService.updateBlockImage(articleId, blockId, dto);
   }
 
   async deleteBlock(articleId: string, blockId: string) {
-    await this.requireArticle(articleId, true);
-    await this.requireArticleBlock(articleId, blockId);
-
-    try {
-      await this.articlesRepository.deleteBlock(blockId);
-    } catch (error) {
-      if (this.isRecordNotFoundError(error)) {
-        throw this.buildArticleBlockNotFoundException();
-      }
-
-      throw error;
-    }
-
-    return {
-      message: 'Bloco do artigo removido.',
-    };
+    return this.articleBlocksService.deleteBlock(articleId, blockId);
   }
 
-  async removeBlockImage(
-    articleId: string,
-    blockId: string,
-  ): Promise<ArticleBlockResponse> {
-    await this.requireArticle(articleId, true);
-    await this.requireArticleBlock(articleId, blockId);
-
-    try {
-      const block = await this.articlesRepository.updateBlock(blockId, {
-        imageUrl: null,
-        imageAlt: null,
-        imageCaption: null,
-      });
-
-      return toArticleBlockItemResponse(block);
-    } catch (error) {
-      if (this.isRecordNotFoundError(error)) {
-        throw this.buildArticleBlockNotFoundException();
-      }
-
-      throw error;
-    }
+  async removeBlockImage(articleId: string, blockId: string): Promise<ArticleBlockResponse> {
+    return this.articleBlocksService.removeBlockImage(articleId, blockId);
   }
 
   async uploadImage(id: string, file?: UploadFile): Promise<ArticleDetailResponse> {
@@ -903,26 +549,6 @@ export class ArticlesService {
     }
 
     return article;
-  }
-
-  private async requireArticleBlock(articleId: string, blockId: string) {
-    const block = await this.articlesRepository.findBlockById(blockId);
-
-    if (!block || block.articleId !== articleId) {
-      throw this.buildArticleBlockNotFoundException();
-    }
-
-    return block;
-  }
-
-  private async requireComment(articleId: string, commentId: string) {
-    const comment = await this.articlesRepository.findCommentById(commentId);
-
-    if (!comment || comment.articleId !== articleId) {
-      throw this.buildCommentNotFoundException();
-    }
-
-    return comment;
   }
 
   private async generateUniqueSlug(title: string, currentArticleId?: string) {
@@ -1012,31 +638,8 @@ export class ArticlesService {
     return normalizedValue.length > 0 ? normalizedValue : null;
   }
 
-  private resolveUploadedBlockImageText(
-    submittedValue: string | undefined,
-    currentValue: string | null,
-  ) {
-    const normalizedSubmittedValue = this.normalizeOptionalText(submittedValue);
-
-    if (normalizedSubmittedValue !== null) {
-      return normalizedSubmittedValue;
-    }
-
-    return currentValue;
-  }
-
   private normalizeTags(tags?: string[]) {
     return (tags ?? []).map(tag => tag.trim()).filter(Boolean);
-  }
-
-  private normalizeBlockItems(
-    items?: unknown[],
-  ): Prisma.InputJsonValue | typeof Prisma.JsonNull {
-    if (items === undefined) {
-      return Prisma.JsonNull;
-    }
-
-    return [...items] as Prisma.InputJsonValue;
   }
 
   private resolveReadingTimeMinutes(article: {
@@ -1095,82 +698,10 @@ export class ArticlesService {
     return file;
   }
 
-  private validateImageUploadRequest(uploadRequest: {
-    fileName: string;
-    contentType: string;
-    fileSize: number;
-  }) {
-    const normalizedFileName = uploadRequest.fileName.trim();
-
-    if (!normalizedFileName || normalizedFileName.includes('..') || /[\\/]/.test(normalizedFileName)) {
-      throw new BadRequestException({
-        message: 'Informe um nome de arquivo valido.',
-        error: 'Bad Request',
-      });
-    }
-
-    if (uploadRequest.fileSize > CONTENT_IMAGE_MAX_FILE_SIZE) {
-      throw new BadRequestException({
-        message: 'A imagem deve ter no maximo 5 MB.',
-        error: 'Bad Request',
-      });
-    }
-
-    if (!ALLOWED_CONTENT_IMAGE_MIME_TYPES.has(uploadRequest.contentType)) {
-      throw new BadRequestException({
-        message: 'Formato de imagem nao permitido.',
-        error: 'Bad Request',
-      });
-    }
-  }
-
-  private validateManagedBlockImageUrl(
-    articleId: string,
-    blockId: string,
-    imageUrl: string,
-  ) {
-    const expectedPrefix = `articles/${articleId}/blocks/${blockId}`;
-
-    if (!this.storageService.isManagedPublicUrl(imageUrl, expectedPrefix)) {
-      throw new BadRequestException({
-        message: 'Informe uma URL de imagem valida.',
-        error: 'Bad Request',
-      });
-    }
-  }
-
   private buildArticleNotFoundException() {
     return new NotFoundException({
       message: 'Artigo n\u00e3o encontrado.',
       error: 'Not Found',
-    });
-  }
-
-  private buildArticleBlockNotFoundException() {
-    return new NotFoundException({
-      message: 'Bloco do artigo n\u00e3o encontrado.',
-      error: 'Not Found',
-    });
-  }
-
-  private buildCommentNotFoundException() {
-    return new NotFoundException({
-      message: 'Comentario nao encontrado.',
-      error: 'Not Found',
-    });
-  }
-
-  private buildCommentOwnerForbiddenException() {
-    return new ForbiddenException({
-      message: 'Voce nao pode gerenciar este comentario.',
-      error: 'Forbidden',
-    });
-  }
-
-  private buildCommentEditForbiddenException() {
-    return new ForbiddenException({
-      message: 'Este comentario nao pode mais ser editado.',
-      error: 'Forbidden',
     });
   }
 

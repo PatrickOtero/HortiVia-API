@@ -8,6 +8,9 @@ import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { StorageService } from '../storage/storage.service';
 import { ArticlesRepository } from './articles.repository';
 import { ArticlesService } from './articles.service';
+import { ArticleCommentsService } from './article-comments.service';
+import { ArticleEngagementService } from './article-engagement.service';
+import { ArticleBlocksService } from './article-blocks.service';
 
 describe('ArticlesService', () => {
   const baseArticle = {
@@ -163,6 +166,12 @@ describe('ArticlesService', () => {
     service = new ArticlesService(
       articlesRepository as unknown as ArticlesRepository,
       storageService as unknown as StorageService,
+      new ArticleCommentsService(articlesRepository as unknown as ArticlesRepository),
+      new ArticleEngagementService(articlesRepository as unknown as ArticlesRepository),
+      new ArticleBlocksService(
+        articlesRepository as unknown as ArticlesRepository,
+        storageService as unknown as StorageService,
+      ),
     );
   });
 

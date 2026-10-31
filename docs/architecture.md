@@ -31,6 +31,16 @@ O controller define rotas, parâmetros e autorização declarativa. DTOs descrev
   - `preferences`: preferências do usuário.
   - `storage` e `mail`: integrações externas compartilhadas, não regras de tela.
   - `settings`: configuração tipada da aplicação.
+
+### Módulo de artigos
+
+`ArticlesController` e `SavedArticlesController` continuam chamando `ArticlesService`, que preserva a API pública usada pelas rotas. O serviço coordena leitura, publicação, slugs e montagem das respostas. Regras que formam fluxos independentes ficam em colaboradores injetados pelo `ArticlesModule`:
+
+- `ArticleCommentsService`: paginação, autoria, edição, exclusão lógica e moderação de comentários.
+- `ArticleEngagementService`: reações úteis e salvamento idempotente de artigos.
+- `ArticleBlocksService`: CRUD e ordenação dos blocos, validação de imagens e integração com o storage para imagens dos blocos.
+
+Os serviços especializados usam `ArticlesRepository` para persistência e os mappers existentes para as respostas. A fachada evita mudanças nos controllers e concentra as operações do ciclo editorial do artigo; regras de comentários, engajamento e blocos devem ser alteradas no serviço especializado correspondente. O módulo não altera schema, migrations ou dados.
 - `src/common`: conceitos usados por mais de um domínio, como filtros, validações, normalização e paginação.
 - `src/prisma`: ciclo de vida do cliente Prisma e conexão com PostgreSQL.
 - `src/generated/prisma`: cliente gerado; não editar manualmente. Atualize o schema e execute `npm run prisma:generate`.
