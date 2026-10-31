@@ -68,6 +68,16 @@ enum ArticleBlockKind {
   OTHER
 }
 
+enum PresignedUploadResourceType {
+  ARTICLE_BLOCK_IMAGE
+}
+
+enum PresignedUploadIntentStatus {
+  PENDING
+  ASSOCIATED
+  SIGNING_FAILED
+}
+
 enum ArticleReactionType {
   HELPFUL
 }
@@ -119,6 +129,7 @@ model User {
   savedArticles                   SavedArticle[]
   preferences                     UserPreference?
   trainingAttempts                TrainingAttempt[]
+  presignedUploadIntents          PresignedUploadIntent[]
 }
 
 model Product {
@@ -276,6 +287,27 @@ model ArticleBlock {
   updatedAt    DateTime         @updatedAt
 
   @@index([articleId, sortOrder])
+}
+
+model PresignedUploadIntent {
+  id                 String                      @id @default(uuid())
+  objectKey          String                      @unique
+  publicUrl          String                      @unique
+  resourceType       PresignedUploadResourceType
+  articleId          String
+  blockId            String
+  requestedByUserId  String?
+  requestedBy        User?                       @relation(fields: [requestedByUserId], references: [id], onDelete: SetNull)
+  contentType        String
+  declaredSize       Int
+  createdAt          DateTime                    @default(now())
+  expiresAt          DateTime
+  status             PresignedUploadIntentStatus @default(PENDING)
+  associatedAt       DateTime?
+  objectEtag         String?
+
+  @@index([status, expiresAt])
+  @@index([articleId, blockId, createdAt])
 }
 
 model SavedArticle {

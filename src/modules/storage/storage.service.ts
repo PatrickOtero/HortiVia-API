@@ -26,6 +26,16 @@ export class StorageService {
   }
 
   async deleteManagedUpload(upload: UploadResult, scope: ManagedImageScope) {
+    const objectKey = this.validateManagedUpload(upload, scope);
+    await this.cloudflareR2StorageService.deleteFile(objectKey);
+  }
+
+  inspectManagedUpload(upload: UploadResult, scope: ManagedImageScope) {
+    const objectKey = this.validateManagedUpload(upload, scope);
+    return this.cloudflareR2StorageService.inspectObject(objectKey);
+  }
+
+  private validateManagedUpload(upload: UploadResult, scope: ManagedImageScope) {
     const expectedPrefix = this.getManagedImagePrefix(scope);
     const publicBaseUrl = this.cloudflareR2StorageService.getPublicBaseUrl();
     const fileName = upload.key.startsWith(`${expectedPrefix}/`)
@@ -34,15 +44,15 @@ export class StorageService {
 
     if (
       upload.url !== `${publicBaseUrl}/${upload.key}` ||
-      !/^\d+-[a-z0-9-]+\.(?:jpg|png|webp)$/i.test(fileName) ||
+      !/^\d+-[a-f0-9]{8}(?:-[a-z0-9-]+)?\.(?:jpg|png|webp)$/i.test(fileName) ||
       fileName.includes('/') ||
       fileName.includes('\\') ||
       fileName.includes('..')
     ) {
-      throw new Error('Refusing to delete an object outside the expected managed image scope.');
+      throw new Error('Object key does not match the expected managed image scope.');
     }
 
-    await this.cloudflareR2StorageService.deleteFile(upload.key);
+    return upload.key;
   }
 
   async uploadProductImage(
@@ -112,31 +122,65 @@ export class StorageService {
     fileName: string,
     contentType: string,
   ): Promise<PresignedUploadResult> {
-    const objectKey = this.buildArticleBlockImageObjectKey(
-      articleId,
-      blockId,
-      fileName,
-      contentType,
-    );
+    const prepared = this.prepareArticleBlockImageUpload(articleId, blockId, fileName, contentType);
+    return this.createPresignedUrlForKey(prepared.key, contentType);
+  }
 
-    return this.cloudflareR2StorageService.createPresignedUploadUrl(
-      objectKey,
-      contentType,
-    );
+  prepareArticleBlockImageUpload(
+    articleId: string,
+    blockId: string,
+    fileName: string,
+    contentType: string,
+  ) {
+    const key = this.buildArticleBlockImageObjectKey(articleId, blockId, fileName, contentType);
+    return { key, url: `${this.cloudflareR2StorageService.getPublicBaseUrl()}/${key}` };
+  }
+
+  createPresignedUrlForKey(objectKey: string, contentType: string): Promise<PresignedUploadResult> {
+    return this.cloudflareR2StorageService.createPresignedUploadUrl(objectKey, contentType);
   }
 
   isManagedPublicUrl(url: string, expectedPrefix?: string) {
-    const normalizedBaseUrl = `${this.cloudflareR2StorageService.getPublicBaseUrl()}/`;
+    try {
+      const base = new URL(this.cloudflareR2StorageService.getPublicBaseUrl());
+      const candidate = new URL(url);
+      if (
+        candidate.origin !== base.origin ||
+        candidate.search ||
+        candidate.hash ||
+        candidate.username ||
+        candidate.password
+      ) return false;
 
-    if (!url.startsWith(normalizedBaseUrl)) {
+      const basePath = base.pathname.replace(/\/+$/, '');
+      const candidatePath = decodeURIComponent(candidate.pathname);
+      if (candidatePath.split('/').some(segment => segment === '.' || segment === '..' || segment.includes('\\'))) {
+        return false;
+      }
+      if (!candidatePath.startsWith(`${basePath}/`)) return false;
+      if (!expectedPrefix) return true;
+
+      const prefix = expectedPrefix.replace(/^\/+|\/+$/g, '');
+      return candidatePath.startsWith(`${basePath}/${prefix}/`);
+    } catch {
       return false;
     }
+  }
 
-    if (!expectedPrefix) {
-      return true;
+  inspectManagedPublicUrl(url: string, expectedPrefix: string) {
+    if (!this.isManagedPublicUrl(url, expectedPrefix)) {
+      throw new Error('Public image URL is outside the expected managed scope.');
     }
 
-    return url.startsWith(`${normalizedBaseUrl}${expectedPrefix.replace(/^\/+/, '')}/`);
+    const base = new URL(this.cloudflareR2StorageService.getPublicBaseUrl());
+    const candidate = new URL(url);
+    const basePath = base.pathname.replace(/\/+$/, '');
+    const objectKey = decodeURIComponent(candidate.pathname).slice(basePath.length + 1);
+    if (!objectKey || objectKey.includes('\\')) {
+      throw new Error('Public image URL does not contain a safe managed object key.');
+    }
+
+    return this.cloudflareR2StorageService.inspectObject(objectKey);
   }
 
   private buildObjectKey(prefix: string, entityId: string, mimeType: string) {

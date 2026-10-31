@@ -143,7 +143,7 @@ describe('ArticlesController', () => {
         fileName: 'folhas.webp',
         contentType: 'image/webp',
         fileSize: 1234,
-      }),
+      }, { userId: 'admin-1', email: 'admin@example.invalid', role: 'ADMIN' }),
     ).resolves.toEqual(response);
 
     expect(articlesService.createBlockImageUploadUrl).toHaveBeenCalledWith(
@@ -154,6 +154,7 @@ describe('ArticlesController', () => {
         contentType: 'image/webp',
         fileSize: 1234,
       },
+      { userId: 'admin-1', email: 'admin@example.invalid', role: 'ADMIN' },
     );
   });
 

@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import type { Prisma } from '../../generated/prisma/client';
 import { ArticlesRepository } from './articles.repository';
 import { ArticleAccessService } from './article-access.service';
 import { StorageService } from '../storage/storage.service';
@@ -21,6 +22,8 @@ import {
 } from './utils/article-content.util';
 import { validateContentImageFile } from '../storage/image-upload.validation';
 import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user';
+import { ArticleBlockUploadTrackingService } from './article-block-upload-tracking.service';
 
 @Injectable()
 export class ArticleBlockImagesService {
@@ -29,27 +32,31 @@ export class ArticleBlockImagesService {
     private readonly articleAccessService: ArticleAccessService,
     private readonly storageService: StorageService,
     private readonly uploadCompensation: StorageUploadCompensationService,
+    private readonly uploadTracking: ArticleBlockUploadTrackingService,
   ) {}
 
   async createUploadUrl(
     articleId: string,
     blockId: string,
     dto: CreateArticleBlockImageUploadDto,
+    user?: AuthenticatedUser,
   ): Promise<PresignedUploadResult> {
     await this.requireBlock(articleId, blockId);
     this.validateUploadRequest(dto);
     try {
-      return await this.storageService.createArticleBlockImageUploadUrl(
+      return await this.uploadTracking.createIntent({
         articleId,
         blockId,
-        dto.fileName,
-        dto.contentType,
-      );
-    } catch {
+        fileName: dto.fileName,
+        contentType: dto.contentType,
+        fileSize: dto.fileSize,
+        user,
+      });
+    } catch (error) {
       throw new InternalServerErrorException({
         message: 'Nao foi possivel preparar o upload da imagem.',
         error: 'Internal Server Error',
-      });
+      }, { cause: error });
     }
   }
 
@@ -57,19 +64,53 @@ export class ArticleBlockImagesService {
     articleId: string,
     blockId: string,
     dto: UpdateArticleBlockImageDto,
+    additionalData: Prisma.ArticleBlockUpdateInput = {},
   ): Promise<ArticleBlockResponse> {
-    await this.requireBlock(articleId, blockId);
+    const existingBlock = await this.requireBlock(articleId, blockId);
     const expectedPrefix = `articles/${articleId}/blocks/${blockId}`;
-    if (!this.storageService.isManagedPublicUrl(dto.imageUrl, expectedPrefix)) {
+    const imageUrl = normalizeArticleText(dto.imageUrl);
+    if (!this.storageService.isManagedPublicUrl(imageUrl, expectedPrefix)) {
       throw new BadRequestException({
         message: 'Informe uma URL de imagem valida.',
         error: 'Bad Request',
       });
     }
 
+    const intent = await this.uploadTracking.findIntent(imageUrl);
+    if (intent) {
+      const block = await this.uploadTracking.associate({
+        articleId,
+        blockId,
+        intentId: intent.id,
+        publicUrl: imageUrl,
+        dto,
+        additionalData,
+      });
+      return toArticleBlockItemResponse(block);
+    }
+
+    if (existingBlock.imageUrl !== imageUrl) {
+      let object: Awaited<ReturnType<StorageService['inspectManagedPublicUrl']>>;
+      try {
+        object = await this.storageService.inspectManagedPublicUrl(imageUrl, expectedPrefix);
+      } catch (error) {
+        throw new InternalServerErrorException({
+          message: 'Nao foi possivel confirmar a imagem no armazenamento.',
+          error: 'Internal Server Error',
+        }, { cause: error });
+      }
+      if (!object.exists) {
+        throw new BadRequestException({
+          message: 'A imagem nao esta disponivel no armazenamento.',
+          error: 'Bad Request',
+        });
+      }
+    }
+
     try {
       const block = await this.articlesRepository.updateBlock(blockId, {
-        imageUrl: normalizeArticleText(dto.imageUrl),
+        ...additionalData,
+        imageUrl,
         imageAlt: normalizeOptionalArticleText(dto.imageAlt),
         imageCaption: normalizeOptionalArticleText(dto.imageCaption),
       });
