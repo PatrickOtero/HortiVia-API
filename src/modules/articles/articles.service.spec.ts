@@ -11,6 +11,12 @@ import { ArticlesService } from './articles.service';
 import { ArticleCommentsService } from './article-comments.service';
 import { ArticleEngagementService } from './article-engagement.service';
 import { ArticleBlocksService } from './article-blocks.service';
+import { ArticleAccessService } from './article-access.service';
+import { ArticleBlockImagesService } from './article-block-images.service';
+import { ArticleImagesService } from './article-images.service';
+import { ArticleManagementService } from './article-management.service';
+import { ArticleQueriesService } from './article-queries.service';
+import { ArticleSlugService } from './article-slug.service';
 
 describe('ArticlesService', () => {
   const baseArticle = {
@@ -163,15 +169,16 @@ describe('ArticlesService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    const repository = articlesRepository as unknown as ArticlesRepository;
+    const access = new ArticleAccessService(repository);
     service = new ArticlesService(
-      articlesRepository as unknown as ArticlesRepository,
-      storageService as unknown as StorageService,
-      new ArticleCommentsService(articlesRepository as unknown as ArticlesRepository),
-      new ArticleEngagementService(articlesRepository as unknown as ArticlesRepository),
-      new ArticleBlocksService(
-        articlesRepository as unknown as ArticlesRepository,
-        storageService as unknown as StorageService,
-      ),
+      new ArticleQueriesService(repository, access),
+      new ArticleManagementService(repository, access, new ArticleSlugService(repository)),
+      new ArticleCommentsService(repository, access),
+      new ArticleEngagementService(repository, access),
+      new ArticleBlocksService(repository, access),
+      new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService),
+      new ArticleImagesService(repository, access, storageService as unknown as StorageService),
     );
   });
 

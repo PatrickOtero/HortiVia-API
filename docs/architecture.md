@@ -34,19 +34,19 @@ O controller define rotas, parâmetros e autorização declarativa. DTOs descrev
 
 ### Módulo de artigos
 
-`ArticlesController` e `SavedArticlesController` continuam chamando `ArticlesService`, que preserva a API pública usada pelas rotas. O serviço coordena leitura, publicação, slugs e montagem das respostas. Regras que formam fluxos independentes ficam em colaboradores injetados pelo `ArticlesModule`:
+`ArticlesController` e `SavedArticlesController` continuam usando `ArticlesService`, uma fachada de compatibilidade sem regras de negócio. Cada fluxo fica no serviço especializado correspondente:
 
-- `ArticleCommentsService`: paginação, autoria, edição, exclusão lógica e moderação de comentários.
-- `ArticleEngagementService`: reações úteis e salvamento idempotente de artigos.
-- `ArticleBlocksService`: CRUD e ordenação dos blocos, validação de imagens e integração com o storage para imagens dos blocos.
+- `ArticleQueriesService`: listagem, pesquisa, paginação e leitura pública/administrativa; usa os mappers existentes.
+- `ArticleManagementService`: criação, edição e despublicação lógica.
+- `ArticleSlugService`: geração de candidato de slug único; o gerenciamento traduz conflito `P2002` para a resposta já estabelecida.
+- `ArticleCommentsService`: autoria, edição, exclusão lógica e moderação.
+- `ArticleEngagementService`: reações e ciclo completo dos artigos salvos, inclusive listagem paginada.
+- `ArticleBlocksService`: criação, atualização, ordenação e remoção dos blocos.
+- `ArticleBlockImagesService`: upload, URL pré-assinada, validação e remoção de imagens dos blocos.
+- `ArticleImagesService`: upload e associação da imagem principal do artigo.
+- `ArticleAccessService`: visibilidade do artigo e associação do bloco ao artigo.
 
-Os serviços especializados usam `ArticlesRepository` para persistência e os mappers existentes para as respostas. A fachada evita mudanças nos controllers e concentra as operações do ciclo editorial do artigo; regras de comentários, engajamento e blocos devem ser alteradas no serviço especializado correspondente. O módulo não altera schema, migrations ou dados.
-- `src/common`: conceitos usados por mais de um domínio, como filtros, validações, normalização e paginação.
-- `src/prisma`: ciclo de vida do cliente Prisma e conexão com PostgreSQL.
-- `src/generated/prisma`: cliente gerado; não editar manualmente. Atualize o schema e execute `npm run prisma:generate`.
-- `prisma/schema.prisma` e `prisma/migrations`: modelo persistido e mudanças de schema versionadas.
-- `test`: testes HTTP e de integração que usam PostgreSQL descartável. Os testes de integração exigem `TRAINING_TEST_DATABASE_URL`; em CI, ausência dessa URL deve falhar em vez de ignorar a suíte.
-
+Regras determinísticas ficam em `utils`: publicação e datas, normalização editorial/tempo de leitura, erros do domínio e validação comum de arquivos. `ArticlesRepository` continua sendo o único acesso a dados. O `ArticlesModule` registra todos os colaboradores; controllers e contratos públicos permanecem inalterados.
 ## Como implementar uma mudança
 
 1. Coloque contratos de entrada em DTOs e valide-os com os decorators existentes.

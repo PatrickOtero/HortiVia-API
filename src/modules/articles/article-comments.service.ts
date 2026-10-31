@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ArticleCommentStatus } from '../../generated/prisma/enums';
 import {
   createPaginationMeta,
@@ -16,17 +12,26 @@ import type { UpdateArticleCommentDto } from './dto/update-article-comment.dto';
 import { toArticleCommentListItemResponse, toArticleCommentResponse } from './mappers/article-response.mapper';
 import { ArticlesRepository } from './articles.repository';
 import type { ArticleCommentResponse, ArticleCommentsListResponse } from './types/article-response';
+import { ArticleAccessService } from './article-access.service';
+import {
+  articleCommentEditForbiddenException,
+  articleCommentNotFoundException,
+  articleCommentOwnerForbiddenException,
+} from './utils/article-errors.util';
 
 @Injectable()
 export class ArticleCommentsService {
-  constructor(private readonly articlesRepository: ArticlesRepository) {}
+  constructor(
+    private readonly articlesRepository: ArticlesRepository,
+    private readonly articleAccessService: ArticleAccessService,
+  ) {}
 
   async listComments(
     articleId: string,
     query: ListArticleCommentsQueryDto,
   ): Promise<ArticleCommentsListResponse> {
     const { page, limit, skip } = resolvePagination(query);
-    await this.requireArticle(articleId);
+    await this.articleAccessService.requireArticle(articleId);
 
     const [comments, total] = await Promise.all([
       this.articlesRepository.listVisibleCommentsByArticle({ articleId, skip, take: limit }),
@@ -44,7 +49,7 @@ export class ArticleCommentsService {
     dto: CreateArticleCommentDto,
     user: AuthenticatedUser,
   ): Promise<ArticleCommentResponse> {
-    await this.requireArticle(articleId);
+    await this.articleAccessService.requireArticle(articleId);
     const comment = await this.articlesRepository.createComment(
       articleId,
       user.userId,
@@ -59,17 +64,17 @@ export class ArticleCommentsService {
     dto: UpdateArticleCommentDto,
     user: AuthenticatedUser,
   ): Promise<ArticleCommentResponse> {
-    await this.requireArticle(articleId, user.role === 'ADMIN');
+    await this.articleAccessService.requireArticle(articleId, user.role === 'ADMIN');
     const comment = await this.requireComment(articleId, commentId);
 
     if (comment.userId !== user.userId) {
-      throw this.buildCommentOwnerForbiddenException();
+      throw articleCommentOwnerForbiddenException();
     }
     if (comment.status === ArticleCommentStatus.DELETED) {
-      throw this.buildCommentNotFoundException();
+      throw articleCommentNotFoundException();
     }
     if (comment.status !== ArticleCommentStatus.VISIBLE) {
-      throw this.buildCommentEditForbiddenException();
+      throw articleCommentEditForbiddenException();
     }
 
     return toArticleCommentResponse(
@@ -78,11 +83,11 @@ export class ArticleCommentsService {
   }
 
   async deleteComment(articleId: string, commentId: string, user: AuthenticatedUser) {
-    await this.requireArticle(articleId, user.role === 'ADMIN');
+    await this.articleAccessService.requireArticle(articleId, user.role === 'ADMIN');
     const comment = await this.requireComment(articleId, commentId);
 
     if (user.role !== 'ADMIN' && comment.userId !== user.userId) {
-      throw this.buildCommentOwnerForbiddenException();
+      throw articleCommentOwnerForbiddenException();
     }
     if (comment.status !== ArticleCommentStatus.DELETED) {
       await this.articlesRepository.updateComment(commentId, {
@@ -99,10 +104,10 @@ export class ArticleCommentsService {
     dto: ModerateArticleCommentDto,
     user: AuthenticatedUser,
   ): Promise<ArticleCommentResponse> {
-    await this.requireArticle(articleId, true);
+    await this.articleAccessService.requireArticle(articleId, true);
     const comment = await this.requireComment(articleId, commentId);
     if (comment.status === ArticleCommentStatus.DELETED) {
-      throw this.buildCommentNotFoundException();
+      throw articleCommentNotFoundException();
     }
 
     const updatedComment = await this.articlesRepository.updateComment(commentId, {
@@ -113,31 +118,13 @@ export class ArticleCommentsService {
     return toArticleCommentResponse(updatedComment);
   }
 
-  private async requireArticle(articleId: string, includeUnpublished = false) {
-    const article = await this.articlesRepository.findById(articleId, includeUnpublished);
-    if (!article) {
-      throw new NotFoundException({ message: 'Artigo não encontrado.', error: 'Not Found' });
-    }
-    return article;
-  }
-
   private async requireComment(articleId: string, commentId: string) {
     const comment = await this.articlesRepository.findCommentById(commentId);
     if (!comment || comment.articleId !== articleId) {
-      throw this.buildCommentNotFoundException();
+      throw articleCommentNotFoundException();
     }
     return comment;
   }
 
-  private buildCommentNotFoundException() {
-    return new NotFoundException({ message: 'Comentario nao encontrado.', error: 'Not Found' });
-  }
 
-  private buildCommentOwnerForbiddenException() {
-    return new ForbiddenException({ message: 'Voce nao pode gerenciar este comentario.', error: 'Forbidden' });
-  }
-
-  private buildCommentEditForbiddenException() {
-    return new ForbiddenException({ message: 'Este comentario nao pode mais ser editado.', error: 'Forbidden' });
-  }
 }

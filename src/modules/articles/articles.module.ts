@@ -8,6 +8,12 @@ import { ArticlesService } from './articles.service';
 import { ArticleCommentsService } from './article-comments.service';
 import { ArticleEngagementService } from './article-engagement.service';
 import { ArticleBlocksService } from './article-blocks.service';
+import { ArticleAccessService } from './article-access.service';
+import { ArticleBlockImagesService } from './article-block-images.service';
+import { ArticleImagesService } from './article-images.service';
+import { ArticleManagementService } from './article-management.service';
+import { ArticleQueriesService } from './article-queries.service';
+import { ArticleSlugService } from './article-slug.service';
 
 @Module({
   imports: [AuthModule, StorageModule],
@@ -17,6 +23,12 @@ import { ArticleBlocksService } from './article-blocks.service';
     ArticleCommentsService,
     ArticleEngagementService,
     ArticleBlocksService,
+    ArticleAccessService,
+    ArticleBlockImagesService,
+    ArticleImagesService,
+    ArticleManagementService,
+    ArticleQueriesService,
+    ArticleSlugService,
     ArticlesService,
   ],
   exports: [ArticlesRepository, ArticlesService],
