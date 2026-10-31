@@ -167,6 +167,22 @@ export class StorageService {
     }
   }
 
+  inspectManagedPublicUrl(url: string, expectedPrefix: string) {
+    if (!this.isManagedPublicUrl(url, expectedPrefix)) {
+      throw new Error('Public image URL is outside the expected managed scope.');
+    }
+
+    const base = new URL(this.cloudflareR2StorageService.getPublicBaseUrl());
+    const candidate = new URL(url);
+    const basePath = base.pathname.replace(/\/+$/, '');
+    const objectKey = decodeURIComponent(candidate.pathname).slice(basePath.length + 1);
+    if (!objectKey || objectKey.includes('\\')) {
+      throw new Error('Public image URL does not contain a safe managed object key.');
+    }
+
+    return this.cloudflareR2StorageService.inspectObject(objectKey);
+  }
+
   private buildObjectKey(prefix: string, entityId: string, mimeType: string) {
     const extension = FILE_EXTENSION_BY_MIME_TYPE[mimeType] ?? 'bin';
     const randomSuffix = randomBytes(4).toString('hex');

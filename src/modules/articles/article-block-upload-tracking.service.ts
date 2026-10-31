@@ -5,6 +5,7 @@ import { PRESIGNED_UPLOAD_EXPIRES_IN_SECONDS } from '../storage/presigned-upload
 import { StorageService } from '../storage/storage.service';
 import type { UpdateArticleBlockImageDto } from './dto/update-article-block-image.dto';
 import { ArticleBlockUploadIntentsRepository } from './article-block-upload-intents.repository';
+import type { Prisma } from '../../generated/prisma/client';
 
 @Injectable()
 export class ArticleBlockUploadTrackingService {
@@ -67,6 +68,7 @@ export class ArticleBlockUploadTrackingService {
     publicUrl: string;
     dto: UpdateArticleBlockImageDto;
     etag?: string;
+    additionalData?: Prisma.ArticleBlockUpdateInput;
   }) {
     const intent = await this.repository.findByPublicUrl(params.publicUrl);
     if (
@@ -114,6 +116,7 @@ export class ArticleBlockUploadTrackingService {
       publicUrl: intent.publicUrl,
       objectEtag: object.etag ?? null,
       data: {
+        ...params.additionalData,
         imageUrl: intent.publicUrl,
         imageAlt: params.dto.imageAlt?.trim() || null,
         imageCaption: params.dto.imageCaption?.trim() || null,

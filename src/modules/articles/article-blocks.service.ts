@@ -11,12 +11,14 @@ import {
   normalizeArticleBlockItems,
   normalizeOptionalArticleText,
 } from './utils/article-content.util';
+import { ArticleBlockImagesService } from './article-block-images.service';
 
 @Injectable()
 export class ArticleBlocksService {
   constructor(
     private readonly articlesRepository: ArticlesRepository,
     private readonly articleAccessService: ArticleAccessService,
+    private readonly articleBlockImagesService: ArticleBlockImagesService,
   ) {}
 
   async createBlock(
@@ -55,6 +57,24 @@ export class ArticleBlocksService {
     if (dto.imageCaption !== undefined) data.imageCaption = normalizeOptionalArticleText(dto.imageCaption);
     if (dto.items !== undefined) data.items = normalizeArticleBlockItems(dto.items);
     if (dto.sortOrder !== undefined) data.sortOrder = dto.sortOrder;
+
+    const imageUrl = normalizeOptionalArticleText(dto.imageUrl);
+    if (imageUrl) {
+      const otherData = { ...data };
+      delete otherData.imageUrl;
+      delete otherData.imageAlt;
+      delete otherData.imageCaption;
+      return this.articleBlockImagesService.updateImage(
+        articleId,
+        blockId,
+        {
+          imageUrl,
+          imageAlt: dto.imageAlt ?? existingBlock.imageAlt ?? undefined,
+          imageCaption: dto.imageCaption ?? existingBlock.imageCaption ?? undefined,
+        },
+        otherData,
+      );
+    }
 
     if (Object.keys(data).length === 0) {
       return toArticleBlockItemResponse(existingBlock);

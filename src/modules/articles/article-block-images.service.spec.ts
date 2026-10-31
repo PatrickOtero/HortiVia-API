@@ -15,7 +15,7 @@ describe('ArticleBlockImagesService pre-signed compatibility', () => {
     imageCaption: null, items: null, sortOrder: 0, createdAt: new Date(), updatedAt: new Date(),
   };
   let repository: jest.Mocked<Pick<ArticlesRepository, 'findById' | 'findBlockById' | 'updateBlock'>>;
-  let storage: jest.Mocked<Pick<StorageService, 'isManagedPublicUrl'>>;
+  let storage: jest.Mocked<Pick<StorageService, 'isManagedPublicUrl' | 'inspectManagedPublicUrl'>>;
   let tracking: jest.Mocked<Pick<ArticleBlockUploadTrackingService, 'createIntent' | 'findIntent' | 'associate'>>;
   let service: ArticleBlockImagesService;
 
@@ -25,7 +25,10 @@ describe('ArticleBlockImagesService pre-signed compatibility', () => {
       findBlockById: jest.fn().mockResolvedValue(block),
       updateBlock: jest.fn().mockResolvedValue({ ...block, imageUrl }),
     } as never;
-    storage = { isManagedPublicUrl: jest.fn().mockReturnValue(true) } as never;
+    storage = {
+      isManagedPublicUrl: jest.fn().mockReturnValue(true),
+      inspectManagedPublicUrl: jest.fn().mockResolvedValue({ exists: true, size: 10, contentType: 'image/webp', etag: 'legacy-etag' }),
+    } as never;
     tracking = {
       createIntent: jest.fn(),
       findIntent: jest.fn().mockResolvedValue(null),
@@ -44,16 +47,38 @@ describe('ArticleBlockImagesService pre-signed compatibility', () => {
     tracking.findIntent.mockResolvedValueOnce({ id: 'intent-1' } as never);
     await service.updateImage(articleId, blockId, { imageUrl, imageAlt: ' descrição ' });
     expect(tracking.findIntent).toHaveBeenCalledWith(imageUrl);
-    expect(tracking.associate).toHaveBeenCalledWith({ articleId, blockId, intentId: 'intent-1', publicUrl: imageUrl, dto: { imageUrl, imageAlt: ' descrição ' } });
+    expect(tracking.associate).toHaveBeenCalledWith({ articleId, blockId, intentId: 'intent-1', publicUrl: imageUrl, dto: { imageUrl, imageAlt: ' descrição ' }, additionalData: {} });
     expect(repository.updateBlock).not.toHaveBeenCalled();
   });
 
   it('preserves compatibility with existing managed URLs that have no tracking record', async () => {
     await service.updateImage(articleId, blockId, { imageUrl, imageAlt: '  Alt antigo  ', imageCaption: 'Legenda antiga' });
+    expect(storage.inspectManagedPublicUrl).toHaveBeenCalledWith(imageUrl, `articles/${articleId}/blocks/${blockId}`);
     expect(repository.updateBlock).toHaveBeenCalledWith(blockId, {
       imageUrl, imageAlt: 'Alt antigo', imageCaption: 'Legenda antiga',
     });
     expect(tracking.associate).not.toHaveBeenCalled();
+  });
+
+  it('keeps editing metadata on the current legacy URL available without R2 checks', async () => {
+    repository.findBlockById.mockResolvedValueOnce({ ...block, imageUrl } as never);
+    await service.updateImage(articleId, blockId, { imageUrl, imageAlt: 'Alt ajustado' });
+    expect(storage.inspectManagedPublicUrl).not.toHaveBeenCalled();
+    expect(repository.updateBlock).toHaveBeenCalledWith(blockId, {
+      imageUrl, imageAlt: 'Alt ajustado', imageCaption: null,
+    });
+  });
+
+  it('does not persist a new untracked URL when its object is missing from R2', async () => {
+    storage.inspectManagedPublicUrl.mockResolvedValueOnce({ exists: false } as never);
+    await expect(service.updateImage(articleId, blockId, { imageUrl })).rejects.toMatchObject({ status: 400 });
+    expect(repository.updateBlock).not.toHaveBeenCalled();
+  });
+
+  it('preserves the database when a legacy URL existence check is indeterminate', async () => {
+    storage.inspectManagedPublicUrl.mockRejectedValueOnce(new Error('R2 unavailable'));
+    await expect(service.updateImage(articleId, blockId, { imageUrl })).rejects.toMatchObject({ status: 500 });
+    expect(repository.updateBlock).not.toHaveBeenCalled();
   });
 
   it('rejects a managed URL from another block before looking up a tracking record', async () => {

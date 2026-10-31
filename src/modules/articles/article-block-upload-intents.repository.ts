@@ -96,9 +96,17 @@ export class ArticleBlockUploadIntentsRepository {
 
         if (intent.status === PresignedUploadIntentStatus.ASSOCIATED) {
           if (block.imageUrl !== params.publicUrl) return { kind: 'CONFLICT' } as const;
-          const updated = await transaction.articleBlock.update({
-            where: { id: params.blockId },
+          const blockUpdate = await transaction.articleBlock.updateMany({
+            where: {
+              id: params.blockId,
+              articleId: params.articleId,
+              imageUrl: params.publicUrl,
+            },
             data: params.data,
+          });
+          if (blockUpdate.count !== 1) return { kind: 'CONFLICT' } as const;
+          const updated = await transaction.articleBlock.findUniqueOrThrow({
+            where: { id: params.blockId },
           });
           return { kind: 'ASSOCIATED', block: updated } as const;
         }

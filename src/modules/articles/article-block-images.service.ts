@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import type { Prisma } from '../../generated/prisma/client';
 import { ArticlesRepository } from './articles.repository';
 import { ArticleAccessService } from './article-access.service';
 import { StorageService } from '../storage/storage.service';
@@ -63,8 +64,9 @@ export class ArticleBlockImagesService {
     articleId: string,
     blockId: string,
     dto: UpdateArticleBlockImageDto,
+    additionalData: Prisma.ArticleBlockUpdateInput = {},
   ): Promise<ArticleBlockResponse> {
-    await this.requireBlock(articleId, blockId);
+    const existingBlock = await this.requireBlock(articleId, blockId);
     const expectedPrefix = `articles/${articleId}/blocks/${blockId}`;
     const imageUrl = normalizeArticleText(dto.imageUrl);
     if (!this.storageService.isManagedPublicUrl(imageUrl, expectedPrefix)) {
@@ -82,12 +84,32 @@ export class ArticleBlockImagesService {
         intentId: intent.id,
         publicUrl: imageUrl,
         dto,
+        additionalData,
       });
       return toArticleBlockItemResponse(block);
     }
 
+    if (existingBlock.imageUrl !== imageUrl) {
+      let object: Awaited<ReturnType<StorageService['inspectManagedPublicUrl']>>;
+      try {
+        object = await this.storageService.inspectManagedPublicUrl(imageUrl, expectedPrefix);
+      } catch (error) {
+        throw new InternalServerErrorException({
+          message: 'Nao foi possivel confirmar a imagem no armazenamento.',
+          error: 'Internal Server Error',
+        }, { cause: error });
+      }
+      if (!object.exists) {
+        throw new BadRequestException({
+          message: 'A imagem nao esta disponivel no armazenamento.',
+          error: 'Bad Request',
+        });
+      }
+    }
+
     try {
       const block = await this.articlesRepository.updateBlock(blockId, {
+        ...additionalData,
         imageUrl,
         imageAlt: normalizeOptionalArticleText(dto.imageAlt),
         imageCaption: normalizeOptionalArticleText(dto.imageCaption),

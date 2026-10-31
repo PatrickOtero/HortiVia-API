@@ -156,6 +156,7 @@ describe('ArticlesService', () => {
     uploadArticleBlockImage: jest.fn(),
     createArticleBlockImageUploadUrl: jest.fn(),
     isManagedPublicUrl: jest.fn(),
+    inspectManagedPublicUrl: jest.fn().mockResolvedValue({ exists: true, size: 12, contentType: 'image/webp', etag: 'legacy-etag' }),
   } as unknown as jest.Mocked<
     Pick<
       StorageService,
@@ -163,6 +164,7 @@ describe('ArticlesService', () => {
       | 'uploadArticleBlockImage'
       | 'createArticleBlockImageUploadUrl'
       | 'isManagedPublicUrl'
+      | 'inspectManagedPublicUrl'
     >
   >;
   const uploadCompensation = {
@@ -182,7 +184,11 @@ describe('ArticlesService', () => {
       new ArticleManagementService(repository, access, new ArticleSlugService(repository)),
       new ArticleCommentsService(repository, access),
       new ArticleEngagementService(repository, access),
-      new ArticleBlocksService(repository, access),
+      new ArticleBlocksService(
+        repository,
+        access,
+        new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation, uploadTracking as never),
+      ),
       new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation, uploadTracking as never),
       new ArticleImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation),
     );

@@ -96,7 +96,7 @@ describe('article domain services', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       }),
     } as unknown as ArticlesRepository;
-    const service = new ArticleBlocksService(repository, new ArticleAccessService(repository));
+    const service = new ArticleBlocksService(repository, new ArticleAccessService(repository), {} as ArticleBlockImagesService);
 
     await service.createBlock('article-1', {
       kind: ArticleBlockKind.PARAGRAPH,
@@ -107,6 +107,27 @@ describe('article domain services', () => {
 
     expect(repository.createBlock).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Seção', body: 'Texto', sortOrder: 0 }),
+    );
+  });
+
+  it('routes a changed block image URL through the image association checks', async () => {
+    const imageUrl = 'https://cdn.example.test/articles/article-1/blocks/block-1/image.webp';
+    const repository = {
+      findById: jest.fn().mockResolvedValue({ id: 'article-1' }),
+      findBlockById: jest.fn().mockResolvedValue({
+        id: 'block-1', articleId: 'article-1', imageUrl: null, imageAlt: 'Alt antigo', imageCaption: 'Legenda antiga',
+      }),
+    } as unknown as ArticlesRepository;
+    const blockImages = { updateImage: jest.fn().mockResolvedValue({ id: 'block-1', imageUrl }) } as unknown as ArticleBlockImagesService;
+    const service = new ArticleBlocksService(repository, new ArticleAccessService(repository), blockImages);
+
+    await service.updateBlock('article-1', 'block-1', { imageUrl, title: 'Imagem atualizada' });
+
+    expect(blockImages.updateImage).toHaveBeenCalledWith(
+      'article-1',
+      'block-1',
+      { imageUrl, imageAlt: 'Alt antigo', imageCaption: 'Legenda antiga' },
+      { title: 'Imagem atualizada' },
     );
   });
 

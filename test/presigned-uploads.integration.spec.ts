@@ -24,7 +24,7 @@ integration('Pre-signed upload association with isolated PostgreSQL', () => {
   let blockId: string;
   let authorId: string;
 
-  async function createIntent(id: string, urlName: string) {
+  async function createIntent(id: string, urlName: string, createdAt?: Date) {
     const key = `articles/${articleId}/blocks/${blockId}/${urlName}-aabbccdd-image.webp`;
     const intent = await prisma.presignedUploadIntent.create({ data: {
       objectKey: key,
@@ -35,6 +35,7 @@ integration('Pre-signed upload association with isolated PostgreSQL', () => {
       requestedByUserId: authorId,
       contentType: 'image/webp',
       declaredSize: 123,
+      ...(createdAt ? { createdAt } : {}),
       expiresAt: new Date(Date.now() + 15 * 60_000),
       id,
     } });
@@ -42,9 +43,14 @@ integration('Pre-signed upload association with isolated PostgreSQL', () => {
     return intent;
   }
 
-  const associationData = (imageUrl: string): Prisma.ArticleBlockUpdateInput => ({
-    imageUrl, imageAlt: 'Alt de teste', imageCaption: 'Legenda de teste',
+  const associationData = (imageUrl: string, imageAlt = 'Alt de teste', imageCaption = 'Legenda de teste'): Prisma.ArticleBlockUpdateInput => ({
+    imageUrl, imageAlt, imageCaption,
   });
+
+  const associate = (intent: Awaited<ReturnType<typeof createIntent>>, data = associationData(intent.publicUrl), objectEtag = 'etag') =>
+    repository.associateBlockImage({
+      intentId: intent.id, articleId, blockId, publicUrl: intent.publicUrl, objectEtag, data,
+    });
 
   beforeAll(async () => {
     const target = new URL(databaseUrl!);
@@ -94,6 +100,104 @@ integration('Pre-signed upload association with isolated PostgreSQL', () => {
     await expect(repository.associateBlockImage(params)).resolves.toMatchObject({ kind: 'ASSOCIATED', block: { imageUrl: intent.publicUrl } });
     expect(await prisma.articleBlock.findUniqueOrThrow({ where: { id: blockId } })).toMatchObject({ imageUrl: intent.publicUrl });
   });
+
+  it('replaces image A with B and rejects a late retry of A without changing B or its metadata', async () => {
+    const imageA = await createIntent('intent-' + executionId + '-replace-a', 'replace-a');
+    const firstAssociation = await associate(imageA, associationData(imageA.publicUrl, 'Alt A', 'Legenda A'), 'etag-a');
+    expect(firstAssociation.kind).toBe('ASSOCIATED');
+
+    const imageB = await createIntent(
+      'intent-' + executionId + '-replace-b',
+      'replace-b',
+      new Date(imageA.createdAt.getTime() + 1000),
+    );
+    expect((await associate(imageB, associationData(imageB.publicUrl, 'Alt B', 'Legenda B'), 'etag-b')).kind).toBe('ASSOCIATED');
+
+    const lateRetry = await associate(imageA, associationData(imageA.publicUrl, 'Alt A atrasado', 'Legenda A atrasada'));
+    expect(lateRetry).toEqual({ kind: 'CONFLICT' });
+    expect(await prisma.articleBlock.findUniqueOrThrow({ where: { id: blockId } }))
+      .toMatchObject({ imageUrl: imageB.publicUrl, imageAlt: 'Alt B', imageCaption: 'Legenda B' });
+    const statuses = await prisma.presignedUploadIntent.findMany({
+      where: { id: { in: [imageA.id, imageB.id] } },
+      orderBy: { id: 'asc' },
+      select: { id: true, status: true, objectEtag: true },
+    });
+    expect(statuses).toHaveLength(2);
+    expect(statuses.every(status => status.status === PresignedUploadIntentStatus.ASSOCIATED)).toBe(true);
+    expect(statuses.find(status => status.id === imageA.id)?.objectEtag).toBe('etag-a');
+    expect(statuses.find(status => status.id === imageB.id)?.objectEtag).toBe('etag-b');
+  });
+
+  it('atomically conflicts when an idempotent A retry races with a completed B replacement', async () => {
+    const imageA = await createIntent('intent-' + executionId + '-race-old-a', 'race-old-a');
+    expect((await associate(imageA, associationData(imageA.publicUrl, 'Alt A', 'Legenda A'), 'etag-a')).kind).toBe('ASSOCIATED');
+    const imageB = await createIntent(
+      'intent-' + executionId + '-race-new-b',
+      'race-new-b',
+      new Date(imageA.createdAt.getTime() + 1000),
+    );
+
+    let notifyRead!: () => void;
+    let continueOldUpdate!: () => void;
+    const oldReadCompleted = new Promise<void>(resolve => { notifyRead = resolve; });
+    const resumeOldUpdate = new Promise<void>(resolve => { continueOldUpdate = resolve; });
+    const gatedPrisma = {
+      $transaction: (callback: (transaction: unknown) => Promise<unknown>) => prisma.$transaction(async transaction => {
+        const articleBlock = new Proxy(transaction.articleBlock, {
+          get(target, property) {
+            const value = Reflect.get(target, property, target);
+            if (property === 'findUnique') {
+              return async (args: { where?: { id?: string } }) => {
+                const result = await value.call(target, args);
+                if (args.where?.id === blockId) {
+                  notifyRead();
+                  await resumeOldUpdate;
+                }
+                return result;
+              };
+            }
+            return typeof value === 'function' ? value.bind(target) : value;
+          },
+        });
+        const transactionProxy = new Proxy(transaction, {
+          get(target, property) {
+            if (property === 'articleBlock') return articleBlock;
+            const value = Reflect.get(target, property, target);
+            return typeof value === 'function' ? value.bind(target) : value;
+          },
+        });
+        return callback(transactionProxy);
+      }),
+    };
+    const gatedRepository = new ArticleBlockUploadIntentsRepository(gatedPrisma as unknown as PrismaService);
+    const oldRetry = gatedRepository.associateBlockImage({
+      intentId: imageA.id,
+      articleId,
+      blockId,
+      publicUrl: imageA.publicUrl,
+      objectEtag: 'etag-a-retry',
+      data: associationData(imageA.publicUrl, 'Alt A tardio', 'Legenda A tardia'),
+    });
+
+    try {
+      await oldReadCompleted;
+      expect((await associate(imageB, associationData(imageB.publicUrl, 'Alt B', 'Legenda B'), 'etag-b')).kind).toBe('ASSOCIATED');
+    } finally {
+      continueOldUpdate();
+    }
+
+    await expect(oldRetry).resolves.toEqual({ kind: 'CONFLICT' });
+    expect(await prisma.articleBlock.findUniqueOrThrow({ where: { id: blockId } }))
+      .toMatchObject({ imageUrl: imageB.publicUrl, imageAlt: 'Alt B', imageCaption: 'Legenda B' });
+    const statuses = await prisma.presignedUploadIntent.findMany({
+      where: { id: { in: [imageA.id, imageB.id] } },
+      select: { id: true, status: true, objectEtag: true },
+    });
+    expect(statuses).toHaveLength(2);
+    expect(statuses.every(status => status.status === PresignedUploadIntentStatus.ASSOCIATED)).toBe(true);
+    expect(statuses.find(status => status.id === imageA.id)?.objectEtag).toBe('etag-a');
+    expect(statuses.find(status => status.id === imageB.id)?.objectEtag).toBe('etag-b');
+  }, 30000);
 
   it('rejects attempts scoped to another block or article without changing persisted state', async () => {
     const intent = await createIntent('intent-' + executionId + '-wrong-scope', 'wrong-scope');
