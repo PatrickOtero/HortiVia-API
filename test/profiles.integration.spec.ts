@@ -14,6 +14,7 @@ import { ProfileController } from '../src/modules/profile/profile.controller';
 import { ProfileService } from '../src/modules/profile/profile.service';
 import { ProfileRepository } from '../src/modules/profile/profile.repository';
 import { StorageService } from '../src/modules/storage/storage.service';
+import { StorageUploadCompensationService } from '../src/modules/storage/storage-upload-compensation.service';
 import { UsersController } from '../src/modules/users/users.controller';
 import { UsersService } from '../src/modules/users/users.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
@@ -54,7 +55,8 @@ integration('Profiles, badges and ranking with isolated PostgreSQL', () => {
         JwtStrategy, JwtAuthGuard, RolesGuard,
         { provide: PrismaService, useValue: prisma },
         { provide: ConfigService, useValue: { getOrThrow: () => secret } },
-        { provide: StorageService, useValue: { uploadAvatar: jest.fn() } }],
+        { provide: StorageService, useValue: { uploadAvatar: jest.fn() } },
+        { provide: StorageUploadCompensationService, useValue: { removeIfUnreferenced: jest.fn() } }],
     }).compile();
     app = module.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
