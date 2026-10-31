@@ -31,12 +31,22 @@ O controller define rotas, parâmetros e autorização declarativa. DTOs descrev
   - `preferences`: preferências do usuário.
   - `storage` e `mail`: integrações externas compartilhadas, não regras de tela.
   - `settings`: configuração tipada da aplicação.
-- `src/common`: conceitos usados por mais de um domínio, como filtros, validações, normalização e paginação.
-- `src/prisma`: ciclo de vida do cliente Prisma e conexão com PostgreSQL.
-- `src/generated/prisma`: cliente gerado; não editar manualmente. Atualize o schema e execute `npm run prisma:generate`.
-- `prisma/schema.prisma` e `prisma/migrations`: modelo persistido e mudanças de schema versionadas.
-- `test`: testes HTTP e de integração que usam PostgreSQL descartável. Os testes de integração exigem `TRAINING_TEST_DATABASE_URL`; em CI, ausência dessa URL deve falhar em vez de ignorar a suíte.
 
+### Módulo de artigos
+
+`ArticlesController` e `SavedArticlesController` continuam usando `ArticlesService`, uma fachada de compatibilidade sem regras de negócio. Cada fluxo fica no serviço especializado correspondente:
+
+- `ArticleQueriesService`: listagem, pesquisa, paginação e leitura pública/administrativa; usa os mappers existentes.
+- `ArticleManagementService`: criação, edição e despublicação lógica.
+- `ArticleSlugService`: geração de candidato de slug único; o gerenciamento traduz conflito `P2002` para a resposta já estabelecida.
+- `ArticleCommentsService`: autoria, edição, exclusão lógica e moderação.
+- `ArticleEngagementService`: reações e ciclo completo dos artigos salvos, inclusive listagem paginada.
+- `ArticleBlocksService`: criação, atualização, ordenação e remoção dos blocos.
+- `ArticleBlockImagesService`: upload, URL pré-assinada, validação e remoção de imagens dos blocos.
+- `ArticleImagesService`: upload e associação da imagem principal do artigo.
+- `ArticleAccessService`: visibilidade do artigo e associação do bloco ao artigo.
+
+Regras determinísticas ficam em `utils`: publicação e datas, normalização editorial/tempo de leitura, erros do domínio e validação comum de arquivos. `ArticlesRepository` continua sendo o único acesso a dados. O `ArticlesModule` registra todos os colaboradores; controllers e contratos públicos permanecem inalterados.
 ## Como implementar uma mudança
 
 1. Coloque contratos de entrada em DTOs e valide-os com os decorators existentes.
