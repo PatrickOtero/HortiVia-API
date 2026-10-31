@@ -19,7 +19,7 @@ import {
   normalizeOptionalArticleText,
   resolveUploadedBlockImageText,
 } from './utils/article-content.util';
-import { validateArticleImageFile } from './utils/article-image-validation.util';
+import { validateContentImageFile } from '../storage/image-upload.validation';
 
 @Injectable()
 export class ArticleBlockImagesService {
@@ -85,7 +85,7 @@ export class ArticleBlockImagesService {
     file?: UploadFile,
   ): Promise<ArticleBlockResponse> {
     const existingBlock = await this.requireBlock(articleId, blockId);
-    const imageFile = validateArticleImageFile(file);
+    const imageFile = validateContentImageFile(file);
     try {
       const uploaded = await this.storageService.uploadArticleBlockImage(
         articleId,

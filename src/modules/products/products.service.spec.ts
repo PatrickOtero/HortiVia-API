@@ -9,6 +9,15 @@ import { ArticlesRepository } from '../articles/articles.repository';
 import { StorageService } from '../storage/storage.service';
 import { ProductsRepository } from './products.repository';
 import { ProductsService } from './products.service';
+import { ProductAccessService } from './product-access.service';
+import { ProductArticleRelationsService } from './product-article-relations.service';
+import { ProductFavoritesService } from './product-favorites.service';
+import { ProductGalleryService } from './product-gallery.service';
+import { ProductGuideSectionsService } from './product-guide-sections.service';
+import { ProductImagesService } from './product-images.service';
+import { ProductManagementService } from './product-management.service';
+import { ProductQueriesService } from './product-queries.service';
+import { ProductSlugService } from './product-slug.service';
 
 describe('ProductsService', () => {
   const baseProduct = {
@@ -131,16 +140,26 @@ describe('ProductsService', () => {
 
   const storageService = {
     uploadProductImage: jest.fn(),
-  } as unknown as jest.Mocked<Pick<StorageService, 'uploadProductImage'>>;
+    uploadProductGalleryImage: jest.fn(),
+    uploadProductGuideSectionImage: jest.fn(),
+  } as unknown as jest.Mocked<StorageService>;
 
   let service: ProductsService;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    const repository = productsRepository as unknown as ProductsRepository;
+    const articleRepository = articlesRepository as unknown as ArticlesRepository;
+    const storage = storageService as unknown as StorageService;
+    const access = new ProductAccessService(repository, articleRepository);
     service = new ProductsService(
-      productsRepository as unknown as ProductsRepository,
-      articlesRepository as unknown as ArticlesRepository,
-      storageService as unknown as StorageService,
+      new ProductQueriesService(repository),
+      new ProductManagementService(repository, access, new ProductSlugService(repository)),
+      new ProductFavoritesService(repository, access),
+      new ProductArticleRelationsService(repository, access),
+      new ProductImagesService(repository, access, storage),
+      new ProductGalleryService(repository, access, storage),
+      new ProductGuideSectionsService(repository, access, storage),
     );
   });
 
