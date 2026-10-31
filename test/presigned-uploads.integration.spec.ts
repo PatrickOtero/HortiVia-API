@@ -76,6 +76,17 @@ integration('Pre-signed upload association with isolated PostgreSQL', () => {
     blockIds.push(block.id);
   }, 30000);
 
+  beforeEach(async () => {
+    if (intentIds.length > 0) {
+      await prisma.presignedUploadIntent.deleteMany({ where: { id: { in: intentIds } } });
+      intentIds.length = 0;
+    }
+    await prisma.articleBlock.update({
+      where: { id: blockId },
+      data: { imageUrl: null, imageAlt: null, imageCaption: null },
+    });
+  });
+
   afterAll(async () => {
     if (!prisma) return;
     try {
