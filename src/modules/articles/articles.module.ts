@@ -14,6 +14,9 @@ import { ArticleImagesService } from './article-images.service';
 import { ArticleManagementService } from './article-management.service';
 import { ArticleQueriesService } from './article-queries.service';
 import { ArticleSlugService } from './article-slug.service';
+import { ArticleBlockUploadIntentsRepository } from './article-block-upload-intents.repository';
+import { ArticleBlockUploadTrackingService } from './article-block-upload-tracking.service';
+import { PresignedUploadReconciliationService } from './presigned-upload-reconciliation.service';
 
 @Module({
   imports: [AuthModule, StorageModule],
@@ -25,6 +28,9 @@ import { ArticleSlugService } from './article-slug.service';
     ArticleBlocksService,
     ArticleAccessService,
     ArticleBlockImagesService,
+    ArticleBlockUploadIntentsRepository,
+    ArticleBlockUploadTrackingService,
+    PresignedUploadReconciliationService,
     ArticleImagesService,
     ArticleManagementService,
     ArticleQueriesService,

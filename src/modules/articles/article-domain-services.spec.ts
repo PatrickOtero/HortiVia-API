@@ -252,12 +252,13 @@ describe('article domain services', () => {
       findBlockById: jest.fn().mockResolvedValue({ id: 'block-1', articleId: 'article-1' }),
     } as unknown as ArticlesRepository;
     const storage = { createArticleBlockImageUploadUrl: jest.fn() } as unknown as StorageService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
+    const uploadTracking = { createIntent: jest.fn() };
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService, uploadTracking as never);
 
     await expect(service.createUploadUrl('article-1', 'block-1', {
       fileName: '../image.png', contentType: 'image/png', fileSize: 10,
     })).rejects.toBeInstanceOf(BadRequestException);
-    expect(storage.createArticleBlockImageUploadUrl).not.toHaveBeenCalled();
+    expect(uploadTracking.createIntent).not.toHaveBeenCalled();
   });
 
   it('maps pre-signed block-image storage failures to the established internal error', async () => {
@@ -268,7 +269,8 @@ describe('article domain services', () => {
     const storage = {
       createArticleBlockImageUploadUrl: jest.fn().mockRejectedValue(new Error('storage unavailable')),
     } as unknown as StorageService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
+    const uploadTracking = { createIntent: jest.fn().mockRejectedValue(new Error('storage unavailable')) };
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService, uploadTracking as never);
 
     await expect(service.createUploadUrl('article-1', 'block-1', {
       fileName: 'image.png', contentType: 'image/png', fileSize: 10,
@@ -290,7 +292,7 @@ describe('article domain services', () => {
     };
     const storage = { uploadArticleBlockImage: jest.fn().mockResolvedValue(uploaded) } as unknown as StorageService;
     const compensation = { removeIfUnreferenced: jest.fn().mockResolvedValue(true) } as unknown as StorageUploadCompensationService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation);
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation, { createIntent: jest.fn() } as never);
     await expect(service.uploadImage('article-1', 'block-1', {}, {
       buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
     })).rejects.toMatchObject({ status: 500, cause: persistenceError });
@@ -306,7 +308,7 @@ describe('article domain services', () => {
     } as unknown as ArticlesRepository;
     const storage = { uploadArticleBlockImage: jest.fn().mockRejectedValue(new Error('R2 outcome unknown')) } as unknown as StorageService;
     const compensation = { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation);
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation, { createIntent: jest.fn() } as never);
     await expect(service.uploadImage('article-1', 'block-1', {}, {
       buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
     })).rejects.toBeInstanceOf(InternalServerErrorException);

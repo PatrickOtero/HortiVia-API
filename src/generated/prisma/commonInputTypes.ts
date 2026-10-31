@@ -389,6 +389,40 @@ export type EnumArticleBlockKindWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
 }
 
+export type EnumPresignedUploadResourceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadResourceType | Prisma.EnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadResourceTypeFilter<$PrismaModel> | $Enums.PresignedUploadResourceType
+}
+
+export type EnumPresignedUploadIntentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadIntentStatus | Prisma.EnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadIntentStatusFilter<$PrismaModel> | $Enums.PresignedUploadIntentStatus
+}
+
+export type EnumPresignedUploadResourceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadResourceType | Prisma.EnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadResourceTypeWithAggregatesFilter<$PrismaModel> | $Enums.PresignedUploadResourceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPresignedUploadResourceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPresignedUploadResourceTypeFilter<$PrismaModel>
+}
+
+export type EnumPresignedUploadIntentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadIntentStatus | Prisma.EnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadIntentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PresignedUploadIntentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPresignedUploadIntentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPresignedUploadIntentStatusFilter<$PrismaModel>
+}
+
 export type EnumArticleReactionTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.ArticleReactionType | Prisma.EnumArticleReactionTypeFieldRefInput<$PrismaModel>
   in?: $Enums.ArticleReactionType[] | Prisma.ListEnumArticleReactionTypeFieldRefInput<$PrismaModel>
@@ -782,6 +816,40 @@ export type NestedEnumArticleBlockKindWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
   _max?: Prisma.NestedEnumArticleBlockKindFilter<$PrismaModel>
+}
+
+export type NestedEnumPresignedUploadResourceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadResourceType | Prisma.EnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadResourceTypeFilter<$PrismaModel> | $Enums.PresignedUploadResourceType
+}
+
+export type NestedEnumPresignedUploadIntentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadIntentStatus | Prisma.EnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadIntentStatusFilter<$PrismaModel> | $Enums.PresignedUploadIntentStatus
+}
+
+export type NestedEnumPresignedUploadResourceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadResourceType | Prisma.EnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadResourceType[] | Prisma.ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadResourceTypeWithAggregatesFilter<$PrismaModel> | $Enums.PresignedUploadResourceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPresignedUploadResourceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPresignedUploadResourceTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumPresignedUploadIntentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PresignedUploadIntentStatus | Prisma.EnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PresignedUploadIntentStatus[] | Prisma.ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPresignedUploadIntentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PresignedUploadIntentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPresignedUploadIntentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPresignedUploadIntentStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumArticleReactionTypeFilter<$PrismaModel = never> = {

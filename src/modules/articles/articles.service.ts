@@ -124,8 +124,8 @@ export class ArticlesService {
     return this.blocks.deleteBlock(articleId, blockId);
   }
 
-  createBlockImageUploadUrl(articleId: string, blockId: string, dto: CreateArticleBlockImageUploadDto): Promise<PresignedUploadResult> {
-    return this.blockImages.createUploadUrl(articleId, blockId, dto);
+  createBlockImageUploadUrl(articleId: string, blockId: string, dto: CreateArticleBlockImageUploadDto, user?: AuthenticatedUser): Promise<PresignedUploadResult> {
+    return this.blockImages.createUploadUrl(articleId, blockId, dto, user);
   }
 
   updateBlockImage(articleId: string, blockId: string, dto: UpdateArticleBlockImageDto): Promise<ArticleBlockResponse> {

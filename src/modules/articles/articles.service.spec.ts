@@ -168,6 +168,7 @@ describe('ArticlesService', () => {
   const uploadCompensation = {
     removeIfUnreferenced: jest.fn().mockResolvedValue(false),
   } as unknown as StorageUploadCompensationService;
+  let uploadTracking: { createIntent: jest.Mock; findIntent: jest.Mock };
 
   let service: ArticlesService;
 
@@ -175,13 +176,14 @@ describe('ArticlesService', () => {
     jest.clearAllMocks();
     const repository = articlesRepository as unknown as ArticlesRepository;
     const access = new ArticleAccessService(repository);
+    uploadTracking = { createIntent: jest.fn(), findIntent: jest.fn() };
     service = new ArticlesService(
       new ArticleQueriesService(repository, access),
       new ArticleManagementService(repository, access, new ArticleSlugService(repository)),
       new ArticleCommentsService(repository, access),
       new ArticleEngagementService(repository, access),
       new ArticleBlocksService(repository, access),
-      new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation),
+      new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation, uploadTracking as never),
       new ArticleImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation),
     );
   });
@@ -1142,7 +1144,7 @@ describe('ArticlesService', () => {
       createdAt: new Date('2026-05-20T11:00:00.000Z'),
       updatedAt: new Date('2026-05-20T11:00:00.000Z'),
     });
-    storageService.createArticleBlockImageUploadUrl.mockResolvedValue({
+    uploadTracking.createIntent.mockResolvedValue({
       key: 'articles/article-1/blocks/block-1/1710000000000-folhas.webp',
       uploadUrl: 'https://upload.example.com',
       url: 'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
@@ -1154,12 +1156,13 @@ describe('ArticlesService', () => {
       fileSize: 1024,
     });
 
-    expect(storageService.createArticleBlockImageUploadUrl).toHaveBeenCalledWith(
-      baseArticle.id,
-      'block-1',
-      'folhas.webp',
-      'image/webp',
-    );
+    expect(uploadTracking.createIntent).toHaveBeenCalledWith(expect.objectContaining({
+      articleId: baseArticle.id,
+      blockId: 'block-1',
+      fileName: 'folhas.webp',
+      contentType: 'image/webp',
+      fileSize: 1024,
+    }));
     expect(result).toEqual({
       key: 'articles/article-1/blocks/block-1/1710000000000-folhas.webp',
       uploadUrl: 'https://upload.example.com',

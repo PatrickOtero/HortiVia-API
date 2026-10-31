@@ -13,6 +13,6 @@ import { StorageUploadCompensationService } from './storage-upload-compensation.
     StorageService,
     StorageUploadCompensationService,
   ],
-  exports: [StorageService, StorageUploadCompensationService],
+  exports: [StorageService, StorageUploadCompensationService, ManagedImageReferencesRepository],
 })
 export class StorageModule {}

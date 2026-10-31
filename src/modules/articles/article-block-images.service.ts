@@ -21,6 +21,8 @@ import {
 } from './utils/article-content.util';
 import { validateContentImageFile } from '../storage/image-upload.validation';
 import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user';
+import { ArticleBlockUploadTrackingService } from './article-block-upload-tracking.service';
 
 @Injectable()
 export class ArticleBlockImagesService {
@@ -29,27 +31,31 @@ export class ArticleBlockImagesService {
     private readonly articleAccessService: ArticleAccessService,
     private readonly storageService: StorageService,
     private readonly uploadCompensation: StorageUploadCompensationService,
+    private readonly uploadTracking: ArticleBlockUploadTrackingService,
   ) {}
 
   async createUploadUrl(
     articleId: string,
     blockId: string,
     dto: CreateArticleBlockImageUploadDto,
+    user?: AuthenticatedUser,
   ): Promise<PresignedUploadResult> {
     await this.requireBlock(articleId, blockId);
     this.validateUploadRequest(dto);
     try {
-      return await this.storageService.createArticleBlockImageUploadUrl(
+      return await this.uploadTracking.createIntent({
         articleId,
         blockId,
-        dto.fileName,
-        dto.contentType,
-      );
-    } catch {
+        fileName: dto.fileName,
+        contentType: dto.contentType,
+        fileSize: dto.fileSize,
+        user,
+      });
+    } catch (error) {
       throw new InternalServerErrorException({
         message: 'Nao foi possivel preparar o upload da imagem.',
         error: 'Internal Server Error',
-      });
+      }, { cause: error });
     }
   }
 
@@ -60,16 +66,29 @@ export class ArticleBlockImagesService {
   ): Promise<ArticleBlockResponse> {
     await this.requireBlock(articleId, blockId);
     const expectedPrefix = `articles/${articleId}/blocks/${blockId}`;
-    if (!this.storageService.isManagedPublicUrl(dto.imageUrl, expectedPrefix)) {
+    const imageUrl = normalizeArticleText(dto.imageUrl);
+    if (!this.storageService.isManagedPublicUrl(imageUrl, expectedPrefix)) {
       throw new BadRequestException({
         message: 'Informe uma URL de imagem valida.',
         error: 'Bad Request',
       });
     }
 
+    const intent = await this.uploadTracking.findIntent(imageUrl);
+    if (intent) {
+      const block = await this.uploadTracking.associate({
+        articleId,
+        blockId,
+        intentId: intent.id,
+        publicUrl: imageUrl,
+        dto,
+      });
+      return toArticleBlockItemResponse(block);
+    }
+
     try {
       const block = await this.articlesRepository.updateBlock(blockId, {
-        imageUrl: normalizeArticleText(dto.imageUrl),
+        imageUrl,
         imageAlt: normalizeOptionalArticleText(dto.imageAlt),
         imageCaption: normalizeOptionalArticleText(dto.imageCaption),
       });
