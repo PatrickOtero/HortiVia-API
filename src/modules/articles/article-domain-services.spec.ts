@@ -1,7 +1,7 @@
 import { ArticleCommentsService } from './article-comments.service';
 import { ArticleEngagementService } from './article-engagement.service';
 import { ArticleBlocksService } from './article-blocks.service';
-import { ArticleReactionType } from '../../generated/prisma/enums';
+import { ArticleBlockKind, ArticleReactionType } from '../../generated/prisma/enums';
 import type { ArticlesRepository } from './articles.repository';
 import type { StorageService } from '../storage/storage.service';
 
@@ -69,7 +69,7 @@ describe('article domain services', () => {
     const service = new ArticleBlocksService(repository, storage);
 
     await service.createBlock('article-1', {
-      kind: 'PARAGRAPH' as never,
+      kind: ArticleBlockKind.PARAGRAPH,
       title: '  Seção  ',
       body: '  Texto  ',
       items: [],
