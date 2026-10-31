@@ -9,18 +9,18 @@ export function isPrismaErrorCode(error: unknown, code: string) {
     (error as { code?: string }).code === code;
 }
 
-export function articleNotFoundException() {
+export function articleNotFoundException(cause?: unknown) {
   return new NotFoundException({
     message: 'Artigo não encontrado.',
     error: 'Not Found',
-  });
+  }, cause ? { cause } : undefined);
 }
 
-export function articleBlockNotFoundException() {
+export function articleBlockNotFoundException(cause?: unknown) {
   return new NotFoundException({
     message: 'Bloco do artigo não encontrado.',
     error: 'Not Found',
-  });
+  }, cause ? { cause } : undefined);
 }
 
 export function articleCommentNotFoundException() {

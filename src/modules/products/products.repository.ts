@@ -270,6 +270,15 @@ export class ProductsRepository {
     });
   }
 
+  async deleteProductImageIfUrlEmpty(imageId: string) {
+    return this.prisma.productImage.deleteMany({
+      where: {
+        id: imageId,
+        url: '',
+      },
+    });
+  }
+
   async findProductGuideSectionById(sectionId: string) {
     return this.prisma.productGuideSection.findUnique({
       where: {

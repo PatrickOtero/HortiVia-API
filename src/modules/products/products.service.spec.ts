@@ -18,6 +18,7 @@ import { ProductImagesService } from './product-images.service';
 import { ProductManagementService } from './product-management.service';
 import { ProductQueriesService } from './product-queries.service';
 import { ProductSlugService } from './product-slug.service';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 
 describe('ProductsService', () => {
   const baseProduct = {
@@ -143,6 +144,9 @@ describe('ProductsService', () => {
     uploadProductGalleryImage: jest.fn(),
     uploadProductGuideSectionImage: jest.fn(),
   } as unknown as jest.Mocked<StorageService>;
+  const uploadCompensation = {
+    removeIfUnreferenced: jest.fn().mockResolvedValue(true),
+  } as unknown as StorageUploadCompensationService;
 
   let service: ProductsService;
 
@@ -157,9 +161,9 @@ describe('ProductsService', () => {
       new ProductManagementService(repository, access, new ProductSlugService(repository)),
       new ProductFavoritesService(repository, access),
       new ProductArticleRelationsService(repository, access),
-      new ProductImagesService(repository, access, storage),
-      new ProductGalleryService(repository, access, storage),
-      new ProductGuideSectionsService(repository, access, storage),
+      new ProductImagesService(repository, access, storage, uploadCompensation),
+      new ProductGalleryService(repository, access, storage, uploadCompensation),
+      new ProductGuideSectionsService(repository, access, storage, uploadCompensation),
     );
   });
 
@@ -836,6 +840,7 @@ describe('ProductsService', () => {
     productsRepository.findById.mockResolvedValue(baseProduct);
     storageService.uploadProductImage.mockResolvedValue({
       url: 'https://cdn.hortivia.com/products/product-1/cover.webp',
+      key: 'products/product-1/1716163200000-a1b2c3d4.webp',
     });
     productsRepository.updateImageUrl.mockResolvedValue({
       ...baseProduct,

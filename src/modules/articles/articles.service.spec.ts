@@ -8,6 +8,7 @@ import type { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { StorageService } from '../storage/storage.service';
 import { ArticlesRepository } from './articles.repository';
 import { ArticlesService } from './articles.service';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 import { ArticleCommentsService } from './article-comments.service';
 import { ArticleEngagementService } from './article-engagement.service';
 import { ArticleBlocksService } from './article-blocks.service';
@@ -164,6 +165,9 @@ describe('ArticlesService', () => {
       | 'isManagedPublicUrl'
     >
   >;
+  const uploadCompensation = {
+    removeIfUnreferenced: jest.fn().mockResolvedValue(false),
+  } as unknown as StorageUploadCompensationService;
 
   let service: ArticlesService;
 
@@ -177,8 +181,8 @@ describe('ArticlesService', () => {
       new ArticleCommentsService(repository, access),
       new ArticleEngagementService(repository, access),
       new ArticleBlocksService(repository, access),
-      new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService),
-      new ArticleImagesService(repository, access, storageService as unknown as StorageService),
+      new ArticleBlockImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation),
+      new ArticleImagesService(repository, access, storageService as unknown as StorageService, uploadCompensation),
     );
   });
 
@@ -1468,6 +1472,7 @@ describe('ArticlesService', () => {
     });
     storageService.uploadArticleBlockImage.mockResolvedValue({
       url: 'https://cdn.hortivia.com/articles/article-1/blocks/block-1/1710000000000-folhas.webp',
+      key: 'articles/article-1/blocks/block-1/1710000000000-folhas.webp',
     });
     articlesRepository.updateBlock.mockResolvedValue({
       id: 'block-1',
@@ -1712,6 +1717,7 @@ describe('ArticlesService', () => {
     articlesRepository.findById.mockResolvedValue(baseArticle);
     storageService.uploadArticleImage.mockResolvedValue({
       url: 'https://cdn.hortivia.com/articles/article-1/cover.webp',
+      key: 'articles/article-1/1710000000000-cover.webp',
     });
     articlesRepository.updateImageUrl.mockResolvedValue({
       ...baseArticle,

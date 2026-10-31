@@ -86,3 +86,8 @@ Regras determinísticas ficam em `utils`: publicação e datas, normalização e
 - `ProductsRepository` permanece como fronteira única de acesso Prisma.
 
 A validação de arquivos é compartilhada em `storage/image-upload.validation.ts`, mantendo regras e mensagens de MIME e tamanho iguais para artigos e produtos. Normalização e erros específicos de produto ficam em funções pequenas do domínio; operações com dependências permanecem em serviços NestJS.
+### Uploads gerenciados no R2
+
+Uploads multipart geram uma chave interna junto da URL, mas a chave não faz parte das respostas HTTP. A compensação após erro de persistência consulta os campos de URL de usuários, produtos, imagens da galeria, guias, artigos, capas e blocos. Só tenta excluir a chave específica do upload se nenhuma entidade a referenciar. A chave também precisa corresponder ao prefixo da entidade e ao nome de arquivo gerado pelo backend. Falhas na leitura do estado ou na exclusão preservam o objeto e são registradas sem URL, chave ou credenciais. Imagens anteriores nunca são removidas por substituição.
+
+Uploads pré-assinados de blocos são diferentes: o cliente envia diretamente ao R2 e o backend não observa se o PUT terminou. Um objeto pode ser enviado e nunca associado ao bloco. Não há limpeza automática desse fluxo; uma reconciliação segura requer registrar tentativas de upload, expiração e comparação persistente antes de qualquer exclusão.

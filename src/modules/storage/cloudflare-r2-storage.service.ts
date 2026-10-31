@@ -1,6 +1,6 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { getStorageConfig } from './storage.config';
 import type { UploadFile } from './types/upload-file';
@@ -16,24 +16,44 @@ type StorageClientContext = {
 @Injectable()
 export class CloudflareR2StorageService {
   private context: StorageClientContext | null = null;
+  private readonly logger = new Logger(CloudflareR2StorageService.name);
 
   constructor(private readonly configService: ConfigService) {}
 
   async uploadFile(objectKey: string, file: UploadFile): Promise<UploadResult> {
     const { client, bucketName, publicBaseUrl } = this.getContext();
 
-    await client.send(
-      new PutObjectCommand({
-        Bucket: bucketName,
-        Key: objectKey,
-        Body: file.buffer,
-        ContentType: file.mimeType,
-      }),
-    );
+    try {
+      await client.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: objectKey,
+          Body: file.buffer,
+          ContentType: file.mimeType,
+        }),
+      );
+    } catch (error) {
+      this.logger.error(
+        'R2 upload failed; its final outcome may be ambiguous, so no object was deleted.',
+        error instanceof Error ? error.name : 'UnknownError',
+      );
+      throw error;
+    }
 
     return {
       url: `${publicBaseUrl}/${objectKey}`,
+      key: objectKey,
     };
+  }
+
+  async deleteFile(objectKey: string): Promise<void> {
+    const { client, bucketName } = this.getContext();
+    await client.send(
+      new DeleteObjectCommand({
+        Bucket: bucketName,
+        Key: objectKey,
+      }),
+    );
   }
 
   async createPresignedUploadUrl(

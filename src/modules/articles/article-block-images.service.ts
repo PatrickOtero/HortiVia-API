@@ -20,6 +20,7 @@ import {
   resolveUploadedBlockImageText,
 } from './utils/article-content.util';
 import { validateContentImageFile } from '../storage/image-upload.validation';
+import { StorageUploadCompensationService } from '../storage/storage-upload-compensation.service';
 
 @Injectable()
 export class ArticleBlockImagesService {
@@ -27,6 +28,7 @@ export class ArticleBlockImagesService {
     private readonly articlesRepository: ArticlesRepository,
     private readonly articleAccessService: ArticleAccessService,
     private readonly storageService: StorageService,
+    private readonly uploadCompensation: StorageUploadCompensationService,
   ) {}
 
   async createUploadUrl(
@@ -86,8 +88,9 @@ export class ArticleBlockImagesService {
   ): Promise<ArticleBlockResponse> {
     const existingBlock = await this.requireBlock(articleId, blockId);
     const imageFile = validateContentImageFile(file);
+    let uploaded: Awaited<ReturnType<StorageService['uploadArticleBlockImage']>> | null = null;
     try {
-      const uploaded = await this.storageService.uploadArticleBlockImage(
+      uploaded = await this.storageService.uploadArticleBlockImage(
         articleId,
         blockId,
         imageFile,
@@ -99,11 +102,18 @@ export class ArticleBlockImagesService {
       });
       return toArticleBlockItemResponse(block);
     } catch (error) {
-      if (isPrismaErrorCode(error, 'P2025')) throw articleBlockNotFoundException();
+      if (uploaded) {
+        await this.uploadCompensation.removeIfUnreferenced(uploaded, {
+          kind: 'article-block',
+          articleId,
+          blockId,
+        });
+      }
+      if (isPrismaErrorCode(error, 'P2025')) throw articleBlockNotFoundException(error);
       throw new InternalServerErrorException({
         message: 'Nao foi possivel enviar a imagem do bloco.',
         error: 'Internal Server Error',
-      });
+      }, { cause: error });
     }
   }
 
