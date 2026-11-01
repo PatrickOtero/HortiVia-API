@@ -406,6 +406,7 @@ export const ModelName = {
   ProductGuideSection: 'ProductGuideSection',
   Article: 'Article',
   ArticleBlock: 'ArticleBlock',
+  PresignedUploadIntent: 'PresignedUploadIntent',
   SavedArticle: 'SavedArticle',
   ArticleReaction: 'ArticleReaction',
   ArticleComment: 'ArticleComment',
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "product" | "trainingQuestion" | "trainingAttempt" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "savedArticle" | "articleReaction" | "articleComment" | "productArticle" | "userPreference"
+    modelProps: "user" | "product" | "trainingQuestion" | "trainingAttempt" | "productFavorite" | "productImage" | "productGuideSection" | "article" | "articleBlock" | "presignedUploadIntent" | "savedArticle" | "articleReaction" | "articleComment" | "productArticle" | "userPreference"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1096,6 +1097,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PresignedUploadIntent: {
+      payload: Prisma.$PresignedUploadIntentPayload<ExtArgs>
+      fields: Prisma.PresignedUploadIntentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PresignedUploadIntentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PresignedUploadIntentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>
+        }
+        findFirst: {
+          args: Prisma.PresignedUploadIntentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PresignedUploadIntentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>
+        }
+        findMany: {
+          args: Prisma.PresignedUploadIntentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>[]
+        }
+        create: {
+          args: Prisma.PresignedUploadIntentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>
+        }
+        createMany: {
+          args: Prisma.PresignedUploadIntentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PresignedUploadIntentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>[]
+        }
+        delete: {
+          args: Prisma.PresignedUploadIntentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>
+        }
+        update: {
+          args: Prisma.PresignedUploadIntentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PresignedUploadIntentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PresignedUploadIntentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PresignedUploadIntentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PresignedUploadIntentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PresignedUploadIntentPayload>
+        }
+        aggregate: {
+          args: Prisma.PresignedUploadIntentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePresignedUploadIntent>
+        }
+        groupBy: {
+          args: Prisma.PresignedUploadIntentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PresignedUploadIntentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PresignedUploadIntentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PresignedUploadIntentCountAggregateOutputType> | number
+        }
+      }
+    }
     SavedArticle: {
       payload: Prisma.$SavedArticlePayload<ExtArgs>
       fields: Prisma.SavedArticleFieldRefs
@@ -1682,6 +1757,26 @@ export const ArticleBlockScalarFieldEnum = {
 export type ArticleBlockScalarFieldEnum = (typeof ArticleBlockScalarFieldEnum)[keyof typeof ArticleBlockScalarFieldEnum]
 
 
+export const PresignedUploadIntentScalarFieldEnum = {
+  id: 'id',
+  objectKey: 'objectKey',
+  publicUrl: 'publicUrl',
+  resourceType: 'resourceType',
+  articleId: 'articleId',
+  blockId: 'blockId',
+  requestedByUserId: 'requestedByUserId',
+  contentType: 'contentType',
+  declaredSize: 'declaredSize',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  status: 'status',
+  associatedAt: 'associatedAt',
+  objectEtag: 'objectEtag'
+} as const
+
+export type PresignedUploadIntentScalarFieldEnum = (typeof PresignedUploadIntentScalarFieldEnum)[keyof typeof PresignedUploadIntentScalarFieldEnum]
+
+
 export const SavedArticleScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1965,6 +2060,34 @@ export type ListEnumArticleBlockKindFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'PresignedUploadResourceType'
+ */
+export type EnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PresignedUploadResourceType'>
+
+
+
+/**
+ * Reference to a field of type 'PresignedUploadResourceType[]'
+ */
+export type ListEnumPresignedUploadResourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PresignedUploadResourceType[]'>
+
+
+
+/**
+ * Reference to a field of type 'PresignedUploadIntentStatus'
+ */
+export type EnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PresignedUploadIntentStatus'>
+
+
+
+/**
+ * Reference to a field of type 'PresignedUploadIntentStatus[]'
+ */
+export type ListEnumPresignedUploadIntentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PresignedUploadIntentStatus[]'>
+
+
+
+/**
  * Reference to a field of type 'ArticleReactionType'
  */
 export type EnumArticleReactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ArticleReactionType'>
@@ -2165,6 +2288,7 @@ export type GlobalOmitConfig = {
   productGuideSection?: Prisma.ProductGuideSectionOmit
   article?: Prisma.ArticleOmit
   articleBlock?: Prisma.ArticleBlockOmit
+  presignedUploadIntent?: Prisma.PresignedUploadIntentOmit
   savedArticle?: Prisma.SavedArticleOmit
   articleReaction?: Prisma.ArticleReactionOmit
   articleComment?: Prisma.ArticleCommentOmit

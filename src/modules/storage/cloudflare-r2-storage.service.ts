@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -6,6 +6,7 @@ import { getStorageConfig } from './storage.config';
 import type { UploadFile } from './types/upload-file';
 import type { PresignedUploadResult } from './types/presigned-upload-result';
 import type { UploadResult } from './types/upload-result';
+import { PRESIGNED_UPLOAD_EXPIRES_IN_SECONDS } from './presigned-upload.constants';
 
 type StorageClientContext = {
   client: S3Client;
@@ -56,6 +57,22 @@ export class CloudflareR2StorageService {
     );
   }
 
+  async inspectObject(objectKey: string) {
+    const { client, bucketName } = this.getContext();
+    try {
+      const result = await client.send(new HeadObjectCommand({ Bucket: bucketName, Key: objectKey }));
+      return {
+        exists: true as const,
+        size: result.ContentLength,
+        contentType: result.ContentType,
+        etag: result.ETag,
+      };
+    } catch (error) {
+      if (this.isMissingObjectError(error)) return { exists: false as const };
+      throw error;
+    }
+  }
+
   async createPresignedUploadUrl(
     objectKey: string,
     contentType: string,
@@ -70,7 +87,7 @@ export class CloudflareR2StorageService {
         ContentType: contentType,
       }),
       {
-        expiresIn: 900,
+        expiresIn: PRESIGNED_UPLOAD_EXPIRES_IN_SECONDS,
       },
     );
 
@@ -106,5 +123,12 @@ export class CloudflareR2StorageService {
     };
 
     return this.context;
+  }
+
+  private isMissingObjectError(error: unknown) {
+    if (!error || typeof error !== 'object') return false;
+    const candidate = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+    return candidate.$metadata?.httpStatusCode === 404 ||
+      candidate.name === 'NotFound' || candidate.name === 'NoSuchKey';
   }
 }

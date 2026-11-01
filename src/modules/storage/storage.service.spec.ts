@@ -6,6 +6,7 @@ describe('StorageService managed image deletion', () => {
   const adapter = {
     uploadFile: jest.fn(),
     deleteFile: jest.fn(),
+    inspectObject: jest.fn(),
     getPublicBaseUrl: jest.fn().mockReturnValue('https://cdn.example.test'),
   } as unknown as jest.Mocked<CloudflareR2StorageService>;
   const service = new StorageService(adapter);
@@ -85,5 +86,22 @@ describe('StorageService managed image deletion', () => {
 
     expect(first.key).not.toBe(second.key);
     expect(first.key).toMatch(/^articles\/article-1\/blocks\/block-1\/\d+-[a-f0-9]{8}-image\.webp$/);
+  });
+
+  it('inspects an exact backend-generated pre-signed key in its article-block scope', async () => {
+    const key = 'articles/article-1/blocks/block-1/1793448000000-aabbccdd-image-guidance.webp';
+    adapter.inspectObject.mockResolvedValue({ exists: true, size: 5, contentType: 'image/webp', etag: 'etag' });
+    await expect(service.inspectManagedUpload({ key, url: `https://cdn.example.test/${key}` }, {
+      kind: 'article-block', articleId: 'article-1', blockId: 'block-1',
+    })).resolves.toMatchObject({ exists: true, size: 5, contentType: 'image/webp' });
+    expect(adapter.inspectObject).toHaveBeenCalledWith(key);
+  });
+
+  it('rejects a pre-signed key from another block before asking R2', async () => {
+    const key = 'articles/article-1/blocks/block-other/1793448000000-aabbccdd-image.webp';
+    expect(() => service.inspectManagedUpload({ key, url: `https://cdn.example.test/${key}` }, {
+      kind: 'article-block', articleId: 'article-1', blockId: 'block-1',
+    })).toThrow();
+    expect(adapter.inspectObject).not.toHaveBeenCalled();
   });
 });

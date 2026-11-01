@@ -90,6 +90,22 @@ export const ArticleBlockKind = {
 export type ArticleBlockKind = (typeof ArticleBlockKind)[keyof typeof ArticleBlockKind]
 
 
+export const PresignedUploadResourceType = {
+  ARTICLE_BLOCK_IMAGE: 'ARTICLE_BLOCK_IMAGE'
+} as const
+
+export type PresignedUploadResourceType = (typeof PresignedUploadResourceType)[keyof typeof PresignedUploadResourceType]
+
+
+export const PresignedUploadIntentStatus = {
+  PENDING: 'PENDING',
+  ASSOCIATED: 'ASSOCIATED',
+  SIGNING_FAILED: 'SIGNING_FAILED'
+} as const
+
+export type PresignedUploadIntentStatus = (typeof PresignedUploadIntentStatus)[keyof typeof PresignedUploadIntentStatus]
+
+
 export const ArticleReactionType = {
   HELPFUL: 'HELPFUL'
 } as const

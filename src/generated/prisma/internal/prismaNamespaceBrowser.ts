@@ -60,6 +60,7 @@ export const ModelName = {
   ProductGuideSection: 'ProductGuideSection',
   Article: 'Article',
   ArticleBlock: 'ArticleBlock',
+  PresignedUploadIntent: 'PresignedUploadIntent',
   SavedArticle: 'SavedArticle',
   ArticleReaction: 'ArticleReaction',
   ArticleComment: 'ArticleComment',
@@ -258,6 +259,26 @@ export const ArticleBlockScalarFieldEnum = {
 } as const
 
 export type ArticleBlockScalarFieldEnum = (typeof ArticleBlockScalarFieldEnum)[keyof typeof ArticleBlockScalarFieldEnum]
+
+
+export const PresignedUploadIntentScalarFieldEnum = {
+  id: 'id',
+  objectKey: 'objectKey',
+  publicUrl: 'publicUrl',
+  resourceType: 'resourceType',
+  articleId: 'articleId',
+  blockId: 'blockId',
+  requestedByUserId: 'requestedByUserId',
+  contentType: 'contentType',
+  declaredSize: 'declaredSize',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  status: 'status',
+  associatedAt: 'associatedAt',
+  objectEtag: 'objectEtag'
+} as const
+
+export type PresignedUploadIntentScalarFieldEnum = (typeof PresignedUploadIntentScalarFieldEnum)[keyof typeof PresignedUploadIntentScalarFieldEnum]
 
 
 export const SavedArticleScalarFieldEnum = {

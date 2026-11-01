@@ -63,6 +63,11 @@ export type Article = Prisma.ArticleModel
  */
 export type ArticleBlock = Prisma.ArticleBlockModel
 /**
+ * Model PresignedUploadIntent
+ *
+ */
+export type PresignedUploadIntent = Prisma.PresignedUploadIntentModel
+/**
  * Model SavedArticle
  *
  */

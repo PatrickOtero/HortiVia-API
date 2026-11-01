@@ -10,20 +10,23 @@ if (!Array.isArray(report.testResults)) {
   throw new Error('Jest JSON report is missing test suite results.');
 }
 
-const integration = report.testResults.find(result =>
-  result.name.replaceAll('\\', '/').endsWith('/test/training.integration.spec.ts'),
-);
-
-if (!integration) {
-  throw new Error('PostgreSQL training integration suite was not run.');
-}
-
-if (
-  integration.status !== 'passed' ||
-  integration.assertionResults.length === 0 ||
-  integration.assertionResults.some(assertion => assertion.status !== 'passed')
-) {
-  throw new Error('PostgreSQL training integration suite did not pass.');
+for (const suitePath of [
+  '/test/training.integration.spec.ts',
+  '/test/presigned-uploads.integration.spec.ts',
+]) {
+  const integration = report.testResults.find(result =>
+    result.name.replaceAll('\\', '/').endsWith(suitePath),
+  );
+  if (!integration) {
+    throw new Error(`Required PostgreSQL integration suite was not run: ${suitePath}`);
+  }
+  if (
+    integration.status !== 'passed' ||
+    integration.assertionResults.length === 0 ||
+    integration.assertionResults.some(assertion => assertion.status !== 'passed')
+  ) {
+    throw new Error(`Required PostgreSQL integration suite did not pass: ${suitePath}`);
+  }
 }
 
 if (
@@ -42,5 +45,5 @@ if (report.numPassedTests < 223) {
 }
 
 console.log(
-  `Validated ${report.numPassedTests} Jest tests; PostgreSQL integration passed and none were skipped.`,
+  `Validated ${report.numPassedTests} Jest tests; required PostgreSQL integration suites passed and none were skipped.`,
 );

@@ -96,7 +96,12 @@ describe('article domain services', () => {
         updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       }),
     } as unknown as ArticlesRepository;
-    const service = new ArticleBlocksService(repository, new ArticleAccessService(repository));
+    const service = new ArticleBlocksService(
+      repository,
+      new ArticleAccessService(repository),
+      {} as ArticleBlockImagesService,
+      { isManagedPublicUrl: jest.fn().mockReturnValue(false) } as never,
+    );
 
     await service.createBlock('article-1', {
       kind: ArticleBlockKind.PARAGRAPH,
@@ -108,6 +113,52 @@ describe('article domain services', () => {
     expect(repository.createBlock).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Seção', body: 'Texto', sortOrder: 0 }),
     );
+  });
+
+  it('routes a changed block image URL through the image association checks', async () => {
+    const imageUrl = 'https://cdn.example.test/articles/article-1/blocks/block-1/image.webp';
+    const repository = {
+      findById: jest.fn().mockResolvedValue({ id: 'article-1' }),
+      findBlockById: jest.fn().mockResolvedValue({
+        id: 'block-1', articleId: 'article-1', imageUrl: null, imageAlt: 'Alt antigo', imageCaption: 'Legenda antiga',
+      }),
+    } as unknown as ArticlesRepository;
+    const blockImages = { updateImage: jest.fn().mockResolvedValue({ id: 'block-1', imageUrl }) } as unknown as ArticleBlockImagesService;
+    const service = new ArticleBlocksService(
+      repository,
+      new ArticleAccessService(repository),
+      blockImages,
+      { isManagedPublicUrl: jest.fn().mockReturnValue(true) } as never,
+    );
+
+    await service.updateBlock('article-1', 'block-1', { imageUrl, title: 'Imagem atualizada' });
+
+    expect(blockImages.updateImage).toHaveBeenCalledWith(
+      'article-1',
+      'block-1',
+      { imageUrl, imageAlt: 'Alt antigo', imageCaption: 'Legenda antiga' },
+      { title: 'Imagem atualizada' },
+    );
+  });
+
+  it('requires a managed image to be associated after its block has an ID', async () => {
+    const repository = {
+      findById: jest.fn().mockResolvedValue({ id: 'article-1' }),
+      createBlock: jest.fn(),
+    } as unknown as ArticlesRepository;
+    const storage = { isManagedPublicUrl: jest.fn().mockReturnValue(true) } as never;
+    const service = new ArticleBlocksService(
+      repository,
+      new ArticleAccessService(repository),
+      {} as ArticleBlockImagesService,
+      storage,
+    );
+
+    await expect(service.createBlock('article-1', {
+      kind: ArticleBlockKind.IMAGE,
+      imageUrl: 'https://cdn.example.test/articles/another-article/blocks/another-block/image.webp',
+    })).rejects.toBeInstanceOf(BadRequestException);
+    expect(repository.createBlock).not.toHaveBeenCalled();
   });
 
   it('builds public article filters and pagination in the query service', async () => {
@@ -252,12 +303,13 @@ describe('article domain services', () => {
       findBlockById: jest.fn().mockResolvedValue({ id: 'block-1', articleId: 'article-1' }),
     } as unknown as ArticlesRepository;
     const storage = { createArticleBlockImageUploadUrl: jest.fn() } as unknown as StorageService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
+    const uploadTracking = { createIntent: jest.fn() };
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService, uploadTracking as never);
 
     await expect(service.createUploadUrl('article-1', 'block-1', {
       fileName: '../image.png', contentType: 'image/png', fileSize: 10,
     })).rejects.toBeInstanceOf(BadRequestException);
-    expect(storage.createArticleBlockImageUploadUrl).not.toHaveBeenCalled();
+    expect(uploadTracking.createIntent).not.toHaveBeenCalled();
   });
 
   it('maps pre-signed block-image storage failures to the established internal error', async () => {
@@ -268,7 +320,8 @@ describe('article domain services', () => {
     const storage = {
       createArticleBlockImageUploadUrl: jest.fn().mockRejectedValue(new Error('storage unavailable')),
     } as unknown as StorageService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService);
+    const uploadTracking = { createIntent: jest.fn().mockRejectedValue(new Error('storage unavailable')) };
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService, uploadTracking as never);
 
     await expect(service.createUploadUrl('article-1', 'block-1', {
       fileName: 'image.png', contentType: 'image/png', fileSize: 10,
@@ -290,7 +343,7 @@ describe('article domain services', () => {
     };
     const storage = { uploadArticleBlockImage: jest.fn().mockResolvedValue(uploaded) } as unknown as StorageService;
     const compensation = { removeIfUnreferenced: jest.fn().mockResolvedValue(true) } as unknown as StorageUploadCompensationService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation);
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation, { createIntent: jest.fn() } as never);
     await expect(service.uploadImage('article-1', 'block-1', {}, {
       buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
     })).rejects.toMatchObject({ status: 500, cause: persistenceError });
@@ -306,7 +359,7 @@ describe('article domain services', () => {
     } as unknown as ArticlesRepository;
     const storage = { uploadArticleBlockImage: jest.fn().mockRejectedValue(new Error('R2 outcome unknown')) } as unknown as StorageService;
     const compensation = { removeIfUnreferenced: jest.fn() } as unknown as StorageUploadCompensationService;
-    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation);
+    const service = new ArticleBlockImagesService(repository, new ArticleAccessService(repository), storage, compensation, { createIntent: jest.fn() } as never);
     await expect(service.uploadImage('article-1', 'block-1', {}, {
       buffer: Buffer.from('image'), mimeType: 'image/webp', size: 10,
     })).rejects.toBeInstanceOf(InternalServerErrorException);

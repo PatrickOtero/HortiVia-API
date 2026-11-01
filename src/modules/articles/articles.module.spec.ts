@@ -11,6 +11,9 @@ import { ArticleImagesService } from './article-images.service';
 import { ArticleManagementService } from './article-management.service';
 import { ArticleQueriesService } from './article-queries.service';
 import { ArticleSlugService } from './article-slug.service';
+import { ArticleBlockUploadIntentsRepository } from './article-block-upload-intents.repository';
+import { ArticleBlockUploadTrackingService } from './article-block-upload-tracking.service';
+import { PresignedUploadReconciliationService } from './presigned-upload-reconciliation.service';
 import { ArticlesService } from './articles.service';
 
 describe('ArticlesModule providers', () => {
@@ -55,6 +58,9 @@ describe('ArticlesModule providers', () => {
     expect(app.get(ArticleSlugService)).toBeInstanceOf(ArticleSlugService);
     expect(app.get(ArticleImagesService)).toBeInstanceOf(ArticleImagesService);
     expect(app.get(ArticleBlockImagesService)).toBeInstanceOf(ArticleBlockImagesService);
+    expect(app.get(ArticleBlockUploadIntentsRepository)).toBeInstanceOf(ArticleBlockUploadIntentsRepository);
+    expect(app.get(ArticleBlockUploadTrackingService)).toBeInstanceOf(ArticleBlockUploadTrackingService);
+    expect(app.get(PresignedUploadReconciliationService)).toBeInstanceOf(PresignedUploadReconciliationService);
 
     await app.close();
   });

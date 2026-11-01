@@ -205,11 +205,13 @@ export class ArticlesController {
     @Param('articleId') articleId: string,
     @Param('blockId') blockId: string,
     @Body() createArticleBlockImageUploadDto: CreateArticleBlockImageUploadDto,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.articlesService.createBlockImageUploadUrl(
       articleId,
       blockId,
       createArticleBlockImageUploadDto,
+      user,
     );
   }
 
